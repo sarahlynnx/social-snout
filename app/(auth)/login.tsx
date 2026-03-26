@@ -47,8 +47,8 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="flex-1 justify-center px-6 py-12">
-          <View className="items-center mb-12">
-            <Text className="text-5xl mb-2">🐾</Text>
+          <View className="items-center mb-8">
+            <Text className="text-5xl leading-tight mb-2">🐾</Text>
             <Text className="text-3xl font-bold text-gray-900">
               SocialSnout
             </Text>

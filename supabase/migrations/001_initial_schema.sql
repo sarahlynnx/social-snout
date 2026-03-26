@@ -11,7 +11,7 @@ CREATE TYPE reaction_type AS ENUM ('LIKE', 'HEART', 'LAUGH', 'WOW');
 -- Users table
 -- The id references auth.users so Supabase Auth and our users table stay in sync
 CREATE TABLE users (
-  id         TEXT PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id         UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email      TEXT UNIQUE NOT NULL,
   name       TEXT NOT NULL,
   avatar_url TEXT,
@@ -21,8 +21,8 @@ CREATE TABLE users (
 
 -- Pets table
 CREATE TABLE pets (
-  id         TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  owner_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_id   UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name       TEXT NOT NULL,
   type       pet_type NOT NULL,
   breed      TEXT,
@@ -38,9 +38,9 @@ CREATE INDEX idx_pets_owner_id ON pets(owner_id);
 
 -- Swipes table
 CREATE TABLE swipes (
-  id         TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  swiper_id  TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  pet_id     TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  swiper_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  pet_id     UUID NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
   direction  swipe_direction NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE(swiper_id, pet_id)
@@ -51,11 +51,11 @@ CREATE INDEX idx_swipes_pet_id ON swipes(pet_id);
 
 -- Matches table
 CREATE TABLE matches (
-  id         TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  pet_a_id   TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
-  pet_b_id   TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
-  user_a_id  TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  user_b_id  TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pet_a_id   UUID NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+  pet_b_id   UUID NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+  user_a_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_b_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE(pet_a_id, pet_b_id)
 );
@@ -65,9 +65,9 @@ CREATE INDEX idx_matches_user_b_id ON matches(user_b_id);
 
 -- Messages table
 CREATE TABLE messages (
-  id         TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  match_id   TEXT NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
-  sender_id  TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  match_id   UUID NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
+  sender_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   content    TEXT NOT NULL,
   read       BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -78,9 +78,9 @@ CREATE INDEX idx_messages_sender_id ON messages(sender_id);
 
 -- Posts table
 CREATE TABLE posts (
-  id         TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  author_id  TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  pet_id     TEXT REFERENCES pets(id) ON DELETE SET NULL,
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  author_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  pet_id     UUID REFERENCES pets(id) ON DELETE SET NULL,
   content    TEXT NOT NULL,
   images     TEXT[] NOT NULL DEFAULT '{}',
   type       post_type NOT NULL DEFAULT 'GENERAL',
@@ -94,9 +94,9 @@ CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
 
 -- Comments table
 CREATE TABLE comments (
-  id         TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  post_id    TEXT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  author_id  TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id    UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  author_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   content    TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -105,9 +105,9 @@ CREATE INDEX idx_comments_post_id ON comments(post_id);
 
 -- Reactions table
 CREATE TABLE reactions (
-  id         TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  post_id    TEXT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id    UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   type       reaction_type NOT NULL,
   UNIQUE(post_id, user_id)
 );
@@ -131,39 +131,39 @@ CREATE POLICY "Users can read all profiles"
   ON users FOR SELECT USING (true);
 
 CREATE POLICY "Users can insert own profile"
-  ON users FOR INSERT WITH CHECK (auth.uid()::text = id);
+  ON users FOR INSERT WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Users can update own profile"
-  ON users FOR UPDATE USING (auth.uid()::text = id);
+  ON users FOR UPDATE USING (auth.uid() = id);
 
 -- Pets: can read all pets, can only manage own pets
 CREATE POLICY "Pets are viewable by everyone"
   ON pets FOR SELECT USING (true);
 
 CREATE POLICY "Users can create own pets"
-  ON pets FOR INSERT WITH CHECK (auth.uid()::text = owner_id);
+  ON pets FOR INSERT WITH CHECK (auth.uid() = owner_id);
 
 CREATE POLICY "Users can update own pets"
-  ON pets FOR UPDATE USING (auth.uid()::text = owner_id);
+  ON pets FOR UPDATE USING (auth.uid() = owner_id);
 
 CREATE POLICY "Users can delete own pets"
-  ON pets FOR DELETE USING (auth.uid()::text = owner_id);
+  ON pets FOR DELETE USING (auth.uid() = owner_id);
 
 -- Swipes: users can read and create their own swipes
 CREATE POLICY "Users can read own swipes"
-  ON swipes FOR SELECT USING (auth.uid()::text = swiper_id);
+  ON swipes FOR SELECT USING (auth.uid() = swiper_id);
 
 CREATE POLICY "Users can create own swipes"
-  ON swipes FOR INSERT WITH CHECK (auth.uid()::text = swiper_id);
+  ON swipes FOR INSERT WITH CHECK (auth.uid() = swiper_id);
 
 -- Matches: users can read matches they are part of
 CREATE POLICY "Users can read own matches"
   ON matches FOR SELECT
-  USING (auth.uid()::text = user_a_id OR auth.uid()::text = user_b_id);
+  USING (auth.uid() = user_a_id OR auth.uid() = user_b_id);
 
 CREATE POLICY "Users can create matches"
   ON matches FOR INSERT WITH CHECK (
-    auth.uid()::text = user_a_id OR auth.uid()::text = user_b_id
+    auth.uid() = user_a_id OR auth.uid() = user_b_id
   );
 
 -- Messages: users can read/send messages in their matches
@@ -173,17 +173,17 @@ CREATE POLICY "Users can read messages in their matches"
     EXISTS (
       SELECT 1 FROM matches
       WHERE matches.id = messages.match_id
-      AND (auth.uid()::text = matches.user_a_id OR auth.uid()::text = matches.user_b_id)
+      AND (auth.uid() = matches.user_a_id OR auth.uid() = matches.user_b_id)
     )
   );
 
 CREATE POLICY "Users can send messages in their matches"
   ON messages FOR INSERT WITH CHECK (
-    auth.uid()::text = sender_id
+    auth.uid() = sender_id
     AND EXISTS (
       SELECT 1 FROM matches
       WHERE matches.id = match_id
-      AND (auth.uid()::text = matches.user_a_id OR auth.uid()::text = matches.user_b_id)
+      AND (auth.uid() = matches.user_a_id OR auth.uid() = matches.user_b_id)
     )
   );
 
@@ -192,7 +192,7 @@ CREATE POLICY "Users can mark messages as read"
     EXISTS (
       SELECT 1 FROM matches
       WHERE matches.id = messages.match_id
-      AND (auth.uid()::text = matches.user_a_id OR auth.uid()::text = matches.user_b_id)
+      AND (auth.uid() = matches.user_a_id OR auth.uid() = matches.user_b_id)
     )
   );
 
@@ -201,33 +201,33 @@ CREATE POLICY "Posts are viewable by everyone"
   ON posts FOR SELECT USING (true);
 
 CREATE POLICY "Users can create posts"
-  ON posts FOR INSERT WITH CHECK (auth.uid()::text = author_id);
+  ON posts FOR INSERT WITH CHECK (auth.uid() = author_id);
 
 CREATE POLICY "Users can update own posts"
-  ON posts FOR UPDATE USING (auth.uid()::text = author_id);
+  ON posts FOR UPDATE USING (auth.uid() = author_id);
 
 CREATE POLICY "Users can delete own posts"
-  ON posts FOR DELETE USING (auth.uid()::text = author_id);
+  ON posts FOR DELETE USING (auth.uid() = author_id);
 
 -- Comments: everyone can read, users can manage their own
 CREATE POLICY "Comments are viewable by everyone"
   ON comments FOR SELECT USING (true);
 
 CREATE POLICY "Users can create comments"
-  ON comments FOR INSERT WITH CHECK (auth.uid()::text = author_id);
+  ON comments FOR INSERT WITH CHECK (auth.uid() = author_id);
 
 CREATE POLICY "Users can delete own comments"
-  ON comments FOR DELETE USING (auth.uid()::text = author_id);
+  ON comments FOR DELETE USING (auth.uid() = author_id);
 
 -- Reactions: everyone can read, users can manage their own
 CREATE POLICY "Reactions are viewable by everyone"
   ON reactions FOR SELECT USING (true);
 
 CREATE POLICY "Users can create reactions"
-  ON reactions FOR INSERT WITH CHECK (auth.uid()::text = user_id);
+  ON reactions FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete own reactions"
-  ON reactions FOR DELETE USING (auth.uid()::text = user_id);
+  ON reactions FOR DELETE USING (auth.uid() = user_id);
 
 -- Spatial index on users location for nearby queries
 CREATE INDEX idx_users_location ON users USING GIST(location);
