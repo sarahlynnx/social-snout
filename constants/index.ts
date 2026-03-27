@@ -21,7 +21,7 @@ export const TEMPERAMENT_TAGS = [
   "Good with dogs",
   "Good with cats",
   "Vaccinated",
-  "Neutered",
+  "Neutered/Spayed",
   "Trained",
 ] as const;
 

@@ -14,9 +14,10 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
-import { uploadPetPhoto } from "@/lib/s3";
+import { uploadPetPhoto, uploadAvatar } from "@/lib/storage";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Avatar } from "@/components/ui/Avatar";
 import {
   PET_TYPES,
   PET_SIZES,
@@ -38,6 +39,7 @@ export default function OnboardingScreen() {
   const [bio, setBio] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const toggleTag = (tag: string) => {
@@ -68,6 +70,19 @@ export default function OnboardingScreen() {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const pickAvatar = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setAvatarUri(result.assets[0].uri);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!name.trim()) {
       Alert.alert("Error", "Please enter your pet's name.");
@@ -84,8 +99,21 @@ export default function OnboardingScreen() {
       return;
     }
 
+    if (!avatarUri) {
+      Alert.alert("Error", "Please add a profile photo of yourself.");
+      return;
+    }
+
     setLoading(true);
     try {
+      // Upload user avatar
+      const avatarUrl = await uploadAvatar(avatarUri, session!.user.id);
+      await supabase
+        .from("users")
+        .update({ avatar_url: avatarUrl })
+        .eq("id", session!.user.id);
+
+      // Upload pet photos
       const uploadedUrls: string[] = [];
       for (const photoUri of photos) {
         const url = await uploadPetPhoto(photoUri);
@@ -297,6 +325,34 @@ export default function OnboardingScreen() {
                 </Pressable>
               ))}
             </View>
+          </View>
+
+          {/* Owner Profile Photo */}
+          <View>
+            <Text className="text-sm font-medium text-gray-700 mb-2">
+              Your Profile Photo
+            </Text>
+            <Text className="text-xs text-gray-400 mb-3">
+              Required for safety — helps other owners verify who they're meeting.
+            </Text>
+            <Pressable onPress={pickAvatar} className="items-center">
+              {avatarUri ? (
+                <View className="relative">
+                  <Image
+                    source={{ uri: avatarUri }}
+                    className="w-28 h-28 rounded-full"
+                  />
+                  <View className="absolute bottom-0 right-0 bg-primary-500 rounded-full w-8 h-8 items-center justify-center">
+                    <Ionicons name="camera" size={16} color="white" />
+                  </View>
+                </View>
+              ) : (
+                <View className="w-28 h-28 rounded-full border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50">
+                  <Ionicons name="person" size={32} color="#9CA3AF" />
+                  <Text className="text-xs text-gray-400 mt-1">Add photo</Text>
+                </View>
+              )}
+            </Pressable>
           </View>
 
           {/* Submit */}
