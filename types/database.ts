@@ -349,6 +349,21 @@ export interface Database {
         };
         Returns: Database["public"]["Tables"]["posts"]["Row"][];
       };
+      handle_swipe: {
+        Args: {
+          p_swiper_pet_id: string;
+          p_swiped_pet_id: string;
+          p_direction: SwipeDirection;
+        };
+        Returns: { matched: boolean; match_id: string | null };
+      };
+      get_swipeable_pets: {
+        Args: {
+          p_pet_id: string;
+          p_limit?: number;
+        };
+        Returns: SwipeablePet[];
+      };
     };
     Enums: {
       pet_type: PetType;
@@ -370,3 +385,15 @@ export type Message = Database["public"]["Tables"]["messages"]["Row"];
 export type Post = Database["public"]["Tables"]["posts"]["Row"];
 export type Comment = Database["public"]["Tables"]["comments"]["Row"];
 export type Reaction = Database["public"]["Tables"]["reactions"]["Row"];
+
+// Swipeable pet returned by get_swipeable_pets RPC
+export type SwipeablePet = Pet & {
+  owner_name: string;
+  owner_avatar_url: string | null;
+};
+
+// Match with full pet and owner profiles (for matches list)
+export type MatchWithProfiles = Match & {
+  pet: Pet;
+  owner: Pick<User, "id" | "name" | "avatar_url">;
+};
