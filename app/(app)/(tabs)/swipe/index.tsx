@@ -1,7 +1,6 @@
 import { View, Text, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SwipeDeck } from "@/components/swipe/SwipeDeck";
 import { MatchOverlay } from "@/components/swipe/MatchOverlay";
 import { useSwipe } from "@/hooks/useSwipe";
@@ -43,7 +42,7 @@ export default function SwipeScreen() {
   }
 
   return (
-    <GestureHandlerRootView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <View className="flex-1 pt-14 pb-4">
         {/* Header */}
         <View className="px-6 pb-4">
@@ -83,6 +82,6 @@ export default function SwipeScreen() {
           onKeepSwiping={dismissMatch}
         />
       )}
-    </GestureHandlerRootView>
+    </View>
   );
 }
