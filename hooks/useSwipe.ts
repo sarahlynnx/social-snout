@@ -1,36 +1,20 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/hooks/useAuth";
-import type { SwipeablePet, Pet, SwipeDirection } from "@/types/database";
+import { useActivePet } from "@/contexts/ActivePetContext";
+import type { SwipeablePet, SwipeDirection } from "@/types/database";
 
 const FETCH_THRESHOLD = 5;
 const BATCH_SIZE = 20;
 
 export function useSwipe() {
-  const { session } = useAuth();
-  const [myPet, setMyPet] = useState<Pet | null>(null);
+  const { activePet } = useActivePet();
   const [pets, setPets] = useState<SwipeablePet[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [matchedPet, setMatchedPet] = useState<SwipeablePet | null>(null);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [swiping, setSwiping] = useState(false);
-
-  // Fetch the user's first pet
-  const fetchMyPet = useCallback(async () => {
-    if (!session?.user) return null;
-
-    const { data, error } = await supabase
-      .from("pets")
-      .select("*")
-      .eq("owner_id", session.user.id)
-      .limit(1)
-      .single();
-
-    if (error || !data) return null;
-    setMyPet(data);
-    return data;
-  }, [session]);
+  const lastPetId = useRef<string | null>(null);
 
   // Fetch swipeable pets via RPC
   const fetchPets = useCallback(
@@ -58,31 +42,42 @@ export function useSwipe() {
     []
   );
 
-  // Initial load
+  // Load when active pet changes
   useEffect(() => {
+    if (!activePet) {
+      setLoading(false);
+      return;
+    }
+
+    // Reset deck when switching pets
+    if (lastPetId.current !== activePet.id) {
+      setPets([]);
+      setCurrentIndex(0);
+      setMatchedPet(null);
+      setMatchId(null);
+      lastPetId.current = activePet.id;
+    }
+
     async function init() {
       setLoading(true);
-      const pet = await fetchMyPet();
-      if (pet) {
-        await fetchPets(pet.id);
-      }
+      await fetchPets(activePet!.id);
       setLoading(false);
     }
     init();
-  }, [fetchMyPet, fetchPets]);
+  }, [activePet, fetchPets]);
 
   // Auto-fetch more when running low (but not while a swipe is in-flight)
   useEffect(() => {
     const remaining = pets.length - currentIndex;
-    if (remaining <= FETCH_THRESHOLD && remaining > 0 && myPet && !swiping) {
-      fetchPets(myPet.id);
+    if (remaining <= FETCH_THRESHOLD && remaining > 0 && activePet && !swiping) {
+      fetchPets(activePet.id);
     }
-  }, [currentIndex, pets.length, myPet, fetchPets, swiping]);
+  }, [currentIndex, pets.length, activePet, fetchPets, swiping]);
 
   // Record a swipe and check for match
   const recordSwipe = useCallback(
     async (petId: string, direction: SwipeDirection) => {
-      if (!myPet) return;
+      if (!activePet) return;
 
       // Advance to next card immediately for snappy feel
       setCurrentIndex((prev) => prev + 1);
@@ -90,7 +85,7 @@ export function useSwipe() {
 
       try {
         const { data, error } = await supabase.rpc("handle_swipe", {
-          p_swiper_pet_id: myPet.id,
+          p_swiper_pet_id: activePet.id,
           p_swiped_pet_id: petId,
           p_direction: direction,
         });
@@ -112,7 +107,7 @@ export function useSwipe() {
         setSwiping(false);
       }
     },
-    [myPet, pets]
+    [activePet, pets]
   );
 
   const dismissMatch = useCallback(() => {
@@ -123,7 +118,7 @@ export function useSwipe() {
   const hasMore = currentIndex < pets.length;
 
   return {
-    myPet,
+    myPet: activePet,
     pets,
     currentIndex,
     loading,

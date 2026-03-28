@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Avatar } from "@/components/ui/Avatar";
+import { PetSwitcher } from "@/components/PetSwitcher";
 import { useMatches } from "@/hooks/useMatches";
 import type { MatchWithProfiles } from "@/types/database";
 
@@ -79,6 +80,11 @@ export default function MatchesScreen() {
 
   return (
     <View className="flex-1 bg-white">
+      {/* Pet switcher header */}
+      <View className="px-4 pt-2 pb-2">
+        <PetSwitcher />
+      </View>
+
       {matches.length > 0 ? (
         <FlatList
           data={matches}

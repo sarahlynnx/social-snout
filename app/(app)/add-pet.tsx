@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { useActivePet } from "@/contexts/ActivePetContext";
 import { supabase } from "@/lib/supabase";
-import { uploadPetPhoto, uploadAvatar } from "@/lib/storage";
+import { uploadPetPhoto } from "@/lib/storage";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
@@ -33,7 +33,7 @@ import {
 } from "@/constants";
 import type { PetType, PetSize, PetPrompt } from "@/types/database";
 
-export default function OnboardingScreen() {
+export default function AddPetScreen() {
   const { session } = useAuth();
   const { refreshPets } = useActivePet();
   const router = useRouter();
@@ -48,7 +48,6 @@ export default function OnboardingScreen() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
   const [prompts, setPrompts] = useState<PetPrompt[]>([]);
-  const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const breeds = type === "DOG" ? DOG_BREEDS : CAT_BREEDS;
@@ -85,19 +84,6 @@ export default function OnboardingScreen() {
 
   const removePhoto = (index: number) => {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const pickAvatar = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setAvatarUri(result.assets[0].uri);
-    }
   };
 
   const togglePrompt = (question: string) => {
@@ -158,20 +144,8 @@ export default function OnboardingScreen() {
       return;
     }
 
-    if (!avatarUri) {
-      Alert.alert("Error", "Please add a profile photo of yourself.");
-      return;
-    }
-
     setLoading(true);
     try {
-      // Upload user avatar
-      const avatarUrl = await uploadAvatar(avatarUri, session!.user.id);
-      await supabase
-        .from("users")
-        .update({ avatar_url: avatarUrl })
-        .eq("id", session!.user.id);
-
       // Upload pet photos
       const uploadedUrls: string[] = [];
       for (const photoUri of photos) {
@@ -194,8 +168,9 @@ export default function OnboardingScreen() {
 
       if (error) throw error;
 
+      // Refresh context — refreshPets auto-selects the newest pet
       await refreshPets();
-      router.replace("/(app)/(tabs)/swipe");
+      router.back();
     } catch (error) {
       Alert.alert(
         "Error",
@@ -215,13 +190,22 @@ export default function OnboardingScreen() {
         contentContainerStyle={{ paddingBottom: 40 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="px-6 pt-16 pb-4">
-          <Text className="text-3xl font-bold text-gray-900">
-            Add Your Pet
-          </Text>
-          <Text className="text-base text-gray-500 mt-2">
-            Tell us about your furry friend to start finding playmates!
-          </Text>
+        {/* Header with close button */}
+        <View className="flex-row items-center justify-between px-6 pt-16 pb-4">
+          <View>
+            <Text className="text-2xl font-bold text-gray-900">
+              Add New Pet
+            </Text>
+            <Text className="text-sm text-gray-500 mt-1">
+              Create a profile for another furry friend
+            </Text>
+          </View>
+          <Pressable
+            onPress={() => router.back()}
+            className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
+          >
+            <Ionicons name="close" size={22} color="#6B7280" />
+          </Pressable>
         </View>
 
         {/* Photos */}
@@ -486,37 +470,9 @@ export default function OnboardingScreen() {
             </View>
           </View>
 
-          {/* Owner Profile Photo */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Your Profile Photo
-            </Text>
-            <Text className="text-xs text-gray-400 mb-3">
-              Required for safety — helps other owners verify who they're meeting.
-            </Text>
-            <Pressable onPress={pickAvatar} className="items-center">
-              {avatarUri ? (
-                <View className="relative">
-                  <Image
-                    source={{ uri: avatarUri }}
-                    className="w-28 h-28 rounded-full"
-                  />
-                  <View className="absolute bottom-0 right-0 bg-primary-500 rounded-full w-8 h-8 items-center justify-center">
-                    <Ionicons name="camera" size={16} color="white" />
-                  </View>
-                </View>
-              ) : (
-                <View className="w-28 h-28 rounded-full border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50">
-                  <Ionicons name="person" size={32} color="#9CA3AF" />
-                  <Text className="text-xs text-gray-400 mt-1">Add photo</Text>
-                </View>
-              )}
-            </Pressable>
-          </View>
-
           {/* Submit */}
           <Button
-            title="Create Pet Profile"
+            title="Add Pet"
             onPress={handleSubmit}
             loading={loading}
             className="mt-4"

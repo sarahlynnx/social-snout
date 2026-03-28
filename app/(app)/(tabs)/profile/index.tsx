@@ -5,17 +5,19 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
+import { useActivePet } from "@/contexts/ActivePetContext";
+import { PetSwitcher } from "@/components/PetSwitcher";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { InfoPills } from "@/components/profile/InfoPills";
 import { PromptCard } from "@/components/profile/PromptCard";
-import type { Pet, User, PetPrompt } from "@/types/database";
+import type { User, PetPrompt } from "@/types/database";
 
 export default function ProfileScreen() {
   const { session, signOut } = useAuth();
+  const { activePet, refreshPets } = useActivePet();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [pet, setPet] = useState<Pet | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -30,17 +32,12 @@ export default function ProfileScreen() {
 
         if (userData) setUser(userData);
 
-        const { data: petData } = await supabase
-          .from("pets")
-          .select("*")
-          .eq("owner_id", session!.user.id)
-          .limit(1)
-          .single();
-
-        if (petData) setPet(petData);
+        // Refresh pets so active pet data is up to date after edits
+        refreshPets();
       }
 
       fetchProfile();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [session])
   );
 
@@ -51,6 +48,7 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const pet = activePet;
   const displayName = user?.name || session?.user?.user_metadata?.name || "User";
   const userEmail = session?.user?.email || "";
   const editPet = () => pet && router.push(`/(app)/edit-pet/${pet.id}`);
@@ -60,10 +58,15 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 40 }}>
+      {/* Pet switcher header */}
+      <View className="px-4 pt-2 pb-2">
+        <PetSwitcher />
+      </View>
+
       {pet ? (
         <View className="px-6">
           {/* Pet header with Edit + Preview buttons */}
-          <View className="flex-row items-center justify-between pt-6 pb-4">
+          <View className="flex-row items-center justify-between pt-2 pb-4">
             <Text className="text-lg font-bold text-gray-900">{pet.name}</Text>
             <View className="flex-row gap-2">
               <Pressable

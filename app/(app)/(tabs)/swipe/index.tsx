@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SwipeDeck } from "@/components/swipe/SwipeDeck";
 import { MatchOverlay } from "@/components/swipe/MatchOverlay";
+import { PetSwitcher } from "@/components/PetSwitcher";
 import { useSwipe } from "@/hooks/useSwipe";
 
 export default function SwipeScreen() {
@@ -43,6 +44,11 @@ export default function SwipeScreen() {
 
   return (
     <View className="flex-1 bg-white">
+      {/* Pet switcher header */}
+      <View className="px-4 pt-2 pb-2">
+        <PetSwitcher />
+      </View>
+
       <View className="flex-1 pb-4">
         {hasMore ? (
           <SwipeDeck

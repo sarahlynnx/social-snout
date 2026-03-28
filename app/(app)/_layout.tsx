@@ -1,31 +1,18 @@
-import { useEffect, useRef } from "react";
-import { Stack, useRouter, useSegments } from "expo-router";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
+import { Stack, useRouter } from "expo-router";
+import { ActivePetProvider, useActivePet } from "@/contexts/ActivePetContext";
 
-export default function AppLayout() {
-  const { session } = useAuth();
+function AppLayoutInner() {
   const router = useRouter();
-  const segments = useSegments();
-  const hasChecked = useRef(false);
+  const { allPets, loading } = useActivePet();
 
   useEffect(() => {
-    if (!session?.user || hasChecked.current) return;
-    hasChecked.current = true;
+    if (loading) return;
 
-    async function checkForPets() {
-      const { count } = await supabase
-        .from("pets")
-        .select("*", { count: "exact", head: true })
-        .eq("owner_id", session!.user.id);
-
-      if ((count ?? 0) === 0) {
-        router.replace("/(app)/onboarding");
-      }
+    if (allPets.length === 0) {
+      router.replace("/(app)/onboarding");
     }
-
-    checkForPets();
-  }, [session]);
+  }, [loading, allPets]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -42,6 +29,18 @@ export default function AppLayout() {
         name="pet-profile/[id]"
         options={{ presentation: "modal" }}
       />
+      <Stack.Screen
+        name="add-pet"
+        options={{ presentation: "modal" }}
+      />
     </Stack>
+  );
+}
+
+export default function AppLayout() {
+  return (
+    <ActivePetProvider>
+      <AppLayoutInner />
+    </ActivePetProvider>
   );
 }
