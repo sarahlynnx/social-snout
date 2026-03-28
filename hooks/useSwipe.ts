@@ -14,6 +14,7 @@ export function useSwipe() {
   const [loading, setLoading] = useState(true);
   const [matchedPet, setMatchedPet] = useState<SwipeablePet | null>(null);
   const [matchId, setMatchId] = useState<string | null>(null);
+  const [swiping, setSwiping] = useState(false);
 
   // Fetch the user's first pet
   const fetchMyPet = useCallback(async () => {
@@ -45,7 +46,13 @@ export function useSwipe() {
       }
 
       if (data && data.length > 0) {
-        setPets((prev) => [...prev, ...(data as SwipeablePet[])]);
+        setPets((prev) => {
+          const existingIds = new Set(prev.map((p) => p.id));
+          const newPets = (data as SwipeablePet[]).filter(
+            (p) => !existingIds.has(p.id)
+          );
+          return newPets.length > 0 ? [...prev, ...newPets] : prev;
+        });
       }
     },
     []
@@ -64,13 +71,13 @@ export function useSwipe() {
     init();
   }, [fetchMyPet, fetchPets]);
 
-  // Auto-fetch more when running low
+  // Auto-fetch more when running low (but not while a swipe is in-flight)
   useEffect(() => {
     const remaining = pets.length - currentIndex;
-    if (remaining <= FETCH_THRESHOLD && remaining > 0 && myPet) {
+    if (remaining <= FETCH_THRESHOLD && remaining > 0 && myPet && !swiping) {
       fetchPets(myPet.id);
     }
-  }, [currentIndex, pets.length, myPet, fetchPets]);
+  }, [currentIndex, pets.length, myPet, fetchPets, swiping]);
 
   // Record a swipe and check for match
   const recordSwipe = useCallback(
@@ -79,25 +86,30 @@ export function useSwipe() {
 
       // Advance to next card immediately for snappy feel
       setCurrentIndex((prev) => prev + 1);
+      setSwiping(true);
 
-      const { data, error } = await supabase.rpc("handle_swipe", {
-        p_swiper_pet_id: myPet.id,
-        p_swiped_pet_id: petId,
-        p_direction: direction,
-      });
+      try {
+        const { data, error } = await supabase.rpc("handle_swipe", {
+          p_swiper_pet_id: myPet.id,
+          p_swiped_pet_id: petId,
+          p_direction: direction,
+        });
 
-      if (error) {
-        console.error("Swipe failed:", error.message);
-        return;
-      }
-
-      // Check if we got a match
-      if (data && data.matched) {
-        const matched = pets.find((p) => p.id === petId);
-        if (matched) {
-          setMatchedPet(matched);
-          setMatchId(data.match_id);
+        if (error) {
+          console.error("Swipe failed:", error.message);
+          return;
         }
+
+        // Check if we got a match
+        if (data && data.matched) {
+          const matched = pets.find((p) => p.id === petId);
+          if (matched) {
+            setMatchedPet(matched);
+            setMatchId(data.match_id);
+          }
+        }
+      } finally {
+        setSwiping(false);
       }
     },
     [myPet, pets]
