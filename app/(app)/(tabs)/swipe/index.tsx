@@ -43,12 +43,7 @@ export default function SwipeScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      <View className="flex-1 pt-14 pb-4">
-        {/* Header */}
-        <View className="px-6 pb-4">
-          <Text className="text-2xl font-bold text-gray-900">Discover</Text>
-        </View>
-
+      <View className="flex-1 pb-4">
         {hasMore ? (
           <SwipeDeck
             pets={pets}

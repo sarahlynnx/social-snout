@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
-import { uploadPetPhoto, uploadAvatar } from "@/lib/storage";
+import { uploadPetPhoto } from "@/lib/storage";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
@@ -28,11 +28,15 @@ import {
   TEMPERAMENT_TAGS,
   MAX_PET_PHOTOS,
 } from "@/constants";
-import type { PetType, PetSize } from "@/types/database";
+import type { PetType, PetSize, Pet } from "@/types/database";
 
-export default function OnboardingScreen() {
-  const { session } = useAuth();
+export default function EditPetScreen() {
   const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
+
+  const [pet, setPet] = useState<Pet | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const [name, setName] = useState("");
   const [type, setType] = useState<PetType>("DOG");
@@ -43,10 +47,58 @@ export default function OnboardingScreen() {
   const [bio, setBio] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
-  const [avatarUri, setAvatarUri] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const breeds = type === "DOG" ? DOG_BREEDS : CAT_BREEDS;
+
+  useEffect(() => {
+    async function fetchPet() {
+      const { data, error } = await supabase
+        .from("pets")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error || !data) {
+        Alert.alert("Error", "Pet not found.");
+        router.back();
+        return;
+      }
+
+      setPet(data);
+      setName(data.name);
+      setType(data.type);
+      setSize(data.size);
+      setBio(data.bio || "");
+      setSelectedTags(data.tags);
+      setPhotos(data.photos);
+
+      // Map age back to picker value
+      if (data.age === 0) setAge("<1");
+      else if (data.age >= 10) setAge("10+");
+      else setAge(String(data.age));
+
+      // Map breed — check if it's in the breed list or custom
+      const breedList = data.type === "DOG" ? DOG_BREEDS : CAT_BREEDS;
+      const savedBreed = data.breed || "";
+
+      if (savedBreed.startsWith("Mixed — ")) {
+        setBreed("Mixed");
+        setCustomBreed(savedBreed.replace("Mixed — ", ""));
+      } else if (savedBreed.startsWith("Other — ")) {
+        setBreed("Other");
+        setCustomBreed(savedBreed.replace("Other — ", ""));
+      } else if (breedList.includes(savedBreed as any)) {
+        setBreed(savedBreed);
+      } else if (savedBreed) {
+        setBreed("Other");
+        setCustomBreed(savedBreed);
+      }
+
+      setLoading(false);
+    }
+
+    fetchPet();
+  }, [id]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -82,19 +134,6 @@ export default function OnboardingScreen() {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const pickAvatar = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setAvatarUri(result.assets[0].uri);
-    }
-  };
-
   const getFinalBreed = () => {
     if (breed === "Other" || breed === "Mixed") {
       return customBreed.trim() ? `${breed} — ${customBreed.trim()}` : breed;
@@ -102,7 +141,7 @@ export default function OnboardingScreen() {
     return breed;
   };
 
-  const handleSubmit = async () => {
+  const handleSave = async () => {
     if (!name.trim()) {
       Alert.alert("Error", "Please enter your pet's name.");
       return;
@@ -133,51 +172,53 @@ export default function OnboardingScreen() {
       return;
     }
 
-    if (!avatarUri) {
-      Alert.alert("Error", "Please add a profile photo of yourself.");
-      return;
-    }
-
-    setLoading(true);
+    setSaving(true);
     try {
-      // Upload user avatar
-      const avatarUrl = await uploadAvatar(avatarUri, session!.user.id);
-      await supabase
-        .from("users")
-        .update({ avatar_url: avatarUrl })
-        .eq("id", session!.user.id);
-
-      // Upload pet photos
-      const uploadedUrls: string[] = [];
-      for (const photoUri of photos) {
-        const url = await uploadPetPhoto(photoUri);
-        uploadedUrls.push(url);
+      // Upload any new local photos (existing URLs start with http)
+      const finalPhotos: string[] = [];
+      for (const photo of photos) {
+        if (photo.startsWith("http")) {
+          finalPhotos.push(photo);
+        } else {
+          const url = await uploadPetPhoto(photo);
+          finalPhotos.push(url);
+        }
       }
 
-      const { error } = await supabase.from("pets").insert({
-        owner_id: session!.user.id,
-        name: name.trim(),
-        type,
-        breed: getFinalBreed(),
-        age: age === "<1" ? 0 : age === "10+" ? 10 : Number(age),
-        size,
-        bio: bio.trim() || null,
-        photos: uploadedUrls,
-        tags: selectedTags,
-      });
+      const { error } = await supabase
+        .from("pets")
+        .update({
+          name: name.trim(),
+          type,
+          breed: getFinalBreed(),
+          age: age === "<1" ? 0 : age === "10+" ? 10 : Number(age),
+          size,
+          bio: bio.trim() || null,
+          photos: finalPhotos,
+          tags: selectedTags,
+        })
+        .eq("id", id);
 
       if (error) throw error;
 
-      router.replace("/(app)/(tabs)/swipe");
+      router.back();
     } catch (error) {
       Alert.alert(
         "Error",
-        error instanceof Error ? error.message : "Failed to create pet profile."
+        error instanceof Error ? error.message : "Failed to update pet profile."
       );
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" color="#F97316" />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -189,12 +230,14 @@ export default function OnboardingScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="px-6 pt-16 pb-4">
-          <Text className="text-3xl font-bold text-gray-900">
-            Add Your Pet
-          </Text>
-          <Text className="text-base text-gray-500 mt-2">
-            Tell us about your furry friend to start finding playmates!
-          </Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-3xl font-bold text-gray-900">
+              Edit Pet
+            </Text>
+            <Pressable onPress={() => router.back()}>
+              <Ionicons name="close" size={28} color="#6B7280" />
+            </Pressable>
+          </View>
         </View>
 
         {/* Photos */}
@@ -413,39 +456,11 @@ export default function OnboardingScreen() {
             </View>
           </View>
 
-          {/* Owner Profile Photo */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Your Profile Photo
-            </Text>
-            <Text className="text-xs text-gray-400 mb-3">
-              Required for safety — helps other owners verify who they're meeting.
-            </Text>
-            <Pressable onPress={pickAvatar} className="items-center">
-              {avatarUri ? (
-                <View className="relative">
-                  <Image
-                    source={{ uri: avatarUri }}
-                    className="w-28 h-28 rounded-full"
-                  />
-                  <View className="absolute bottom-0 right-0 bg-primary-500 rounded-full w-8 h-8 items-center justify-center">
-                    <Ionicons name="camera" size={16} color="white" />
-                  </View>
-                </View>
-              ) : (
-                <View className="w-28 h-28 rounded-full border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50">
-                  <Ionicons name="person" size={32} color="#9CA3AF" />
-                  <Text className="text-xs text-gray-400 mt-1">Add photo</Text>
-                </View>
-              )}
-            </Pressable>
-          </View>
-
-          {/* Submit */}
+          {/* Save */}
           <Button
-            title="Create Pet Profile"
-            onPress={handleSubmit}
-            loading={loading}
+            title="Save Changes"
+            onPress={handleSave}
+            loading={saving}
             className="mt-4"
           />
         </View>

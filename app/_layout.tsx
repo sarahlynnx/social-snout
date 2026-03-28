@@ -1,6 +1,34 @@
 import "../global.css";
-import { Stack } from "expo-router";
+import { useEffect } from "react";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { ActivityIndicator, View } from "react-native";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function RootLayout() {
+  const { session, loading } = useAuth();
+  const router = useRouter();
+  const segments = useSegments();
+
+  useEffect(() => {
+    if (loading) return;
+
+    const inAuthGroup = segments[0] === "(auth)";
+    const inAppGroup = segments[0] === "(app)";
+
+    if (!session && inAppGroup) {
+      router.replace("/(auth)/login");
+    } else if (session && inAuthGroup) {
+      router.replace("/(app)/(tabs)/swipe");
+    }
+  }, [session, loading, segments]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "white" }}>
+        <ActivityIndicator size="large" color="#F97316" />
+      </View>
+    );
+  }
+
   return <Stack screenOptions={{ headerShown: false }} />;
 }

@@ -28,9 +28,11 @@ export function PetCard({ pet }: PetCardProps) {
   };
 
   const ageDisplay =
-    pet.age >= 12
-      ? `${Math.floor(pet.age / 12)}y ${pet.age % 12 ? `${pet.age % 12}m` : ""}`
-      : `${pet.age}m`;
+    pet.age === 0
+      ? "<1 yr"
+      : pet.age >= 10
+        ? "10+ yrs"
+        : `${pet.age} yr${pet.age === 1 ? "" : "s"}`;
 
   return (
     <View

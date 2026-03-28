@@ -78,12 +78,7 @@ export default function MatchesScreen() {
   }
 
   return (
-    <View className="flex-1 bg-white pt-14">
-      {/* Header */}
-      <View className="px-6 pb-4">
-        <Text className="text-2xl font-bold text-gray-900">Matches</Text>
-      </View>
-
+    <View className="flex-1 bg-white">
       {matches.length > 0 ? (
         <FlatList
           data={matches}

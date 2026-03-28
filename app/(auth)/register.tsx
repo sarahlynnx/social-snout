@@ -33,10 +33,6 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await signUp(email.trim(), password, name.trim());
-      Alert.alert(
-        "Check Your Email",
-        "We sent you a confirmation link. Please verify your email to continue."
-      );
     } catch (error) {
       Alert.alert(
         "Sign Up Failed",
