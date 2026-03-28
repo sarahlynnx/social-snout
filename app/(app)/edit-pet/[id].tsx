@@ -27,8 +27,10 @@ import {
   CAT_BREEDS,
   TEMPERAMENT_TAGS,
   MAX_PET_PHOTOS,
+  PET_PROMPTS,
+  MAX_PET_PROMPTS,
 } from "@/constants";
-import type { PetType, PetSize, Pet } from "@/types/database";
+import type { PetType, PetSize, Pet, PetPrompt } from "@/types/database";
 
 export default function EditPetScreen() {
   const router = useRouter();
@@ -47,6 +49,7 @@ export default function EditPetScreen() {
   const [bio, setBio] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
+  const [prompts, setPrompts] = useState<PetPrompt[]>([]);
 
   const breeds = type === "DOG" ? DOG_BREEDS : CAT_BREEDS;
 
@@ -71,6 +74,7 @@ export default function EditPetScreen() {
       setBio(data.bio || "");
       setSelectedTags(data.tags);
       setPhotos(data.photos);
+      setPrompts(Array.isArray(data.prompts) ? data.prompts : []);
 
       // Map age back to picker value
       if (data.age === 0) setAge("<1");
@@ -132,6 +136,26 @@ export default function EditPetScreen() {
 
   const removePhoto = (index: number) => {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const togglePrompt = (question: string) => {
+    setPrompts((prev) => {
+      const existing = prev.find((p) => p.question === question);
+      if (existing) {
+        return prev.filter((p) => p.question !== question);
+      }
+      if (prev.length >= MAX_PET_PROMPTS) {
+        Alert.alert("Limit Reached", `You can answer up to ${MAX_PET_PROMPTS} prompts.`);
+        return prev;
+      }
+      return [...prev, { question, answer: "" }];
+    });
+  };
+
+  const updatePromptAnswer = (question: string, answer: string) => {
+    setPrompts((prev) =>
+      prev.map((p) => (p.question === question ? { ...p, answer } : p))
+    );
   };
 
   const getFinalBreed = () => {
@@ -196,6 +220,7 @@ export default function EditPetScreen() {
           bio: bio.trim() || null,
           photos: finalPhotos,
           tags: selectedTags,
+          prompts: prompts.filter((p) => p.answer.trim()),
         })
         .eq("id", id);
 
@@ -348,7 +373,8 @@ export default function EditPetScreen() {
             </View>
             {(breed === "Other" || breed === "Mixed") && (
               <TextInput
-                className="mt-3 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-900"
+                className="mt-3 border border-gray-200 rounded-xl px-4 text-gray-900"
+                style={{ fontSize: 16, minHeight: 48 }}
                 placeholder={breed === "Mixed" ? "e.g. Lab/Poodle" : "Enter breed"}
                 value={customBreed}
                 onChangeText={setCustomBreed}
@@ -418,7 +444,7 @@ export default function EditPetScreen() {
           {/* Bio */}
           <Input
             label="Bio (optional)"
-            placeholder="Tell us about your pet's personality..."
+            placeholder={`Tell us about ${name.trim() ? `${name.trim()}'s` : "your pet's"} personality...`}
             value={bio}
             onChangeText={setBio}
             multiline
@@ -453,6 +479,51 @@ export default function EditPetScreen() {
                   </Text>
                 </Pressable>
               ))}
+            </View>
+          </View>
+
+          {/* Pet Prompts */}
+          <View>
+            <Text className="text-sm font-medium text-gray-700 mb-1">
+              Pet Prompts
+            </Text>
+            <Text className="text-xs text-gray-400 mb-3">
+              Pick up to {MAX_PET_PROMPTS} to show off your pet's personality
+            </Text>
+            <View className="gap-3">
+              {PET_PROMPTS.map((question) => {
+                const selected = prompts.find((p) => p.question === question);
+                return (
+                  <View key={question}>
+                    <Pressable
+                      onPress={() => togglePrompt(question)}
+                      className={`py-3 px-4 rounded-xl border-2 ${
+                        selected
+                          ? "border-primary-500 bg-primary-50"
+                          : "border-gray-200 bg-white"
+                      }`}
+                    >
+                      <Text
+                        className={`text-sm font-medium ${
+                          selected ? "text-primary-600" : "text-gray-600"
+                        }`}
+                      >
+                        {question}
+                      </Text>
+                    </Pressable>
+                    {selected && (
+                      <TextInput
+                        className="mt-2 border border-gray-200 rounded-xl px-4 text-gray-900"
+                        style={{ fontSize: 16, minHeight: 48 }}
+                        placeholder="Write your answer..."
+                        value={selected.answer}
+                        onChangeText={(text) => updatePromptAnswer(question, text)}
+                        autoCapitalize="sentences"
+                      />
+                    )}
+                  </View>
+                );
+              })}
             </View>
           </View>
 

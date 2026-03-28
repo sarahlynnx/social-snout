@@ -113,6 +113,21 @@ export const TEMPERAMENT_TAGS = [
 
 export const MAX_PET_PHOTOS = 6;
 
+export const PET_PROMPTS = [
+  "My favorite thing is...",
+  "I get the zoomies when...",
+  "My ideal playdate is...",
+  "You should know that I...",
+  "My favorite treat is...",
+  "My favorite toy is...",
+  "I'm scared of...",
+  "My hidden talent is...",
+  "I love to nap...",
+  "My best trick is...",
+] as const;
+
+export const MAX_PET_PROMPTS = 3;
+
 export const POST_TYPES = ["GENERAL", "LOST_PET", "EVENT", "PHOTO"] as const;
 
 export const REACTION_TYPES = ["LIKE", "HEART", "LAUGH", "WOW"] as const;

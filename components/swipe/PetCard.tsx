@@ -11,9 +11,10 @@ const CARD_WIDTH = SCREEN_WIDTH - 32;
 
 interface PetCardProps {
   pet: SwipeablePet;
+  onOpenProfile?: () => void;
 }
 
-export function PetCard({ pet }: PetCardProps) {
+export function PetCard({ pet, onOpenProfile }: PetCardProps) {
   const [photoIndex, setPhotoIndex] = useState(0);
   const photos = pet.photos.length > 0 ? pet.photos : [];
   const currentPhoto = photos[photoIndex];
@@ -52,14 +53,18 @@ export function PetCard({ pet }: PetCardProps) {
         </View>
       )}
 
-      {/* Tap zones for photo navigation */}
+      {/* Tap zones: left 20% = prev photo, center 60% = open profile, right 20% = next photo */}
       <View className="absolute inset-0 flex-row">
         <Pressable
-          className="flex-1"
+          style={{ width: "20%" }}
           onPress={() => handleTapPhoto("left")}
         />
         <Pressable
-          className="flex-1"
+          style={{ width: "60%" }}
+          onPress={onOpenProfile}
+        />
+        <Pressable
+          style={{ width: "20%" }}
           onPress={() => handleTapPhoto("right")}
         />
       </View>

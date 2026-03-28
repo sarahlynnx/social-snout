@@ -18,9 +18,10 @@ interface SwipeDeckProps {
   pets: SwipeablePet[];
   currentIndex: number;
   onSwipe: (petId: string, direction: "RIGHT" | "LEFT") => void;
+  onOpenProfile?: (petId: string) => void;
 }
 
-export function SwipeDeck({ pets, currentIndex, onSwipe }: SwipeDeckProps) {
+export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeDeckProps) {
   const position = useRef(new Animated.ValueXY()).current;
 
   const currentPet = pets[currentIndex];
@@ -50,9 +51,9 @@ export function SwipeDeck({ pets, currentIndex, onSwipe }: SwipeDeckProps) {
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, gesture) =>
-        Math.abs(gesture.dx) > 5 || Math.abs(gesture.dy) > 5,
+        Math.abs(gesture.dx) > 10 || Math.abs(gesture.dy) > 10,
       onPanResponderMove: Animated.event(
         [null, { dx: position.x, dy: position.y }],
         { useNativeDriver: false }
@@ -152,7 +153,10 @@ export function SwipeDeck({ pets, currentIndex, onSwipe }: SwipeDeckProps) {
             </Text>
           </Animated.View>
 
-          <PetCard pet={currentPet} />
+          <PetCard
+            pet={currentPet}
+            onOpenProfile={() => onOpenProfile?.(currentPet.id)}
+          />
         </Animated.View>
       </View>
 

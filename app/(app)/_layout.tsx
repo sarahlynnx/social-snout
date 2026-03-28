@@ -38,6 +38,10 @@ export default function AppLayout() {
         name="edit-pet/[id]"
         options={{ presentation: "modal" }}
       />
+      <Stack.Screen
+        name="pet-profile/[id]"
+        options={{ presentation: "modal" }}
+      />
     </Stack>
   );
 }

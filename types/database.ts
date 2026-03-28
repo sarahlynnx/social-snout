@@ -1,3 +1,5 @@
+export type PetPrompt = { question: string; answer: string };
+
 export type PetType = "DOG" | "CAT";
 export type PetSize = "SMALL" | "MEDIUM" | "LARGE";
 export type SwipeDirection = "RIGHT" | "LEFT";
@@ -46,6 +48,7 @@ export interface Database {
           bio: string | null;
           photos: string[];
           tags: string[];
+          prompts: PetPrompt[];
           created_at: string;
         };
         Insert: {
@@ -59,6 +62,7 @@ export interface Database {
           bio?: string | null;
           photos?: string[];
           tags?: string[];
+          prompts?: PetPrompt[];
           created_at?: string;
         };
         Update: {
@@ -72,6 +76,7 @@ export interface Database {
           bio?: string | null;
           photos?: string[];
           tags?: string[];
+          prompts?: PetPrompt[];
           created_at?: string;
         };
         Relationships: [

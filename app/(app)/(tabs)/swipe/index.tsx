@@ -49,6 +49,7 @@ export default function SwipeScreen() {
             pets={pets}
             currentIndex={currentIndex}
             onSwipe={recordSwipe}
+            onOpenProfile={(petId) => router.push(`/(app)/pet-profile/${petId}`)}
           />
         ) : (
           /* Empty state */
