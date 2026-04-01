@@ -107,12 +107,7 @@ export default function MatchingPreferencesScreen() {
     >
       {/* Header */}
       <View className="px-6 pt-16 pb-4">
-        <View className="flex-row items-center justify-between">
-          <Text className="text-3xl font-bold text-gray-900">Preferences</Text>
-          <Pressable onPress={() => router.back()}>
-            <Ionicons name="close" size={28} color="#6B7280" />
-          </Pressable>
-        </View>
+        <Text className="text-3xl font-bold text-gray-900">Preferences</Text>
         <Text className="text-sm text-gray-500 mt-1">
           Filter which pets appear in your swipe deck
         </Text>

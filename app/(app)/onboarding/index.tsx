@@ -224,6 +224,7 @@ export default function OnboardingScreen() {
       <ScrollView
         contentContainerStyle={{ paddingBottom: 40 }}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
         <View className="px-6 pt-16 pb-4">
           <Text className="text-3xl font-bold text-gray-900">Add Your Pet</Text>
@@ -347,6 +348,8 @@ export default function OnboardingScreen() {
                 value={customBreed}
                 onChangeText={setCustomBreed}
                 autoCapitalize="words"
+                returnKeyType="done"
+                submitBehavior="blurAndSubmit"
               />
             )}
           </View>
@@ -487,6 +490,8 @@ export default function OnboardingScreen() {
                           updatePromptAnswer(question, text)
                         }
                         autoCapitalize="sentences"
+                        returnKeyType="done"
+                        submitBehavior="blurAndSubmit"
                       />
                     )}
                   </View>

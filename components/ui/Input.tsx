@@ -25,6 +25,8 @@ export function Input({ label, error, className = "", secureTextEntry, ...props 
           style={{ fontSize: 16, minHeight: 48 }}
           placeholderTextColor="#9CA3AF"
           secureTextEntry={secureTextEntry && hidden}
+          returnKeyType="done"
+          submitBehavior="blurAndSubmit"
           {...props}
         />
         {secureTextEntry && (

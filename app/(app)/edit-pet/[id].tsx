@@ -253,16 +253,12 @@ export default function EditPetScreen() {
       <ScrollView
         contentContainerStyle={{ paddingBottom: 40 }}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
         <View className="px-6 pt-16 pb-4">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-3xl font-bold text-gray-900">
-              Edit Pet
-            </Text>
-            <Pressable onPress={() => router.back()}>
-              <Ionicons name="close" size={28} color="#6B7280" />
-            </Pressable>
-          </View>
+          <Text className="text-3xl font-bold text-gray-900">
+            Edit Pet
+          </Text>
         </View>
 
         {/* Photos */}
@@ -379,6 +375,8 @@ export default function EditPetScreen() {
                 value={customBreed}
                 onChangeText={setCustomBreed}
                 autoCapitalize="words"
+                returnKeyType="done"
+                submitBehavior="blurAndSubmit"
               />
             )}
           </View>
@@ -519,6 +517,8 @@ export default function EditPetScreen() {
                         value={selected.answer}
                         onChangeText={(text) => updatePromptAnswer(question, text)}
                         autoCapitalize="sentences"
+                        returnKeyType="done"
+                        submitBehavior="blurAndSubmit"
                       />
                     )}
                   </View>

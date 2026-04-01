@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { View, ScrollView, Pressable, ActivityIndicator, Alert } from "react-native";
+import { View, ScrollView, ActivityIndicator, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "@/lib/supabase";
 import { PetProfileView } from "@/components/profile/PetProfileView";
 import type { Pet, User } from "@/types/database";
@@ -53,14 +52,6 @@ export default function PetProfileScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Close button */}
-      <Pressable
-        onPress={() => router.back()}
-        className="absolute top-14 right-4 z-10 bg-black/30 rounded-full w-9 h-9 items-center justify-center"
-      >
-        <Ionicons name="close" size={22} color="white" />
-      </Pressable>
-
       <ScrollView>
         {pet && (
           <PetProfileView
