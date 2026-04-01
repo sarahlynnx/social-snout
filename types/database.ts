@@ -362,6 +362,47 @@ export interface Database {
           },
         ];
       };
+      matching_preferences: {
+        Row: {
+          id: string;
+          user_id: string;
+          pet_types: PetType[];
+          sizes: PetSize[];
+          age_min: number;
+          age_max: number;
+          required_tags: string[];
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          pet_types?: PetType[];
+          sizes?: PetSize[];
+          age_min?: number;
+          age_max?: number;
+          required_tags?: string[];
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          pet_types?: PetType[];
+          sizes?: PetSize[];
+          age_min?: number;
+          age_max?: number;
+          required_tags?: string[];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "matching_preferences_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       comment_reactions: {
         Row: {
           id: string;
@@ -458,6 +499,7 @@ export type Post = Database["public"]["Tables"]["posts"]["Row"];
 export type Comment = Database["public"]["Tables"]["comments"]["Row"];
 export type Reaction = Database["public"]["Tables"]["reactions"]["Row"];
 export type CommentReaction = Database["public"]["Tables"]["comment_reactions"]["Row"];
+export type MatchingPreferences = Database["public"]["Tables"]["matching_preferences"]["Row"];
 
 export type SwipeablePet = Pet & {
   owner_name: string;

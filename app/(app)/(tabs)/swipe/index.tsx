@@ -1,5 +1,6 @@
+import { useCallback, useRef } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SwipeDeck } from "@/components/swipe/SwipeDeck";
 import { MatchOverlay } from "@/components/swipe/MatchOverlay";
@@ -18,7 +19,19 @@ export default function SwipeScreen() {
     hasMore,
     recordSwipe,
     dismissMatch,
+    resetDeck,
   } = useSwipe();
+
+  const isFirstFocus = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      if (isFirstFocus.current) {
+        isFirstFocus.current = false;
+        return;
+      }
+      resetDeck();
+    }, [resetDeck])
+  );
 
   if (loading) {
     return (
@@ -55,10 +68,11 @@ export default function SwipeScreen() {
             pets={pets}
             currentIndex={currentIndex}
             onSwipe={recordSwipe}
-            onOpenProfile={(petId) => router.push(`/(app)/pet-profile/${petId}`)}
+            onOpenProfile={(petId) =>
+              router.push(`/(app)/pet-profile/${petId}`)
+            }
           />
         ) : (
-          /* Empty state */
           <View className="flex-1 items-center justify-center px-6">
             <Ionicons name="search" size={64} color="#D1D5DB" />
             <Text className="text-xl font-bold text-gray-900 mt-4">
@@ -78,7 +92,6 @@ export default function SwipeScreen() {
           matchedPet={matchedPet}
           onSendMessage={() => {
             dismissMatch();
-            // Navigate to matches tab (chat coming in Phase 4)
             router.push("/(app)/(tabs)/matches");
           }}
           onKeepSwiping={dismissMatch}

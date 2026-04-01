@@ -41,6 +41,10 @@ function AppLayoutInner() {
         name="post/[id]"
         options={{ presentation: "modal" }}
       />
+      <Stack.Screen
+        name="matching-preferences"
+        options={{ presentation: "modal" }}
+      />
     </Stack>
   );
 }

@@ -162,6 +162,48 @@ export default function ProfileScreen() {
         </View>
       )}
 
+      {/* Settings */}
+      <View className="px-6 py-4 border-t border-gray-100">
+        <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+          Settings
+        </Text>
+        <Pressable
+          onPress={() => router.push("/(app)/matching-preferences")}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: "#F9FAFB",
+            borderRadius: 16,
+            padding: 16,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: "#FFF7ED",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Ionicons name="options-outline" size={20} color="#F97316" />
+            </View>
+            <View>
+              <Text className="text-base font-semibold text-gray-900">
+                Matching Preferences
+              </Text>
+              <Text className="text-sm text-gray-500">
+                Filter which pets you see
+              </Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+        </Pressable>
+      </View>
+
       {/* Pet Parent */}
       <View className="px-6 py-4 border-t border-gray-100">
         <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">

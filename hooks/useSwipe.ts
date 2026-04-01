@@ -115,6 +115,17 @@ export function useSwipe() {
     setMatchId(null);
   }, []);
 
+  const resetDeck = useCallback(async () => {
+    if (!activePet) return;
+    setPets([]);
+    setCurrentIndex(0);
+    setMatchedPet(null);
+    setMatchId(null);
+    setLoading(true);
+    await fetchPets(activePet.id);
+    setLoading(false);
+  }, [activePet, fetchPets]);
+
   const hasMore = currentIndex < pets.length;
 
   return {
@@ -127,5 +138,6 @@ export function useSwipe() {
     hasMore,
     recordSwipe,
     dismissMatch,
+    resetDeck,
   };
 }
