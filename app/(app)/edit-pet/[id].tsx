@@ -6,8 +6,6 @@ import {
   Pressable,
   Image,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   TextInput,
   ActivityIndicator,
 } from "react-native";
@@ -118,7 +116,10 @@ export default function EditPetScreen() {
 
   const pickImage = async () => {
     if (photos.length >= MAX_PET_PHOTOS) {
-      Alert.alert("Limit Reached", `You can add up to ${MAX_PET_PHOTOS} photos.`);
+      Alert.alert(
+        "Limit Reached",
+        `You can add up to ${MAX_PET_PHOTOS} photos.`
+      );
       return;
     }
 
@@ -145,7 +146,10 @@ export default function EditPetScreen() {
         return prev.filter((p) => p.question !== question);
       }
       if (prev.length >= MAX_PET_PROMPTS) {
-        Alert.alert("Limit Reached", `You can answer up to ${MAX_PET_PROMPTS} prompts.`);
+        Alert.alert(
+          "Limit Reached",
+          `You can answer up to ${MAX_PET_PROMPTS} prompts.`
+        );
         return prev;
       }
       return [...prev, { question, answer: "" }];
@@ -246,26 +250,20 @@ export default function EditPetScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-white"
-    >
+    <View className="flex-1 bg-white">
       <ScrollView
         contentContainerStyle={{ paddingBottom: 40 }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets
       >
         <View className="px-6 pt-16 pb-4">
-          <Text className="text-3xl font-bold text-gray-900">
-            Edit Pet
-          </Text>
+          <Text className="text-3xl font-bold text-gray-900">Edit Pet</Text>
         </View>
 
         {/* Photos */}
         <View className="px-6 py-4">
-          <Text className="text-sm font-medium text-gray-700 mb-3">
-            Photos
-          </Text>
+          <Text className="text-sm font-medium text-gray-700 mb-3">Photos</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -273,11 +271,12 @@ export default function EditPetScreen() {
             style={{ overflow: "visible" }}
           >
             {photos.map((uri, index) => (
-              <View key={index} className="relative" style={{ overflow: "visible" }}>
-                <Image
-                  source={{ uri }}
-                  className="w-24 h-24 rounded-xl"
-                />
+              <View
+                key={index}
+                className="relative"
+                style={{ overflow: "visible" }}
+              >
+                <Image source={{ uri }} className="w-24 h-24 rounded-xl" />
                 <Pressable
                   onPress={() => removePhoto(index)}
                   className="absolute -top-2 -right-2 bg-red-500 rounded-full w-6 h-6 items-center justify-center"
@@ -371,7 +370,9 @@ export default function EditPetScreen() {
               <TextInput
                 className="mt-3 border border-gray-200 rounded-xl px-4 text-gray-900"
                 style={{ fontSize: 16, minHeight: 48 }}
-                placeholder={breed === "Mixed" ? "e.g. Lab/Poodle" : "Enter breed"}
+                placeholder={
+                  breed === "Mixed" ? "e.g. Lab/Poodle" : "Enter breed"
+                }
                 value={customBreed}
                 onChangeText={setCustomBreed}
                 autoCapitalize="words"
@@ -383,9 +384,7 @@ export default function EditPetScreen() {
 
           {/* Age */}
           <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Age
-            </Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2">Age</Text>
             <View className="flex-row flex-wrap gap-2">
               {PET_AGE_OPTIONS.map((option) => (
                 <Pressable
@@ -413,9 +412,7 @@ export default function EditPetScreen() {
 
           {/* Size */}
           <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Size
-            </Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2">Size</Text>
             <View className="gap-2">
               {PET_SIZES.map((petSize) => (
                 <Pressable
@@ -442,7 +439,9 @@ export default function EditPetScreen() {
           {/* Bio */}
           <Input
             label="Bio (optional)"
-            placeholder={`Tell us about ${name.trim() ? `${name.trim()}'s` : "your pet's"} personality...`}
+            placeholder={`Tell us about ${
+              name.trim() ? `${name.trim()}'s` : "your pet's"
+            } personality...`}
             value={bio}
             onChangeText={setBio}
             multiline
@@ -515,7 +514,9 @@ export default function EditPetScreen() {
                         style={{ fontSize: 16, minHeight: 48 }}
                         placeholder="Write your answer..."
                         value={selected.answer}
-                        onChangeText={(text) => updatePromptAnswer(question, text)}
+                        onChangeText={(text) =>
+                          updatePromptAnswer(question, text)
+                        }
                         autoCapitalize="sentences"
                         returnKeyType="done"
                         submitBehavior="blurAndSubmit"
@@ -536,6 +537,6 @@ export default function EditPetScreen() {
           />
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
