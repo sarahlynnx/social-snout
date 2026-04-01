@@ -54,16 +54,7 @@ export default function MatchingPreferencesScreen() {
     }
   }, [loading, preferences]);
 
-  const togglePetType = (type: PetType) => {
-    setPetTypes((prev) => {
-      if (prev.includes(type)) {
-        if (prev.length === 1) return prev;
-        return prev.filter((t) => t !== type);
-      }
-      return [...prev, type];
-    });
-  };
-
+  const selectPetType = (type: PetType) => setPetTypes([type]);
   const setBoth = () => setPetTypes(["DOG", "CAT"]);
 
   const toggleSize = (size: PetSize) => {
@@ -138,7 +129,7 @@ export default function MatchingPreferencesScreen() {
             return (
               <Pressable
                 key={type}
-                onPress={() => togglePetType(type)}
+                onPress={() => selectPetType(type)}
                 className="flex-1"
                 style={{
                   paddingVertical: 12,
