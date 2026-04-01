@@ -33,6 +33,14 @@ function AppLayoutInner() {
         name="add-pet"
         options={{ presentation: "modal" }}
       />
+      <Stack.Screen
+        name="create-post"
+        options={{ presentation: "modal" }}
+      />
+      <Stack.Screen
+        name="post/[id]"
+        options={{ presentation: "modal" }}
+      />
     </Stack>
   );
 }

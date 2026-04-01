@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useActivePet } from "@/contexts/ActivePetContext";
 import { supabase } from "@/lib/supabase";
 import { uploadPetPhoto, uploadAvatar } from "@/lib/storage";
+import { saveUserLocation } from "@/lib/location";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
@@ -67,7 +68,10 @@ export default function OnboardingScreen() {
 
   const pickImage = async () => {
     if (photos.length >= MAX_PET_PHOTOS) {
-      Alert.alert("Limit Reached", `You can add up to ${MAX_PET_PHOTOS} photos.`);
+      Alert.alert(
+        "Limit Reached",
+        `You can add up to ${MAX_PET_PHOTOS} photos.`
+      );
       return;
     }
 
@@ -107,7 +111,10 @@ export default function OnboardingScreen() {
         return prev.filter((p) => p.question !== question);
       }
       if (prev.length >= MAX_PET_PROMPTS) {
-        Alert.alert("Limit Reached", `You can answer up to ${MAX_PET_PROMPTS} prompts.`);
+        Alert.alert(
+          "Limit Reached",
+          `You can answer up to ${MAX_PET_PROMPTS} prompts.`
+        );
         return prev;
       }
       return [...prev, { question, answer: "" }];
@@ -195,6 +202,9 @@ export default function OnboardingScreen() {
       if (error) throw error;
 
       await refreshPets();
+
+      saveUserLocation(session!.user.id).catch(() => {});
+
       router.replace("/(app)/(tabs)/swipe");
     } catch (error) {
       Alert.alert(
@@ -216,9 +226,7 @@ export default function OnboardingScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="px-6 pt-16 pb-4">
-          <Text className="text-3xl font-bold text-gray-900">
-            Add Your Pet
-          </Text>
+          <Text className="text-3xl font-bold text-gray-900">Add Your Pet</Text>
           <Text className="text-base text-gray-500 mt-2">
             Tell us about your furry friend to start finding playmates!
           </Text>
@@ -226,9 +234,7 @@ export default function OnboardingScreen() {
 
         {/* Photos */}
         <View className="px-6 py-4">
-          <Text className="text-sm font-medium text-gray-700 mb-3">
-            Photos
-          </Text>
+          <Text className="text-sm font-medium text-gray-700 mb-3">Photos</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -236,11 +242,12 @@ export default function OnboardingScreen() {
             style={{ overflow: "visible" }}
           >
             {photos.map((uri, index) => (
-              <View key={index} className="relative" style={{ overflow: "visible" }}>
-                <Image
-                  source={{ uri }}
-                  className="w-24 h-24 rounded-xl"
-                />
+              <View
+                key={index}
+                className="relative"
+                style={{ overflow: "visible" }}
+              >
+                <Image source={{ uri }} className="w-24 h-24 rounded-xl" />
                 <Pressable
                   onPress={() => removePhoto(index)}
                   className="absolute -top-2 -right-2 bg-red-500 rounded-full w-6 h-6 items-center justify-center"
@@ -334,7 +341,9 @@ export default function OnboardingScreen() {
               <TextInput
                 className="mt-3 border border-gray-200 rounded-xl px-4 text-gray-900"
                 style={{ fontSize: 16, minHeight: 48 }}
-                placeholder={breed === "Mixed" ? "e.g. Lab/Poodle" : "Enter breed"}
+                placeholder={
+                  breed === "Mixed" ? "e.g. Lab/Poodle" : "Enter breed"
+                }
                 value={customBreed}
                 onChangeText={setCustomBreed}
                 autoCapitalize="words"
@@ -344,9 +353,7 @@ export default function OnboardingScreen() {
 
           {/* Age */}
           <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Age
-            </Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2">Age</Text>
             <View className="flex-row flex-wrap gap-2">
               {PET_AGE_OPTIONS.map((option) => (
                 <Pressable
@@ -374,9 +381,7 @@ export default function OnboardingScreen() {
 
           {/* Size */}
           <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Size
-            </Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2">Size</Text>
             <View className="gap-2">
               {PET_SIZES.map((petSize) => (
                 <Pressable
@@ -403,7 +408,9 @@ export default function OnboardingScreen() {
           {/* Bio */}
           <Input
             label="Bio (optional)"
-            placeholder={`Tell us about ${name.trim() ? `${name.trim()}'s` : "your pet's"} personality...`}
+            placeholder={`Tell us about ${
+              name.trim() ? `${name.trim()}'s` : "your pet's"
+            } personality...`}
             value={bio}
             onChangeText={setBio}
             multiline
@@ -476,7 +483,9 @@ export default function OnboardingScreen() {
                         style={{ fontSize: 16, minHeight: 48 }}
                         placeholder="Write your answer..."
                         value={selected.answer}
-                        onChangeText={(text) => updatePromptAnswer(question, text)}
+                        onChangeText={(text) =>
+                          updatePromptAnswer(question, text)
+                        }
                         autoCapitalize="sentences"
                       />
                     )}
@@ -492,7 +501,8 @@ export default function OnboardingScreen() {
               Your Profile Photo
             </Text>
             <Text className="text-xs text-gray-400 mb-3">
-              Required for safety — helps other owners verify who they're meeting.
+              Required for safety - helps other owners verify who they're
+              meeting.
             </Text>
             <Pressable onPress={pickAvatar} className="items-center">
               {avatarUri ? (

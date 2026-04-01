@@ -130,4 +130,31 @@ export const MAX_PET_PROMPTS = 3;
 
 export const POST_TYPES = ["GENERAL", "LOST_PET", "EVENT", "PHOTO"] as const;
 
-export const REACTION_TYPES = ["LIKE", "HEART", "LAUGH", "WOW"] as const;
+export const POST_TYPE_LABELS: Record<string, string> = {
+  GENERAL: "General",
+  LOST_PET: "Lost Pet",
+  EVENT: "Event",
+  PHOTO: "Photo",
+};
+
+export const POST_TYPE_COLORS: Record<string, string> = {
+  LOST_PET: "#EF4444",
+  EVENT: "#3B82F6",
+  PHOTO: "#22C55E",
+};
+
+export const REACTION_TYPES = ["HEART", "LAUGH", "WOW", "IDEA", "SAD"] as const;
+
+export const REACTION_EMOJIS: Record<
+  string,
+  { image: ReturnType<typeof require>; color: string }
+> = {
+  HEART: { image: require("@/assets/emoji/red_heart_3d.png"), color: "#EF4444" },
+  LAUGH: { image: require("@/assets/emoji/face_with_tears_of_joy_3d.png"), color: "#F59E0B" },
+  WOW: { image: require("@/assets/emoji/face_with_open_mouth_3d.png"), color: "#8B5CF6" },
+  IDEA: { image: require("@/assets/emoji/light_bulb_3d.png"), color: "#F59E0B" },
+  SAD: { image: require("@/assets/emoji/crying_face_3d.png"), color: "#3B82F6" },
+};
+
+export const FEED_PAGE_SIZE = 20;
+export const MAX_POST_IMAGES = 4;

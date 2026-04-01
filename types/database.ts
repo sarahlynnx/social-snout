@@ -4,7 +4,7 @@ export type PetType = "DOG" | "CAT";
 export type PetSize = "SMALL" | "MEDIUM" | "LARGE";
 export type SwipeDirection = "RIGHT" | "LEFT";
 export type PostType = "GENERAL" | "LOST_PET" | "EVENT" | "PHOTO";
-export type ReactionType = "LIKE" | "HEART" | "LAUGH" | "WOW";
+export type ReactionType = "HEART" | "LAUGH" | "WOW" | "IDEA" | "SAD";
 
 export interface Database {
   public: {
@@ -279,6 +279,8 @@ export interface Database {
           id: string;
           post_id: string;
           author_id: string;
+          pet_id: string | null;
+          parent_comment_id: string | null;
           content: string;
           created_at: string;
         };
@@ -286,6 +288,8 @@ export interface Database {
           id?: string;
           post_id: string;
           author_id: string;
+          pet_id?: string | null;
+          parent_comment_id?: string | null;
           content: string;
           created_at?: string;
         };
@@ -293,6 +297,8 @@ export interface Database {
           id?: string;
           post_id?: string;
           author_id?: string;
+          pet_id?: string | null;
+          parent_comment_id?: string | null;
           content?: string;
           created_at?: string;
         };
@@ -302,6 +308,27 @@ export interface Database {
             columns: ["post_id"];
             isOneToOne: false;
             referencedRelation: "posts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_pet_id_fkey";
+            columns: ["pet_id"];
+            isOneToOne: false;
+            referencedRelation: "pets";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "comments_parent_comment_id_fkey";
+            columns: ["parent_comment_id"];
+            isOneToOne: false;
+            referencedRelation: "comments";
             referencedColumns: ["id"];
           },
         ];
@@ -331,6 +358,35 @@ export interface Database {
             columns: ["post_id"];
             isOneToOne: false;
             referencedRelation: "posts";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      comment_reactions: {
+        Row: {
+          id: string;
+          comment_id: string;
+          user_id: string;
+          type: ReactionType;
+        };
+        Insert: {
+          id?: string;
+          comment_id: string;
+          user_id: string;
+          type: ReactionType;
+        };
+        Update: {
+          id?: string;
+          comment_id?: string;
+          user_id?: string;
+          type?: ReactionType;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "comment_reactions_comment_id_fkey";
+            columns: ["comment_id"];
+            isOneToOne: false;
+            referencedRelation: "comments";
             referencedColumns: ["id"];
           },
         ];
@@ -369,6 +425,17 @@ export interface Database {
         };
         Returns: SwipeablePet[];
       };
+      nearby_post_ids: {
+        Args: {
+          lat: number;
+          lng: number;
+          radius_miles?: number;
+          cursor_created_at?: string | null;
+          page_size?: number;
+          p_type?: PostType | null;
+        };
+        Returns: { post_id: string }[];
+      };
     };
     Enums: {
       pet_type: PetType;
@@ -390,15 +457,28 @@ export type Message = Database["public"]["Tables"]["messages"]["Row"];
 export type Post = Database["public"]["Tables"]["posts"]["Row"];
 export type Comment = Database["public"]["Tables"]["comments"]["Row"];
 export type Reaction = Database["public"]["Tables"]["reactions"]["Row"];
+export type CommentReaction = Database["public"]["Tables"]["comment_reactions"]["Row"];
 
-// Swipeable pet returned by get_swipeable_pets RPC
 export type SwipeablePet = Pet & {
   owner_name: string;
   owner_avatar_url: string | null;
 };
 
-// Match with full pet and owner profiles (for matches list)
 export type MatchWithProfiles = Match & {
   pet: Pet;
   owner: Pick<User, "id" | "name" | "avatar_url">;
+};
+
+export type PostWithDetails = Post & {
+  pet: Pet | null;
+  author: Pick<User, "id" | "name" | "avatar_url">;
+  reactions: Reaction[];
+  comments: { count: number }[];
+};
+
+export type CommentWithPet = Comment & {
+  pet: Pet | null;
+  author: Pick<User, "id" | "name" | "avatar_url">;
+  comment_reactions: CommentReaction[];
+  replies?: CommentWithPet[];
 };
