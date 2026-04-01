@@ -45,6 +45,7 @@ function AppLayoutInner() {
         name="matching-preferences"
         options={{ presentation: "modal" }}
       />
+      <Stack.Screen name="chat/[matchId]" />
     </Stack>
   );
 }

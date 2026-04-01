@@ -1,7 +1,10 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useMatches } from "@/hooks/useMatches";
 
 export default function TabLayout() {
+  const { totalUnread } = useMatches();
+
   return (
     <Tabs
       screenOptions={{
@@ -53,6 +56,8 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="heart" size={size} color={color} />
           ),
+          tabBarBadge: totalUnread > 0 ? totalUnread : undefined,
+          tabBarBadgeStyle: { backgroundColor: "#F97316" },
         }}
       />
       <Tabs.Screen

@@ -8,63 +8,66 @@ import {
   RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Avatar } from "@/components/ui/Avatar";
-import { PetSwitcher } from "@/components/PetSwitcher";
+import { useRouter } from "expo-router";
 import { useMatches } from "@/hooks/useMatches";
-import type { MatchWithProfiles } from "@/types/database";
+import type { MatchWithMessages } from "@/types/database";
 
 export default function MatchesScreen() {
+  const router = useRouter();
   const { matches, loading, refresh } = useMatches();
 
-  const renderMatch = ({ item }: { item: MatchWithProfiles }) => {
-    const photo = item.pet.photos[0];
-    const matchDate = new Date(item.created_at);
-    const timeAgo = getTimeAgo(matchDate);
+  const renderMatch = ({ item }: { item: MatchWithMessages }) => {
+    const timeAgo = item.last_message_at
+      ? getTimeAgo(new Date(item.last_message_at))
+      : getTimeAgo(new Date(item.created_at));
+    const hasUnread = item.unread_count > 0;
 
     return (
       <Pressable
         className="flex-row items-center px-6 py-4 bg-white active:bg-gray-50"
-        onPress={() => {
-          // Chat navigation — Phase 4
-        }}
+        onPress={() => router.push(`/(app)/chat/${item.id}`)}
       >
         {/* Pet photo */}
-        {photo ? (
+        {item.pet_photo ? (
           <Image
-            source={{ uri: photo }}
-            className="w-16 h-16 rounded-full"
+            source={{ uri: item.pet_photo }}
+            className="w-14 h-14 rounded-full"
           />
         ) : (
-          <View className="w-16 h-16 rounded-full bg-gray-200 items-center justify-center">
-            <Ionicons name="paw" size={24} color="#D1D5DB" />
+          <View className="w-14 h-14 rounded-full bg-gray-200 items-center justify-center">
+            <Ionicons name="paw" size={22} color="#D1D5DB" />
           </View>
         )}
 
         {/* Info */}
         <View className="flex-1 ml-4">
-          <Text className="text-base font-semibold text-gray-900">
-            {item.pet.name}
+          <Text
+            className={`text-base font-semibold ${
+              hasUnread ? "text-gray-900" : "text-gray-900"
+            }`}
+          >
+            {item.pet_name}
           </Text>
-          <View className="flex-row items-center gap-2 mt-1">
-            <Avatar
-              uri={item.owner.avatar_url}
-              name={item.owner.name}
-              size="sm"
-              className="w-5 h-5"
-            />
-            <Text className="text-sm text-gray-500">{item.owner.name}</Text>
-          </View>
+          <Text
+            className={`text-sm mt-0.5 ${
+              hasUnread ? "text-gray-900 font-medium" : "text-gray-500"
+            }`}
+            numberOfLines={1}
+          >
+            {item.last_message_content ?? "New match! Say hi 👋"}
+          </Text>
         </View>
 
-        {/* Time + chevron */}
-        <View className="items-end">
+        {/* Time + unread badge */}
+        <View className="items-end gap-1.5">
           <Text className="text-xs text-gray-400">{timeAgo}</Text>
-          <Ionicons
-            name="chevron-forward"
-            size={20}
-            color="#D1D5DB"
-            style={{ marginTop: 4 }}
-          />
+          {hasUnread && (
+            <View className="bg-primary-500 rounded-full min-w-[20px] h-5 items-center justify-center px-1.5">
+              <Text className="text-xs font-bold text-white">
+                {item.unread_count}
+              </Text>
+            </View>
+          )}
         </View>
       </Pressable>
     );
@@ -80,9 +83,9 @@ export default function MatchesScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Pet switcher header */}
-      <View className="px-4 pt-2 pb-2">
-        <PetSwitcher />
+      {/* Header */}
+      <View className="px-6 pt-4 pb-2">
+        <Text className="text-2xl font-bold text-gray-900">Matches</Text>
       </View>
 
       {matches.length > 0 ? (
@@ -103,7 +106,7 @@ export default function MatchesScreen() {
         />
       ) : (
         <View className="flex-1 items-center justify-center px-6">
-          <Ionicons name="heart-outline" size={64} color="#D1D5DB" />
+          <Ionicons name="chatbubble-outline" size={64} color="#D1D5DB" />
           <Text className="text-xl font-bold text-gray-900 mt-4">
             No Matches Yet
           </Text>

@@ -477,6 +477,12 @@ export interface Database {
         };
         Returns: { post_id: string }[];
       };
+      get_matches_with_messages: {
+        Args: {
+          p_user_id: string;
+        };
+        Returns: MatchWithMessages[];
+      };
     };
     Enums: {
       pet_type: PetType;
@@ -523,4 +529,20 @@ export type CommentWithPet = Comment & {
   author: Pick<User, "id" | "name" | "avatar_url">;
   comment_reactions: CommentReaction[];
   replies?: CommentWithPet[];
+};
+
+export type MatchWithMessages = {
+  id: string;
+  pet_a_id: string;
+  pet_b_id: string;
+  user_a_id: string;
+  user_b_id: string;
+  created_at: string;
+  pet_name: string;
+  pet_photo: string | null;
+  owner_name: string;
+  owner_avatar: string | null;
+  last_message_content: string | null;
+  last_message_at: string | null;
+  unread_count: number;
 };
