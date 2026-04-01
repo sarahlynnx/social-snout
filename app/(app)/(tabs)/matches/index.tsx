@@ -10,11 +10,20 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useMatches } from "@/hooks/useMatches";
+import { useActivePet } from "@/contexts/ActivePetContext";
+import { PetSwitcher } from "@/components/PetSwitcher";
 import type { MatchWithMessages } from "@/types/database";
 
 export default function MatchesScreen() {
   const router = useRouter();
   const { matches, loading, refresh } = useMatches();
+  const { activePet } = useActivePet();
+
+  const filteredMatches = activePet
+    ? matches.filter(
+        (m) => m.pet_a_id === activePet.id || m.pet_b_id === activePet.id
+      )
+    : matches;
 
   const renderMatch = ({ item }: { item: MatchWithMessages }) => {
     const timeAgo = item.last_message_at
@@ -83,14 +92,13 @@ export default function MatchesScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      {/* Header */}
-      <View className="px-6 pt-4 pb-2">
-        <Text className="text-2xl font-bold text-gray-900">Matches</Text>
+      <View className="px-4 pt-2 pb-2">
+        <PetSwitcher />
       </View>
 
-      {matches.length > 0 ? (
+      {filteredMatches.length > 0 ? (
         <FlatList
-          data={matches}
+          data={filteredMatches}
           keyExtractor={(item) => item.id}
           renderItem={renderMatch}
           ItemSeparatorComponent={() => (

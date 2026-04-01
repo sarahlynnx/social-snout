@@ -23,6 +23,7 @@ type MatchInfo = {
   petName: string;
   petPhoto: string | null;
   ownerName: string;
+  breed: string | null;
 };
 
 export default function ChatScreen() {
@@ -35,9 +36,17 @@ export default function ChatScreen() {
   const [matchInfo, setMatchInfo] = useState<MatchInfo | null>(null);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   const userId = session?.user?.id;
+
+  // Track keyboard visibility
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardWillShow", () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener("keyboardWillHide", () => setKeyboardVisible(false));
+    return () => { showSub.remove(); hideSub.remove(); };
+  }, []);
 
   // Fetch match info for the header
   useEffect(() => {
@@ -46,8 +55,8 @@ export default function ChatScreen() {
         .from("matches")
         .select(`
           *,
-          pet_a:pets!matches_pet_a_id_fkey(name, photos),
-          pet_b:pets!matches_pet_b_id_fkey(name, photos),
+          pet_a:pets!matches_pet_a_id_fkey(name, photos, breed),
+          pet_b:pets!matches_pet_b_id_fkey(name, photos, breed),
           owner_a:users!matches_user_a_id_fkey(name),
           owner_b:users!matches_user_b_id_fkey(name)
         `)
@@ -60,10 +69,14 @@ export default function ChatScreen() {
       const otherPet = isUserA ? match.pet_b : match.pet_a;
       const otherOwner = isUserA ? match.owner_b : match.owner_a;
 
+      const rawBreed: string | null = (otherPet as any).breed;
+      const breed = rawBreed?.replace(/^(Mixed|Other) — /, "") ?? null;
+
       setMatchInfo({
         petName: (otherPet as any).name,
         petPhoto: (otherPet as any).photos?.[0] ?? null,
         ownerName: (otherOwner as any).name,
+        breed,
       });
     }
 
@@ -137,26 +150,13 @@ export default function ChatScreen() {
               >
                 {item.content}
               </Text>
-              <View
-                className={`flex-row items-center gap-1 mt-1 ${
-                  isMine ? "justify-end" : "justify-start"
+              <Text
+                className={`text-[11px] mt-1 ${
+                  isMine ? "text-white/70" : "text-gray-400"
                 }`}
               >
-                <Text
-                  className={`text-[11px] ${
-                    isMine ? "text-white/70" : "text-gray-400"
-                  }`}
-                >
-                  {time}
-                </Text>
-                {isMine && (
-                  <Ionicons
-                    name={item.read ? "checkmark-done" : "checkmark"}
-                    size={14}
-                    color={item.read ? "#FFFFFF" : "rgba(255,255,255,0.5)"}
-                  />
-                )}
-              </View>
+                {time}
+              </Text>
             </View>
           </View>
         </View>
@@ -202,8 +202,8 @@ export default function ChatScreen() {
             {matchInfo?.petName ?? "Chat"}
           </Text>
           {matchInfo?.ownerName && (
-            <Text className="text-xs text-gray-400">
-              {matchInfo.ownerName}'s pet
+            <Text className="text-xs text-gray-400" numberOfLines={1}>
+              {matchInfo.ownerName}'s {matchInfo.breed ?? "pet"}
             </Text>
           )}
         </View>
@@ -230,7 +230,7 @@ export default function ChatScreen() {
       {/* Input */}
       <View
         className="border-t border-gray-100 bg-white"
-        style={{ paddingBottom: insets.bottom || 8 }}
+        style={{ paddingBottom: keyboardVisible ? 4 : (insets.bottom || 8) }}
       >
         <View className="flex-row items-center px-4 pt-3 pb-2 gap-3">
           <TextInput

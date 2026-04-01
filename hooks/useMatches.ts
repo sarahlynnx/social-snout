@@ -38,13 +38,13 @@ export function useMatches() {
     setLoading(true);
     fetchMatches();
 
-    // Subscribe to new messages to auto-refresh the list
+    // Subscribe to message changes (INSERT = new messages, UPDATE = read status)
     const channel = supabase
       .channel("matches-messages")
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "messages",
         },
