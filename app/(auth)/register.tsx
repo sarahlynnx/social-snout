@@ -2,22 +2,26 @@ import { useState } from "react";
 import {
   View,
   Text,
+  Pressable,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Alert,
 } from "react-native";
 import { Link } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 export default function RegisterScreen() {
-  const { signUp } = useAuth();
+  const { signUp, resendVerification } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingVerification, setPendingVerification] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
@@ -32,7 +36,10 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      await signUp(email.trim(), password, name.trim());
+      const result = await signUp(email.trim(), password, name.trim());
+      if (result.needsEmailConfirmation) {
+        setPendingVerification(true);
+      }
     } catch (error) {
       Alert.alert(
         "Sign Up Failed",
@@ -42,6 +49,56 @@ export default function RegisterScreen() {
       setLoading(false);
     }
   };
+
+  const handleResend = async () => {
+    setResending(true);
+    try {
+      await resendVerification(email.trim());
+      Alert.alert("Sent!", "A new verification email has been sent.");
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "Failed to resend email."
+      );
+    } finally {
+      setResending(false);
+    }
+  };
+
+  if (pendingVerification) {
+    return (
+      <View className="flex-1 justify-center items-center px-6 bg-white">
+        <Ionicons name="mail-outline" size={64} color="#F97316" />
+        <Text className="text-2xl font-bold text-gray-900 mt-6 text-center">
+          Check Your Email
+        </Text>
+        <Text className="text-base text-gray-500 mt-3 text-center leading-6">
+          We sent a verification link to{"\n"}
+          <Text className="font-semibold text-gray-700">{email.trim()}</Text>
+        </Text>
+        <Text className="text-sm text-gray-400 mt-2 text-center">
+          Click the link in the email to activate your account, then come back
+          here to sign in.
+        </Text>
+
+        <Button
+          title={resending ? "Sending..." : "Resend Verification Email"}
+          onPress={handleResend}
+          loading={resending}
+          variant="outline"
+          className="mt-8 w-full"
+        />
+
+        <Link href="/(auth)/login" asChild>
+          <Pressable className="mt-4">
+            <Text className="text-primary-500 font-semibold">
+              Go to Sign In
+            </Text>
+          </Pressable>
+        </Link>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView

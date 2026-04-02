@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   View,
   Text,
+  Pressable,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -13,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 export default function LoginScreen() {
-  const { signIn } = useAuth();
+  const { signIn, resendVerification, resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,12 +29,50 @@ export default function LoginScreen() {
     try {
       await signIn(email.trim(), password);
     } catch (error) {
-      Alert.alert(
-        "Sign In Failed",
-        error instanceof Error ? error.message : "An error occurred."
-      );
+      const message =
+        error instanceof Error ? error.message : "An error occurred.";
+
+      if (message.toLowerCase().includes("email not confirmed")) {
+        Alert.alert(
+          "Email Not Verified",
+          "Please check your email and click the verification link before signing in.",
+          [
+            { text: "OK", style: "cancel" },
+            {
+              text: "Resend Email",
+              onPress: async () => {
+                try {
+                  await resendVerification(email.trim());
+                  Alert.alert("Sent!", "A new verification email has been sent.");
+                } catch {
+                  Alert.alert("Error", "Failed to resend verification email.");
+                }
+              },
+            },
+          ]
+        );
+      } else {
+        Alert.alert("Sign In Failed", message);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      Alert.alert("Enter Your Email", "Please enter your email address above, then tap Forgot Password.");
+      return;
+    }
+
+    try {
+      await resetPassword(email.trim());
+      Alert.alert("Check Your Email", "If an account exists with that email, we've sent a password reset link.");
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        error instanceof Error ? error.message : "Failed to send reset email."
+      );
     }
   };
 
@@ -83,6 +122,10 @@ export default function LoginScreen() {
               loading={loading}
               className="mt-2"
             />
+
+            <Pressable onPress={handleForgotPassword} className="items-center mt-3">
+              <Text className="text-sm text-gray-400">Forgot Password?</Text>
+            </Pressable>
           </View>
 
           <View className="flex-row justify-center mt-8">
