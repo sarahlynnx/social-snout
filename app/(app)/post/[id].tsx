@@ -232,7 +232,7 @@ export default function PostDetailScreen() {
                   source={{ uri }}
                   style={{
                     width: imageWidth,
-                    height: imageWidth * 0.65,
+                    height: imageWidth,
                     borderRadius: 12,
                   }}
                 />

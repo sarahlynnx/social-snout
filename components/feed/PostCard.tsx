@@ -90,7 +90,7 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
           {imageCount === 1 ? (
             <Image
               source={{ uri: post.images[0] }}
-              style={{ width: imageWidth, height: imageWidth * 0.6, borderRadius: 12 }}
+              style={{ width: imageWidth, height: imageWidth, borderRadius: 12 }}
             />
           ) : (
             post.images.slice(0, 4).map((uri, i) => (
@@ -99,7 +99,7 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
                 source={{ uri }}
                 style={{
                   width: (imageWidth - 8) / 2,
-                  height: (imageWidth - 8) / 2 * 0.75,
+                  height: (imageWidth - 8) / 2,
                   borderRadius: 12,
                 }}
               />

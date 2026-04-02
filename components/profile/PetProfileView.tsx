@@ -18,13 +18,6 @@ export function PetProfileView({
   ownerAvatar,
   showOwner = true,
 }: PetProfileViewProps) {
-  const ageDisplay =
-    pet.age === 0
-      ? "<1 yr"
-      : pet.age >= 10
-        ? "10+ yrs"
-        : `${pet.age} yr${pet.age === 1 ? "" : "s"}`;
-
   const prompts: PetPrompt[] = Array.isArray(pet.prompts) ? pet.prompts : [];
 
   return (
@@ -33,11 +26,8 @@ export function PetProfileView({
       <PhotoCarousel photos={pet.photos} />
 
       <View className="px-6 pt-5 pb-8 gap-5">
-        {/* Name + age */}
-        <View className="flex-row items-baseline gap-2">
-          <Text className="text-2xl font-bold text-gray-900">{pet.name}</Text>
-          <Text className="text-lg text-gray-500">{ageDisplay}</Text>
-        </View>
+        {/* Name */}
+        <Text className="text-2xl font-bold text-gray-900">{pet.name}</Text>
 
         {/* Info pills */}
         <InfoPills breed={pet.breed} age={pet.age} size={pet.size} />

@@ -20,6 +20,7 @@ import { useMessages } from "@/hooks/useMessages";
 import type { Message } from "@/types/database";
 
 type MatchInfo = {
+  petId: string;
   petName: string;
   petPhoto: string | null;
   ownerName: string;
@@ -66,6 +67,7 @@ export default function ChatScreen() {
       if (!match) return;
 
       const isUserA = match.user_a_id === userId;
+      const otherPetId = isUserA ? match.pet_b_id : match.pet_a_id;
       const otherPet = isUserA ? match.pet_b : match.pet_a;
       const otherOwner = isUserA ? match.owner_b : match.owner_a;
 
@@ -73,6 +75,7 @@ export default function ChatScreen() {
       const breed = rawBreed?.replace(/^(Mixed|Other) — /, "") ?? null;
 
       setMatchInfo({
+        petId: otherPetId,
         petName: (otherPet as any).name,
         petPhoto: (otherPet as any).photos?.[0] ?? null,
         ownerName: (otherOwner as any).name,
@@ -187,26 +190,35 @@ export default function ChatScreen() {
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <Ionicons name="chevron-back" size={28} color="#1F2937" />
         </Pressable>
-        {matchInfo?.petPhoto ? (
-          <Image
-            source={{ uri: matchInfo.petPhoto }}
-            className="w-10 h-10 rounded-full ml-3"
-          />
-        ) : (
-          <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center ml-3">
-            <Ionicons name="paw" size={18} color="#D1D5DB" />
-          </View>
-        )}
-        <View className="ml-3 flex-1">
-          <Text className="text-base font-semibold text-gray-900">
-            {matchInfo?.petName ?? "Chat"}
-          </Text>
-          {matchInfo?.ownerName && (
-            <Text className="text-xs text-gray-400" numberOfLines={1}>
-              {matchInfo.ownerName}'s {matchInfo.breed ?? "pet"}
-            </Text>
+        <Pressable
+          className="flex-row items-center flex-1 ml-3"
+          onPress={() => {
+            if (matchInfo?.petId) {
+              router.push(`/(app)/pet-profile/${matchInfo.petId}?matchId=${matchId}`);
+            }
+          }}
+        >
+          {matchInfo?.petPhoto ? (
+            <Image
+              source={{ uri: matchInfo.petPhoto }}
+              className="w-10 h-10 rounded-full"
+            />
+          ) : (
+            <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center">
+              <Ionicons name="paw" size={18} color="#D1D5DB" />
+            </View>
           )}
-        </View>
+          <View className="ml-3 flex-1">
+            <Text className="text-base font-semibold text-gray-900">
+              {matchInfo?.petName ?? "Chat"}
+            </Text>
+            {matchInfo?.ownerName && (
+              <Text className="text-xs text-gray-400" numberOfLines={1}>
+                {matchInfo.ownerName}'s {matchInfo.breed ?? "pet"}
+              </Text>
+            )}
+          </View>
+        </Pressable>
       </View>
 
       {/* Messages */}
