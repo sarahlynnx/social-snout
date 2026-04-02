@@ -11,6 +11,7 @@ export function useSwipe() {
   const [pets, setPets] = useState<SwipeablePet[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [matchedPet, setMatchedPet] = useState<SwipeablePet | null>(null);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [swiping, setSwiping] = useState(false);
@@ -25,9 +26,11 @@ export function useSwipe() {
       });
 
       if (error) {
-        console.error("Failed to fetch swipeable pets:", error.message);
+        setError(error.message);
         return;
       }
+
+      setError(null);
 
       if (data && data.length > 0) {
         setPets((prev) => {
@@ -133,6 +136,7 @@ export function useSwipe() {
     pets,
     currentIndex,
     loading,
+    error,
     matchedPet,
     matchId,
     hasMore,

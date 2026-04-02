@@ -5,6 +5,7 @@ import type { PostWithDetails } from "@/types/database";
 export function usePost(postId: string) {
   const [post, setPost] = useState<PostWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchPost = useCallback(async () => {
     const { data, error } = await supabase
@@ -22,11 +23,12 @@ export function usePost(postId: string) {
       .single();
 
     if (error) {
-      console.error("Failed to fetch post:", error.message);
+      setError(error.message);
       setLoading(false);
       return;
     }
 
+    setError(null);
     setPost(data as PostWithDetails);
     setLoading(false);
   }, [postId]);
@@ -35,5 +37,5 @@ export function usePost(postId: string) {
     fetchPost();
   }, [fetchPost]);
 
-  return { post, loading, refresh: fetchPost };
+  return { post, loading, error, refresh: fetchPost };
 }

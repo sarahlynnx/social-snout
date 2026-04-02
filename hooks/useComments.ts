@@ -5,6 +5,7 @@ import type { CommentWithPet, ReactionType } from "@/types/database";
 export function useComments(postId: string) {
   const [comments, setComments] = useState<CommentWithPet[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchComments = useCallback(async () => {
     const { data, error } = await supabase
@@ -21,11 +22,12 @@ export function useComments(postId: string) {
       .order("created_at", { ascending: true });
 
     if (error) {
-      console.error("Failed to fetch comments:", error.message);
+      setError(error.message);
       setLoading(false);
       return;
     }
 
+    setError(null);
     const allComments = (data ?? []) as CommentWithPet[];
     const byId = new Map<string, CommentWithPet>();
     const topLevel: CommentWithPet[] = [];
@@ -118,5 +120,5 @@ export function useComments(postId: string) {
     [fetchComments]
   );
 
-  return { comments, loading, refresh: fetchComments, addComment, toggleCommentReaction };
+  return { comments, loading, error, refresh: fetchComments, addComment, toggleCommentReaction };
 }

@@ -7,6 +7,7 @@ export function useMatches() {
   const { session } = useAuth();
   const [matches, setMatches] = useState<MatchWithMessages[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const userId = session?.user?.id;
 
@@ -22,11 +23,12 @@ export function useMatches() {
     });
 
     if (error) {
-      console.error("Failed to fetch matches:", error.message);
+      setError(error.message);
       setLoading(false);
       return;
     }
 
+    setError(null);
     setMatches((data as MatchWithMessages[]) ?? []);
     setLoading(false);
   }, [userId]);
@@ -67,6 +69,7 @@ export function useMatches() {
   return {
     matches,
     loading,
+    error,
     totalUnread,
     refresh: fetchMatches,
   };

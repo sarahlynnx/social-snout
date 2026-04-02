@@ -12,11 +12,12 @@ import { useRouter } from "expo-router";
 import { useMatches } from "@/hooks/useMatches";
 import { useActivePet } from "@/contexts/ActivePetContext";
 import { PetSwitcher } from "@/components/PetSwitcher";
+import { ErrorState } from "@/components/ui/ErrorState";
 import type { MatchWithMessages } from "@/types/database";
 
 export default function MatchesScreen() {
   const router = useRouter();
-  const { matches, loading, refresh } = useMatches();
+  const { matches, loading, error, refresh } = useMatches();
   const { activePet } = useActivePet();
 
   const filteredMatches = activePet
@@ -86,6 +87,18 @@ export default function MatchesScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#F97316" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 bg-white">
+        <ErrorState
+          title="Couldn't load matches"
+          message={error}
+          onRetry={refresh}
+        />
       </View>
     );
   }

@@ -1,10 +1,10 @@
-import { useCallback, useRef } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
-import { useRouter, useFocusEffect } from "expo-router";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SwipeDeck } from "@/components/swipe/SwipeDeck";
 import { MatchOverlay } from "@/components/swipe/MatchOverlay";
 import { PetSwitcher } from "@/components/PetSwitcher";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useSwipe } from "@/hooks/useSwipe";
 
 export default function SwipeScreen() {
@@ -14,6 +14,7 @@ export default function SwipeScreen() {
     pets,
     currentIndex,
     loading,
+    error,
     matchedPet,
     matchId,
     hasMore,
@@ -22,21 +23,22 @@ export default function SwipeScreen() {
     resetDeck,
   } = useSwipe();
 
-  const isFirstFocus = useRef(true);
-  useFocusEffect(
-    useCallback(() => {
-      if (isFirstFocus.current) {
-        isFirstFocus.current = false;
-        return;
-      }
-      resetDeck();
-    }, [resetDeck])
-  );
-
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#F97316" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 bg-white">
+        <ErrorState
+          title="Couldn't load pets"
+          message={error}
+          onRetry={resetDeck}
+        />
       </View>
     );
   }

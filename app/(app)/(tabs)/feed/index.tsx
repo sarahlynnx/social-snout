@@ -7,6 +7,7 @@ import { useReactions } from "@/hooks/useReactions";
 import { PostCard } from "@/components/feed/PostCard";
 import { PostTypeFilter } from "@/components/feed/PostTypeFilter";
 import { LocationPrompt } from "@/components/feed/LocationPrompt";
+import { ErrorState } from "@/components/ui/ErrorState";
 import type { PostWithDetails, ReactionType } from "@/types/database";
 
 export default function FeedScreen() {
@@ -15,6 +16,7 @@ export default function FeedScreen() {
   const {
     posts,
     loading,
+    error,
     refreshing,
     hasMore,
     hasLocation,
@@ -53,6 +55,18 @@ export default function FeedScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#F97316" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 bg-white">
+        <ErrorState
+          title="Couldn't load feed"
+          message={error}
+          onRetry={refresh}
+        />
       </View>
     );
   }

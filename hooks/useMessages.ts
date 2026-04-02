@@ -7,6 +7,7 @@ export function useMessages(matchId: string) {
   const { session } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   const userId = session?.user?.id;
@@ -19,11 +20,12 @@ export function useMessages(matchId: string) {
       .order("created_at", { ascending: true });
 
     if (error) {
-      console.error("Failed to fetch messages:", error.message);
+      setError(error.message);
       setLoading(false);
       return;
     }
 
+    setError(null);
     setMessages(data ?? []);
     setLoading(false);
   }, [matchId]);
@@ -99,5 +101,5 @@ export function useMessages(matchId: string) {
     [matchId, userId]
   );
 
-  return { messages, loading, sendMessage, markAsRead };
+  return { messages, loading, error, sendMessage, markAsRead };
 }

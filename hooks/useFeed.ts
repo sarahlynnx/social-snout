@@ -9,6 +9,7 @@ export function useFeed() {
     useUserLocation();
   const [posts, setPosts] = useState<PostWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [activeFilter, setActiveFilter] = useState<PostType | null>(null);
@@ -31,9 +32,11 @@ export function useFeed() {
       );
 
       if (rpcError) {
-        console.error("Failed to fetch nearby post IDs:", rpcError.message);
+        setError(rpcError.message);
         return;
       }
+
+      setError(null);
 
       const postIds = (idRows ?? []).map(
         (r: { post_id: string }) => r.post_id
@@ -122,6 +125,7 @@ export function useFeed() {
   return {
     posts,
     loading,
+    error,
     refreshing,
     hasMore,
     hasLocation,
