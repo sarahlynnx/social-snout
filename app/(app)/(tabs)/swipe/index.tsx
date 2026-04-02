@@ -33,7 +33,7 @@ export default function SwipeScreen() {
 
   if (error) {
     return (
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-gray-50">
         <ErrorState
           title="Couldn't load pets"
           message={error}
@@ -58,7 +58,7 @@ export default function SwipeScreen() {
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-gray-50">
       {/* Pet switcher header */}
       <View className="px-4 pt-2 pb-2">
         <PetSwitcher />

@@ -93,7 +93,7 @@ export default function MatchesScreen() {
 
   if (error) {
     return (
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-gray-50">
         <ErrorState
           title="Couldn't load matches"
           message={error}
@@ -104,7 +104,7 @@ export default function MatchesScreen() {
   }
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-gray-50">
       <View className="px-4 pt-2 pb-2">
         <PetSwitcher />
       </View>
