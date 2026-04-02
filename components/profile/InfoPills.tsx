@@ -18,7 +18,7 @@ function formatAge(age: number) {
 function Pill({ icon, label }: { icon: keyof typeof Ionicons.glyphMap; label: string }) {
   return (
     <View className="flex-row items-center bg-gray-100 rounded-full px-3 py-1.5 gap-1.5">
-      <Ionicons name={icon} size={14} color="#6B7280" />
+      <Ionicons name={icon} size={14} color="#5C584F" />
       <Text className="text-sm text-gray-700">{label}</Text>
     </View>
   );

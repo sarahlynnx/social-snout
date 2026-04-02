@@ -45,7 +45,7 @@ export default function MatchesScreen() {
           />
         ) : (
           <View className="w-14 h-14 rounded-full bg-gray-200 items-center justify-center">
-            <Ionicons name="paw" size={22} color="#D1D5DB" />
+            <Ionicons name="paw" size={22} color="#D4D1CA" />
           </View>
         )}
 
@@ -86,7 +86,7 @@ export default function MatchesScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#F97316" />
+        <ActivityIndicator size="large" color="#5A8A4F" />
       </View>
     );
   }
@@ -121,13 +121,13 @@ export default function MatchesScreen() {
             <RefreshControl
               refreshing={loading}
               onRefresh={refresh}
-              tintColor="#F97316"
+              tintColor="#5A8A4F"
             />
           }
         />
       ) : (
         <View className="flex-1 items-center justify-center px-6">
-          <Ionicons name="chatbubble-outline" size={64} color="#D1D5DB" />
+          <Ionicons name="chatbubble-outline" size={64} color="#D4D1CA" />
           <Text className="text-xl font-bold text-gray-900 mt-4">
             No Matches Yet
           </Text>

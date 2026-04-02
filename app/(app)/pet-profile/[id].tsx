@@ -92,7 +92,7 @@ export default function PetProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#F97316" />
+        <ActivityIndicator size="large" color="#5A8A4F" />
       </View>
     );
   }

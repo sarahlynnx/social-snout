@@ -204,7 +204,7 @@ export default function AddPetScreen() {
             onPress={() => router.back()}
             className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
           >
-            <Ionicons name="close" size={22} color="#6B7280" />
+            <Ionicons name="close" size={22} color="#5C584F" />
           </Pressable>
         </View>
 
@@ -238,7 +238,7 @@ export default function AddPetScreen() {
                 onPress={pickImage}
                 className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50"
               >
-                <Ionicons name="camera" size={28} color="#9CA3AF" />
+                <Ionicons name="camera" size={28} color="#A8A49C" />
                 <Text className="text-xs text-gray-400 mt-1">Add</Text>
               </Pressable>
             )}

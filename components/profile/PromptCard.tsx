@@ -7,7 +7,7 @@ interface PromptCardProps {
 
 export function PromptCard({ prompt }: PromptCardProps) {
   return (
-    <View className="bg-gray-50 rounded-2xl p-4">
+    <View className="bg-secondary-50 rounded-2xl p-4 border-l-4 border-secondary-300">
       <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide">
         {prompt.question}
       </Text>

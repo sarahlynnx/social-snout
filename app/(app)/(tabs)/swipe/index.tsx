@@ -26,7 +26,7 @@ export default function SwipeScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#F97316" />
+        <ActivityIndicator size="large" color="#5A8A4F" />
       </View>
     );
   }
@@ -46,7 +46,7 @@ export default function SwipeScreen() {
   if (!myPet) {
     return (
       <View className="flex-1 items-center justify-center bg-white px-6">
-        <Ionicons name="paw" size={64} color="#F97316" />
+        <Ionicons name="paw" size={64} color="#5A8A4F" />
         <Text className="text-xl font-bold text-gray-900 mt-4">
           No Pet Profile
         </Text>
@@ -76,7 +76,7 @@ export default function SwipeScreen() {
           />
         ) : (
           <View className="flex-1 items-center justify-center px-6">
-            <Ionicons name="search" size={64} color="#D1D5DB" />
+            <Ionicons name="search" size={64} color="#D4D1CA" />
             <Text className="text-xl font-bold text-gray-900 mt-4">
               No More Pets Nearby
             </Text>

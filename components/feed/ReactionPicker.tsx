@@ -73,7 +73,7 @@ export function ReactionPicker({
                   borderRadius: 22,
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: isActive ? "#F3F4F6" : "transparent",
+                  backgroundColor: isActive ? "#F5F4F0" : "transparent",
                 }}
               >
                 <Image

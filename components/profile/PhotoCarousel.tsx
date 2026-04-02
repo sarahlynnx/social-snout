@@ -27,7 +27,7 @@ export function PhotoCarousel({ photos, height = SCREEN_WIDTH * 0.85 }: PhotoCar
         />
       ) : (
         <View className="w-full h-full items-center justify-center">
-          <Ionicons name="paw" size={64} color="#D1D5DB" />
+          <Ionicons name="paw" size={64} color="#D4D1CA" />
         </View>
       )}
 

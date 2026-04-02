@@ -51,7 +51,7 @@ export function CommentInput({
             Replying to {replyingTo.petName}
           </Text>
           <Pressable onPress={onCancelReply}>
-            <Ionicons name="close" size={16} color="#9CA3AF" />
+            <Ionicons name="close" size={16} color="#A8A49C" />
           </Pressable>
         </View>
       )}
@@ -64,7 +64,7 @@ export function CommentInput({
           />
         ) : (
           <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center">
-            <Ionicons name="paw" size={14} color="#F97316" />
+            <Ionicons name="paw" size={14} color="#5A8A4F" />
           </View>
         )}
 
@@ -83,7 +83,7 @@ export function CommentInput({
               ? `Reply to ${replyingTo.petName}...`
               : "Add a comment..."
           }
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A49C"
           value={text}
           onChangeText={setText}
           multiline
@@ -93,7 +93,7 @@ export function CommentInput({
           <Ionicons
             name="send"
             size={22}
-            color={text.trim() && !submitting ? "#F97316" : "#D1D5DB"}
+            color={text.trim() && !submitting ? "#5A8A4F" : "#D4D1CA"}
           />
         </Pressable>
       </View>

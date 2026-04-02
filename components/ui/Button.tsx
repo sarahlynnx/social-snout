@@ -41,7 +41,7 @@ export function Button({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === "outline" ? "#F97316" : "#FFFFFF"}
+          color={variant === "outline" ? "#5A8A4F" : "#FFFFFF"}
           className="mr-2"
         />
       ) : null}

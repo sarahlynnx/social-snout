@@ -16,7 +16,7 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <View className="flex-1 items-center justify-center px-6 py-20">
-      <Ionicons name={icon} size={48} color="#D1D5DB" />
+      <Ionicons name={icon} size={48} color="#D4D1CA" />
       <Text className="text-lg font-semibold text-gray-900 mt-4 text-center">
         {title}
       </Text>

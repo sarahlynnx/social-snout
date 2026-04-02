@@ -50,7 +50,7 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
           />
         ) : (
           <View className="w-10 h-10 rounded-full bg-primary-100 items-center justify-center">
-            <Ionicons name="paw" size={18} color="#F97316" />
+            <Ionicons name="paw" size={18} color="#5A8A4F" />
           </View>
         )}
         <View className="flex-1 ml-3">

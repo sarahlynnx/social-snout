@@ -38,7 +38,7 @@ export default function FeedScreen() {
   if (locationLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#F97316" />
+        <ActivityIndicator size="large" color="#5A8A4F" />
       </View>
     );
   }
@@ -54,7 +54,7 @@ export default function FeedScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#F97316" />
+        <ActivityIndicator size="large" color="#5A8A4F" />
       </View>
     );
   }
@@ -93,12 +93,12 @@ export default function FeedScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={refresh}
-            tintColor="#F97316"
+            tintColor="#5A8A4F"
           />
         }
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center px-6 pt-20">
-            <Ionicons name="newspaper-outline" size={64} color="#D1D5DB" />
+            <Ionicons name="newspaper-outline" size={64} color="#D4D1CA" />
             <Text className="text-xl font-bold text-gray-900 mt-4">
               No Posts Yet
             </Text>

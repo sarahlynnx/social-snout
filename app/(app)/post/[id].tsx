@@ -124,7 +124,7 @@ export default function PostDetailScreen() {
   if (postLoading || !post) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#F97316" />
+        <ActivityIndicator size="large" color="#5A8A4F" />
       </View>
     );
   }
@@ -190,7 +190,7 @@ export default function PostDetailScreen() {
               />
             ) : (
               <View className="w-11 h-11 rounded-full bg-primary-100 items-center justify-center">
-                <Ionicons name="paw" size={20} color="#F97316" />
+                <Ionicons name="paw" size={20} color="#5A8A4F" />
               </View>
             )}
             <View className="flex-1 ml-3">
@@ -274,7 +274,7 @@ export default function PostDetailScreen() {
                   style={{ width: 20, height: 20 }}
                 />
               ) : (
-                <Ionicons name="heart-outline" size={20} color="#6B7280" />
+                <Ionicons name="heart-outline" size={20} color="#5C584F" />
               )}
               <Text
                 style={{
@@ -282,7 +282,7 @@ export default function PostDetailScreen() {
                   fontWeight: "600",
                   color: myReaction
                     ? REACTION_EMOJIS[myReaction.type]?.color ?? "#EF4444"
-                    : "#6B7280",
+                    : "#5C584F",
                 }}
               >
                 Like
@@ -297,9 +297,9 @@ export default function PostDetailScreen() {
                 gap: 6,
               }}
             >
-              <Ionicons name="chatbubble-outline" size={20} color="#6B7280" />
+              <Ionicons name="chatbubble-outline" size={20} color="#5C584F" />
               <Text
-                style={{ fontSize: 13, fontWeight: "600", color: "#6B7280" }}
+                style={{ fontSize: 13, fontWeight: "600", color: "#5C584F" }}
               >
                 Comment
               </Text>
@@ -319,9 +319,9 @@ export default function PostDetailScreen() {
                 gap: 6,
               }}
             >
-              <Ionicons name="arrow-redo-outline" size={20} color="#6B7280" />
+              <Ionicons name="arrow-redo-outline" size={20} color="#5C584F" />
               <Text
-                style={{ fontSize: 13, fontWeight: "600", color: "#6B7280" }}
+                style={{ fontSize: 13, fontWeight: "600", color: "#5C584F" }}
               >
                 Share
               </Text>
@@ -376,7 +376,7 @@ export default function PostDetailScreen() {
                       );
                     })}
                   </View>
-                  <Text style={{ fontSize: 13, color: "#6B7280" }}>
+                  <Text style={{ fontSize: 13, color: "#5C584F" }}>
                     {totalReactions}{" "}
                     {totalReactions === 1 ? "reaction" : "reactions"}
                   </Text>
@@ -385,7 +385,7 @@ export default function PostDetailScreen() {
                 <View />
               )}
               {commentCount > 0 && (
-                <Text style={{ fontSize: 13, color: "#6B7280" }}>
+                <Text style={{ fontSize: 13, color: "#5C584F" }}>
                   {commentCount} {commentCount === 1 ? "comment" : "comments"}
                 </Text>
               )}
@@ -398,7 +398,7 @@ export default function PostDetailScreen() {
           {commentsLoading ? (
             <ActivityIndicator
               size="small"
-              color="#F97316"
+              color="#5A8A4F"
               style={{ marginTop: 16 }}
             />
           ) : comments.length > 0 ? (

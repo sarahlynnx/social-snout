@@ -61,7 +61,7 @@ export function PetAuthorPicker({
                     />
                   ) : (
                     <View className="w-11 h-11 rounded-full bg-primary-100 items-center justify-center">
-                      <Ionicons name="paw" size={20} color="#F97316" />
+                      <Ionicons name="paw" size={20} color="#5A8A4F" />
                     </View>
                   )}
                   <View className="flex-1 ml-3">
@@ -74,7 +74,7 @@ export function PetAuthorPicker({
                     <Ionicons
                       name="checkmark-circle"
                       size={22}
-                      color="#F97316"
+                      color="#5A8A4F"
                     />
                   )}
                 </Pressable>

@@ -17,9 +17,16 @@ import { useActivePet } from "@/contexts/ActivePetContext";
 import { PetSwitcher } from "@/components/PetSwitcher";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { InfoPills } from "@/components/profile/InfoPills";
 import { PromptCard } from "@/components/profile/PromptCard";
 import type { User, PetPrompt } from "@/types/database";
+
+function getAgeSubtitle(age: number): string {
+  if (age < 1) return "Still a puppy!";
+  if (age === 1) return "1 year of tail wags";
+  return `${age} years of tail wags`;
+}
 
 export default function ProfileScreen() {
   const { session, signOut, deleteAccount } = useAuth();
@@ -97,7 +104,7 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-white"
+      className="flex-1 bg-gray-50"
       contentContainerStyle={{ paddingBottom: 40 }}
     >
       {/* Pet switcher header */}
@@ -106,35 +113,40 @@ export default function ProfileScreen() {
       </View>
 
       {pet ? (
-        <View className="px-6">
+        <View className="px-4 gap-3">
           {/* Pet header with Edit + Preview buttons */}
-          <View className="flex-row items-center justify-between pt-2 pb-4">
-            <Text className="text-lg font-bold text-gray-900">{pet.name}</Text>
-            <View className="flex-row gap-2">
-              <Pressable
-                onPress={editPet}
-                className="flex-row items-center gap-1.5 bg-primary-50 border border-primary-200 rounded-full px-3 py-1.5"
-              >
-                <Ionicons name="pencil" size={14} color="#F97316" />
-                <Text className="text-sm font-medium text-primary-600">
-                  Edit
+          <View className="bg-white rounded-2xl px-4 py-4">
+            <View className="flex-row items-center justify-between">
+              <View>
+                <Text className="text-lg font-bold text-gray-900">{pet.name}</Text>
+                <Text className="text-sm text-gray-400 mt-0.5">
+                  {getAgeSubtitle(pet.age)}
                 </Text>
-              </Pressable>
-              <Pressable
-                onPress={previewPet}
-                className="flex-row items-center gap-1.5 bg-gray-100 rounded-full px-3 py-1.5"
-              >
-                <Ionicons name="eye-outline" size={16} color="#6B7280" />
-                <Text className="text-sm text-gray-600">Preview</Text>
-              </Pressable>
+              </View>
+              <View className="flex-row gap-2">
+                <Pressable
+                  onPress={editPet}
+                  className="flex-row items-center gap-1.5 bg-primary-50 border border-primary-200 rounded-full px-3 py-1.5"
+                >
+                  <Ionicons name="pencil" size={14} color="#5A8A4F" />
+                  <Text className="text-sm font-medium text-primary-600">
+                    Edit
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={previewPet}
+                  className="flex-row items-center gap-1.5 bg-gray-100 rounded-full px-3 py-1.5"
+                >
+                  <Ionicons name="eye-outline" size={16} color="#A8A49C" />
+                  <Text className="text-sm text-gray-600">Preview</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
 
           {/* Photos section */}
-          <View className="py-4">
-            <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-              Photos
-            </Text>
+          <View className="bg-white rounded-2xl p-4">
+            <SectionHeader icon="camera-outline" title="Photos" />
             <View className="flex-row flex-wrap gap-2">
               {pet.photos.map((uri, i) => (
                 <Image
@@ -148,19 +160,15 @@ export default function ProfileScreen() {
           </View>
 
           {/* Basics section */}
-          <View className="py-4 border-t border-gray-100">
-            <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-              Basics
-            </Text>
+          <View className="bg-white rounded-2xl p-4">
+            <SectionHeader icon="paw" title="Basics" />
             <InfoPills breed={pet.breed} age={pet.age} size={pet.size} />
           </View>
 
           {/* Bio section */}
           {pet.bio ? (
-            <View className="py-4 border-t border-gray-100">
-              <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-                Bio
-              </Text>
+            <View className="bg-white rounded-2xl p-4">
+              <SectionHeader icon="book-outline" title="Bio" />
               <Text className="text-base text-gray-700 leading-6">
                 {pet.bio}
               </Text>
@@ -169,10 +177,8 @@ export default function ProfileScreen() {
 
           {/* Prompts section */}
           {prompts.length > 0 ? (
-            <View className="py-4 border-t border-gray-100">
-              <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-                Prompts
-              </Text>
+            <View className="bg-white rounded-2xl p-4">
+              <SectionHeader icon="chatbubble-ellipses-outline" title="Prompts" />
               <View className="gap-3">
                 {prompts.map((prompt, i) => (
                   <PromptCard key={i} prompt={prompt} />
@@ -183,10 +189,8 @@ export default function ProfileScreen() {
 
           {/* Tags section */}
           {pet.tags.length > 0 ? (
-            <View className="py-4 border-t border-gray-100">
-              <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-                Temperament
-              </Text>
+            <View className="bg-white rounded-2xl p-4">
+              <SectionHeader icon="heart-outline" title="Temperament" />
               <View className="flex-row flex-wrap gap-2">
                 {pet.tags.map((tag) => (
                   <View
@@ -199,86 +203,79 @@ export default function ProfileScreen() {
               </View>
             </View>
           ) : null}
+
+          {/* Settings */}
+          <View className="bg-white rounded-2xl p-4">
+            <SectionHeader icon="settings-outline" title="Settings" />
+            <Pressable
+              onPress={() => router.push("/(app)/matching-preferences")}
+              className="flex-row items-center justify-between bg-gray-50 rounded-2xl p-4"
+            >
+              <View className="flex-row items-center gap-3">
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: "#F4F7F4",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Ionicons name="options-outline" size={20} color="#5A8A4F" />
+                </View>
+                <View>
+                  <Text className="text-base font-semibold text-gray-900">
+                    Matching Preferences
+                  </Text>
+                  <Text className="text-sm text-gray-500">
+                    Find your park pals
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#A8A49C" />
+            </Pressable>
+          </View>
+
+          {/* Pet Parent */}
+          <View className="bg-white rounded-2xl p-4">
+            <SectionHeader icon="person-outline" title="Pet Parent" />
+            <View className="flex-row items-center gap-3 bg-gray-50 rounded-2xl p-4">
+              <Avatar uri={user?.avatar_url} name={displayName} size="md" />
+              <View>
+                <Text className="text-base font-semibold text-gray-900">
+                  {displayName}
+                </Text>
+                <Text className="text-sm text-gray-500">{userEmail}</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Account */}
+          <View className="gap-3 mt-1">
+            <Button title="Sign Out" onPress={handleSignOut} variant="outline" />
+            <Pressable
+              onPress={handleDeleteAccount}
+              disabled={deleting}
+              className="items-center py-3"
+            >
+              <Text className="text-sm text-red-400">
+                {deleting ? "Deleting..." : "Delete Account"}
+              </Text>
+            </Pressable>
+          </View>
         </View>
       ) : (
-        <View className="px-6 py-8">
-          <Text className="text-base text-gray-500 text-center">
-            Your pet profile will appear here.
+        <View className="px-6 py-16 items-center">
+          <Ionicons name="paw" size={64} color="#C5D7C0" />
+          <Text className="text-lg font-semibold text-gray-700 mt-4">
+            No pup on the leash yet
+          </Text>
+          <Text className="text-sm text-gray-400 mt-1 text-center">
+            Add your first pet to get started at the park!
           </Text>
         </View>
       )}
-
-      {/* Settings */}
-      <View className="px-6 py-4 border-t border-gray-100">
-        <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-          Settings
-        </Text>
-        <Pressable
-          onPress={() => router.push("/(app)/matching-preferences")}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            backgroundColor: "#F9FAFB",
-            borderRadius: 16,
-            padding: 16,
-          }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: "#FFF7ED",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Ionicons name="options-outline" size={20} color="#F97316" />
-            </View>
-            <View>
-              <Text className="text-base font-semibold text-gray-900">
-                Matching Preferences
-              </Text>
-              <Text className="text-sm text-gray-500">
-                Filter which pets you see
-              </Text>
-            </View>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-        </Pressable>
-      </View>
-
-      {/* Pet Parent */}
-      <View className="px-6 py-4 border-t border-gray-100">
-        <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-          Pet Parent
-        </Text>
-        <View className="flex-row items-center gap-3 bg-gray-50 rounded-2xl p-4">
-          <Avatar uri={user?.avatar_url} name={displayName} size="md" />
-          <View>
-            <Text className="text-base font-semibold text-gray-900">
-              {displayName}
-            </Text>
-            <Text className="text-sm text-gray-500">{userEmail}</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Account */}
-      <View className="px-6 pt-2 gap-3">
-        <Button title="Sign Out" onPress={handleSignOut} variant="outline" />
-        <Pressable
-          onPress={handleDeleteAccount}
-          disabled={deleting}
-          className="items-center py-3"
-        >
-          <Text className="text-sm text-red-400">
-            {deleting ? "Deleting..." : "Delete Account"}
-          </Text>
-        </Pressable>
-      </View>
     </ScrollView>
   );
 }

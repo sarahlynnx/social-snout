@@ -51,7 +51,7 @@ export function ReactionBar({
     : REACTION_EMOJIS.HEART.image;
   const likeColor = hasReacted
     ? REACTION_EMOJIS[myReaction.type]?.color ?? "#EF4444"
-    : "#6B7280";
+    : "#5C584F";
 
   return (
     <View
@@ -69,15 +69,15 @@ export function ReactionBar({
           paddingHorizontal: 12,
           paddingVertical: 4,
           borderRadius: 999,
-          backgroundColor: hasReacted ? "#FFF7ED" : "#F3F4F6",
+          backgroundColor: hasReacted ? "#F4F7F4" : "#F5F4F0",
           borderWidth: hasReacted ? 1 : 0,
-          borderColor: hasReacted ? "#FDBA74" : "transparent",
+          borderColor: hasReacted ? "#C5D7C0" : "transparent",
         }}
       >
         {hasReacted ? (
           <Image source={likeImage} style={{ width: 18, height: 18 }} />
         ) : (
-          <Ionicons name="heart-outline" size={18} color="#9CA3AF" />
+          <Ionicons name="heart-outline" size={18} color="#A8A49C" />
         )}
         {totalReactions > 0 && (
           <Text style={{ color: likeColor, fontSize: 12, fontWeight: "600" }}>
@@ -96,13 +96,13 @@ export function ReactionBar({
           paddingHorizontal: 12,
           paddingVertical: 6,
           borderRadius: 999,
-          backgroundColor: "#F3F4F6",
+          backgroundColor: "#F5F4F0",
           marginLeft: 8,
         }}
       >
-        <Ionicons name="chatbubble-outline" size={16} color="#6B7280" />
+        <Ionicons name="chatbubble-outline" size={16} color="#5C584F" />
         {commentCount > 0 && (
-          <Text style={{ color: "#6B7280", fontSize: 12, fontWeight: "600" }}>
+          <Text style={{ color: "#5C584F", fontSize: 12, fontWeight: "600" }}>
             {commentCount}
           </Text>
         )}
@@ -118,11 +118,11 @@ export function ReactionBar({
           paddingHorizontal: 12,
           paddingVertical: 6,
           borderRadius: 999,
-          backgroundColor: "#F3F4F6",
+          backgroundColor: "#F5F4F0",
           marginLeft: "auto",
         }}
       >
-        <Ionicons name="arrow-redo-outline" size={16} color="#6B7280" />
+        <Ionicons name="arrow-redo-outline" size={16} color="#5C584F" />
       </Pressable>
 
       <ReactionPicker

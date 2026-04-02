@@ -68,7 +68,7 @@ export default function RegisterScreen() {
   if (pendingVerification) {
     return (
       <View className="flex-1 justify-center items-center px-6 bg-white">
-        <Ionicons name="mail-outline" size={64} color="#F97316" />
+        <Ionicons name="mail-outline" size={64} color="#5A8A4F" />
         <Text className="text-2xl font-bold text-gray-900 mt-6 text-center">
           Check Your Email
         </Text>

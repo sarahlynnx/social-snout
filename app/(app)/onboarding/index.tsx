@@ -263,7 +263,7 @@ export default function OnboardingScreen() {
                 onPress={pickImage}
                 className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50"
               >
-                <Ionicons name="camera" size={28} color="#9CA3AF" />
+                <Ionicons name="camera" size={28} color="#A8A49C" />
                 <Text className="text-xs text-gray-400 mt-1">Add</Text>
               </Pressable>
             )}
@@ -523,7 +523,7 @@ export default function OnboardingScreen() {
                 </View>
               ) : (
                 <View className="w-28 h-28 rounded-full border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50">
-                  <Ionicons name="person" size={32} color="#9CA3AF" />
+                  <Ionicons name="person" size={32} color="#A8A49C" />
                   <Text className="text-xs text-gray-400 mt-1">Add photo</Text>
                 </View>
               )}

@@ -244,7 +244,7 @@ export default function EditPetScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#F97316" />
+        <ActivityIndicator size="large" color="#5A8A4F" />
       </View>
     );
   }
@@ -290,7 +290,7 @@ export default function EditPetScreen() {
                 onPress={pickImage}
                 className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50"
               >
-                <Ionicons name="camera" size={28} color="#9CA3AF" />
+                <Ionicons name="camera" size={28} color="#A8A49C" />
                 <Text className="text-xs text-gray-400 mt-1">Add</Text>
               </Pressable>
             )}

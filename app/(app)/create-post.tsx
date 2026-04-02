@@ -158,7 +158,7 @@ export default function CreatePostScreen() {
             />
           ) : (
             <View className="w-9 h-9 rounded-full bg-primary-100 items-center justify-center">
-              <Ionicons name="paw" size={16} color="#F97316" />
+              <Ionicons name="paw" size={16} color="#5A8A4F" />
             </View>
           )}
           <View className="ml-3 flex-1">
@@ -168,7 +168,7 @@ export default function CreatePostScreen() {
             </Text>
           </View>
           {allPets.length > 1 && (
-            <Ionicons name="chevron-down" size={18} color="#9CA3AF" />
+            <Ionicons name="chevron-down" size={18} color="#A8A49C" />
           )}
         </Pressable>
 
@@ -209,7 +209,7 @@ export default function CreatePostScreen() {
             className="text-base text-gray-900 leading-6"
             style={{ fontSize: 16, minHeight: 120 }}
             placeholder={PLACEHOLDERS[postType]}
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#A8A49C"
             value={content}
             onChangeText={setContent}
             multiline
@@ -249,7 +249,7 @@ export default function CreatePostScreen() {
             onPress={pickImage}
             className="flex-row items-center gap-2 px-4 py-3 mt-4 mx-4 rounded-xl border border-gray-200 active:bg-gray-50"
           >
-            <Ionicons name="camera-outline" size={20} color="#9CA3AF" />
+            <Ionicons name="camera-outline" size={20} color="#A8A49C" />
             <Text className="text-sm text-gray-500">Add Photo</Text>
           </Pressable>
         )}

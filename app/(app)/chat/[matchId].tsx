@@ -171,7 +171,7 @@ export default function ChatScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#F97316" />
+        <ActivityIndicator size="large" color="#5A8A4F" />
       </View>
     );
   }
@@ -205,7 +205,7 @@ export default function ChatScreen() {
             />
           ) : (
             <View className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center">
-              <Ionicons name="paw" size={18} color="#D1D5DB" />
+              <Ionicons name="paw" size={18} color="#D4D1CA" />
             </View>
           )}
           <View className="ml-3 flex-1">
@@ -231,7 +231,7 @@ export default function ChatScreen() {
         contentContainerStyle={{ paddingVertical: 12 }}
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center py-20">
-            <Ionicons name="chatbubble-outline" size={48} color="#D1D5DB" />
+            <Ionicons name="chatbubble-outline" size={48} color="#D4D1CA" />
             <Text className="text-base text-gray-400 mt-3">
               Say hi to {matchInfo?.petName ?? "your match"}!
             </Text>
@@ -256,7 +256,7 @@ export default function ChatScreen() {
               textAlignVertical: "center",
             }}
             placeholder="Type a message..."
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#A8A49C"
             value={text}
             onChangeText={setText}
             multiline
@@ -269,7 +269,7 @@ export default function ChatScreen() {
             <Ionicons
               name="send"
               size={24}
-              color={text.trim() && !sending ? "#F97316" : "#D1D5DB"}
+              color={text.trim() && !sending ? "#5A8A4F" : "#D4D1CA"}
             />
           </Pressable>
         </View>

@@ -8,11 +8,11 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#F97316",
-        tabBarInactiveTintColor: "#9CA3AF",
+        tabBarActiveTintColor: "#5A8A4F",
+        tabBarInactiveTintColor: "#A8A49C",
         tabBarStyle: {
           backgroundColor: "#FFFFFF",
-          borderTopColor: "#F3F4F6",
+          borderTopColor: "#E8E6E1",
           paddingBottom: 8,
           paddingTop: 8,
           height: 88,
@@ -57,7 +57,7 @@ export default function TabLayout() {
             <Ionicons name="heart" size={size} color={color} />
           ),
           tabBarBadge: totalUnread > 0 ? totalUnread : undefined,
-          tabBarBadgeStyle: { backgroundColor: "#F97316" },
+          tabBarBadgeStyle: { backgroundColor: "#5A8A4F" },
         }}
       />
       <Tabs.Screen

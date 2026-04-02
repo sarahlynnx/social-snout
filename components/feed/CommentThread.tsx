@@ -80,7 +80,7 @@ function CommentItem({
               height: isReply ? 24 : 28,
             }}
           >
-            <Ionicons name="paw" size={isReply ? 10 : 12} color="#F97316" />
+            <Ionicons name="paw" size={isReply ? 10 : 12} color="#5A8A4F" />
           </View>
         )}
         <Text className="text-sm font-semibold text-gray-900">{petName}</Text>
@@ -128,13 +128,13 @@ function CommentItem({
                 style={{ width: 20, height: 20 }}
               />
             ) : (
-              <Ionicons name="heart-outline" size={20} color="#9CA3AF" />
+              <Ionicons name="heart-outline" size={20} color="#A8A49C" />
             )}
             {totalReactions > 0 ? (
               <Text
                 style={{
                   fontSize: 13,
-                  color: myReaction ? "#EF4444" : "#9CA3AF",
+                  color: myReaction ? "#EF4444" : "#A8A49C",
                   fontWeight: "500",
                 }}
               >
@@ -142,7 +142,7 @@ function CommentItem({
               </Text>
             ) : (
               <Text
-                style={{ fontSize: 13, color: "#9CA3AF", fontWeight: "500" }}
+                style={{ fontSize: 13, color: "#A8A49C", fontWeight: "500" }}
               >
                 Like
               </Text>
@@ -159,8 +159,8 @@ function CommentItem({
               paddingVertical: 6,
             }}
           >
-            <Ionicons name="chatbubble-outline" size={16} color="#9CA3AF" />
-            <Text style={{ fontSize: 13, color: "#9CA3AF", fontWeight: "500" }}>
+            <Ionicons name="chatbubble-outline" size={16} color="#A8A49C" />
+            <Text style={{ fontSize: 13, color: "#A8A49C", fontWeight: "500" }}>
               Reply
             </Text>
           </Pressable>
@@ -210,7 +210,7 @@ function CommentWithReplies({
       style={{
         paddingVertical: 12,
         borderBottomWidth: isLast ? 0 : 1,
-        borderBottomColor: "#F3F4F6",
+        borderBottomColor: "#F5F4F0",
       }}
     >
       <CommentItem

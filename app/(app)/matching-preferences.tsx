@@ -93,7 +93,7 @@ export default function MatchingPreferencesScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#F97316" />
+        <ActivityIndicator size="large" color="#5A8A4F" />
       </View>
     );
   }
@@ -130,22 +130,22 @@ export default function MatchingPreferencesScreen() {
                   paddingVertical: 12,
                   borderRadius: 16,
                   borderWidth: 2,
-                  borderColor: isSelected ? "#F97316" : "#E5E7EB",
-                  backgroundColor: isSelected ? "#FFF7ED" : "#fff",
+                  borderColor: isSelected ? "#5A8A4F" : "#E8E6E1",
+                  backgroundColor: isSelected ? "#F4F7F4" : "#fff",
                   alignItems: "center",
                 }}
               >
                 <Ionicons
                   name={type === "DOG" ? "paw" : "paw-outline"}
                   size={24}
-                  color={isSelected ? "#F97316" : "#9CA3AF"}
+                  color={isSelected ? "#5A8A4F" : "#A8A49C"}
                 />
                 <Text
                   style={{
                     marginTop: 4,
                     fontSize: 14,
                     fontWeight: "600",
-                    color: isSelected ? "#F97316" : "#6B7280",
+                    color: isSelected ? "#5A8A4F" : "#5C584F",
                   }}
                 >
                   {type === "DOG" ? "Dogs" : "Cats"}
@@ -160,22 +160,22 @@ export default function MatchingPreferencesScreen() {
               paddingVertical: 12,
               borderRadius: 16,
               borderWidth: 2,
-              borderColor: isBoth ? "#F97316" : "#E5E7EB",
-              backgroundColor: isBoth ? "#FFF7ED" : "#fff",
+              borderColor: isBoth ? "#5A8A4F" : "#E8E6E1",
+              backgroundColor: isBoth ? "#F4F7F4" : "#fff",
               alignItems: "center",
             }}
           >
             <Ionicons
               name="heart"
               size={24}
-              color={isBoth ? "#F97316" : "#9CA3AF"}
+              color={isBoth ? "#5A8A4F" : "#A8A49C"}
             />
             <Text
               style={{
                 marginTop: 4,
                 fontSize: 14,
                 fontWeight: "600",
-                color: isBoth ? "#F97316" : "#6B7280",
+                color: isBoth ? "#5A8A4F" : "#5C584F",
               }}
             >
               Both
@@ -239,15 +239,15 @@ export default function MatchingPreferencesScreen() {
                   paddingHorizontal: 14,
                   borderRadius: 999,
                   borderWidth: 2,
-                  borderColor: isSelected ? "#F97316" : "#E5E7EB",
-                  backgroundColor: isSelected ? "#FFF7ED" : "#fff",
+                  borderColor: isSelected ? "#5A8A4F" : "#E8E6E1",
+                  backgroundColor: isSelected ? "#F4F7F4" : "#fff",
                 }}
               >
                 <Text
                   style={{
                     fontSize: 13,
                     fontWeight: isSelected ? "600" : "400",
-                    color: isSelected ? "#F97316" : "#6B7280",
+                    color: isSelected ? "#5A8A4F" : "#5C584F",
                   }}
                 >
                   {opt.label}
@@ -273,15 +273,15 @@ export default function MatchingPreferencesScreen() {
                   paddingHorizontal: 14,
                   borderRadius: 999,
                   borderWidth: 2,
-                  borderColor: isSelected ? "#F97316" : "#E5E7EB",
-                  backgroundColor: isSelected ? "#FFF7ED" : "#fff",
+                  borderColor: isSelected ? "#5A8A4F" : "#E8E6E1",
+                  backgroundColor: isSelected ? "#F4F7F4" : "#fff",
                 }}
               >
                 <Text
                   style={{
                     fontSize: 13,
                     fontWeight: isSelected ? "600" : "400",
-                    color: isSelected ? "#F97316" : "#6B7280",
+                    color: isSelected ? "#5A8A4F" : "#5C584F",
                   }}
                 >
                   {opt.label}

@@ -54,7 +54,7 @@ export function PetCard({ pet, onOpenProfile }: PetCardProps) {
           />
         ) : (
           <View className="w-full h-full items-center justify-center bg-gray-200">
-            <Ionicons name="paw" size={64} color="#D1D5DB" />
+            <Ionicons name="paw" size={64} color="#D4D1CA" />
           </View>
         )}
 

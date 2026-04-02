@@ -23,7 +23,7 @@ export function Input({ label, error, className = "", secureTextEntry, ...props 
             error ? "border-red-500" : "border-gray-200"
           } ${secureTextEntry ? "pr-12" : ""} ${className}`}
           style={{ fontSize: 16, minHeight: 48 }}
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#A8A49C"
           secureTextEntry={secureTextEntry && hidden}
           returnKeyType="done"
           submitBehavior="blurAndSubmit"
@@ -37,7 +37,7 @@ export function Input({ label, error, className = "", secureTextEntry, ...props 
             <Ionicons
               name={hidden ? "eye-off-outline" : "eye-outline"}
               size={20}
-              color="#9CA3AF"
+              color="#A8A49C"
             />
           </Pressable>
         )}

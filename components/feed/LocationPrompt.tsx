@@ -17,7 +17,7 @@ export function LocationPrompt({ onRequestLocation }: LocationPromptProps) {
   return (
     <View className="flex-1 items-center justify-center px-8">
       <View className="w-20 h-20 rounded-full bg-primary-50 items-center justify-center mb-4">
-        <Ionicons name="location-outline" size={40} color="#F97316" />
+        <Ionicons name="location-outline" size={40} color="#5A8A4F" />
       </View>
       <Text className="text-xl font-bold text-gray-900 text-center">
         Enable Location

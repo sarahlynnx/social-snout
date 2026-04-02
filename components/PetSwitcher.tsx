@@ -45,13 +45,13 @@ export function PetSwitcher() {
           />
         ) : (
           <View className="w-7 h-7 rounded-full bg-primary-100 items-center justify-center">
-            <Ionicons name="paw" size={14} color="#F97316" />
+            <Ionicons name="paw" size={14} color="#5A8A4F" />
           </View>
         )}
         <Text className="text-sm font-semibold text-gray-900">
           {activePet.name}
         </Text>
-        <Ionicons name="chevron-down" size={14} color="#9CA3AF" />
+        <Ionicons name="chevron-down" size={14} color="#A8A49C" />
       </Pressable>
 
       {/* Switcher modal */}
@@ -102,7 +102,7 @@ export function PetSwitcher() {
                       />
                     ) : (
                       <View className="w-11 h-11 rounded-full bg-primary-100 items-center justify-center">
-                        <Ionicons name="paw" size={20} color="#F97316" />
+                        <Ionicons name="paw" size={20} color="#5A8A4F" />
                       </View>
                     )}
                     <View className="flex-1 ml-3">
@@ -114,7 +114,7 @@ export function PetSwitcher() {
                       </Text>
                     </View>
                     {isActive && (
-                      <Ionicons name="checkmark-circle" size={22} color="#F97316" />
+                      <Ionicons name="checkmark-circle" size={22} color="#5A8A4F" />
                     )}
                   </Pressable>
                 );
@@ -127,7 +127,7 @@ export function PetSwitcher() {
               className="flex-row items-center px-6 py-3 border-t border-gray-100 active:bg-gray-50"
             >
               <View className="w-11 h-11 rounded-full bg-gray-100 items-center justify-center">
-                <Ionicons name="add" size={24} color="#6B7280" />
+                <Ionicons name="add" size={24} color="#5C584F" />
               </View>
               <Text className="text-base font-medium text-gray-700 ml-3">
                 Add New Pet
