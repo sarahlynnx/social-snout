@@ -483,6 +483,12 @@ export interface Database {
         };
         Returns: MatchWithMessages[];
       };
+      delete_user_account: {
+        Args: {
+          p_user_id: string;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       pet_type: PetType;

@@ -1,6 +1,14 @@
 import { useCallback, useState } from "react";
 import { useFocusEffect } from "expo-router";
-import { View, Text, ScrollView, Alert, Image, Pressable, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Alert,
+  Image,
+  Pressable,
+  Dimensions,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,7 +22,7 @@ import { PromptCard } from "@/components/profile/PromptCard";
 import type { User, PetPrompt } from "@/types/database";
 
 export default function ProfileScreen() {
-  const { session, signOut } = useAuth();
+  const { session, signOut, deleteAccount } = useAuth();
   const { activePet, refreshPets } = useActivePet();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -32,7 +40,6 @@ export default function ProfileScreen() {
 
         if (userData) setUser(userData);
 
-        // Refresh pets so active pet data is up to date after edits
         refreshPets();
       }
 
@@ -48,16 +55,51 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "This will permanently delete your account, pets, posts, matches, and messages. This cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete Account",
+          style: "destructive",
+          onPress: async () => {
+            setDeleting(true);
+            try {
+              await deleteAccount();
+            } catch (error) {
+              Alert.alert(
+                "Error",
+                error instanceof Error
+                  ? error.message
+                  : "Failed to delete account."
+              );
+              setDeleting(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const pet = activePet;
-  const displayName = user?.name || session?.user?.user_metadata?.name || "User";
+  const displayName =
+    user?.name || session?.user?.user_metadata?.name || "User";
   const userEmail = session?.user?.email || "";
   const editPet = () => pet && router.push(`/(app)/edit-pet/${pet.id}`);
   const previewPet = () => pet && router.push(`/(app)/pet-profile/${pet.id}`);
-  const prompts: PetPrompt[] = pet && Array.isArray(pet.prompts) ? pet.prompts : [];
+  const prompts: PetPrompt[] =
+    pet && Array.isArray(pet.prompts) ? pet.prompts : [];
   const photoSize = Math.floor((Dimensions.get("window").width - 48 - 16) / 3);
 
   return (
-    <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView
+      className="flex-1 bg-white"
+      contentContainerStyle={{ paddingBottom: 40 }}
+    >
       {/* Pet switcher header */}
       <View className="px-4 pt-2 pb-2">
         <PetSwitcher />
@@ -74,7 +116,9 @@ export default function ProfileScreen() {
                 className="flex-row items-center gap-1.5 bg-primary-50 border border-primary-200 rounded-full px-3 py-1.5"
               >
                 <Ionicons name="pencil" size={14} color="#F97316" />
-                <Text className="text-sm font-medium text-primary-600">Edit</Text>
+                <Text className="text-sm font-medium text-primary-600">
+                  Edit
+                </Text>
               </Pressable>
               <Pressable
                 onPress={previewPet}
@@ -117,7 +161,9 @@ export default function ProfileScreen() {
               <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
                 Bio
               </Text>
-              <Text className="text-base text-gray-700 leading-6">{pet.bio}</Text>
+              <Text className="text-base text-gray-700 leading-6">
+                {pet.bio}
+              </Text>
             </View>
           ) : null}
 
@@ -220,9 +266,18 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      {/* Sign Out */}
-      <View className="px-6 pt-2">
+      {/* Account */}
+      <View className="px-6 pt-2 gap-3">
         <Button title="Sign Out" onPress={handleSignOut} variant="outline" />
+        <Pressable
+          onPress={handleDeleteAccount}
+          disabled={deleting}
+          className="items-center py-3"
+        >
+          <Text className="text-sm text-red-400">
+            {deleting ? "Deleting..." : "Delete Account"}
+          </Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
