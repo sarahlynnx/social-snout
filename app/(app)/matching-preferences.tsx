@@ -43,6 +43,7 @@ export default function MatchingPreferencesScreen() {
   const [requiredTags, setRequiredTags] = useState<string[]>(
     preferences.requiredTags
   );
+  const [radiusMiles, setRadiusMiles] = useState(preferences.radiusMiles);
 
   useEffect(() => {
     if (!loading) {
@@ -51,6 +52,7 @@ export default function MatchingPreferencesScreen() {
       setAgeMin(preferences.ageMin);
       setAgeMax(preferences.ageMax);
       setRequiredTags(preferences.requiredTags);
+      setRadiusMiles(preferences.radiusMiles);
     }
   }, [loading, preferences]);
 
@@ -80,6 +82,7 @@ export default function MatchingPreferencesScreen() {
       ageMin,
       ageMax,
       requiredTags,
+      radiusMiles,
     };
 
     const success = await savePreferences(prefs);
@@ -111,6 +114,45 @@ export default function MatchingPreferencesScreen() {
         <Text className="text-sm text-gray-500 mt-1">
           Filter which pets appear in your swipe deck
         </Text>
+      </View>
+
+      {/* Distance Radius */}
+      <View className="px-6 py-4">
+        <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+          Distance
+        </Text>
+        <Text className="text-sm text-gray-500 mb-3">
+          Show pets within {radiusMiles} {radiusMiles === 1 ? "mile" : "miles"}
+        </Text>
+        <View className="flex-row flex-wrap gap-2">
+          {[5, 10, 15, 25, 50, 100].map((miles) => {
+            const isSelected = radiusMiles === miles;
+            return (
+              <Pressable
+                key={miles}
+                onPress={() => setRadiusMiles(miles)}
+                style={{
+                  paddingVertical: 8,
+                  paddingHorizontal: 14,
+                  borderRadius: 999,
+                  borderWidth: 2,
+                  borderColor: isSelected ? "#5A8A4F" : "#E8E6E1",
+                  backgroundColor: isSelected ? "#F4F7F4" : "#fff",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: isSelected ? "600" : "400",
+                    color: isSelected ? "#5A8A4F" : "#5C584F",
+                  }}
+                >
+                  {miles} mi
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       {/* Pet Type */}

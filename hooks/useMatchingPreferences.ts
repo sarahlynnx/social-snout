@@ -9,6 +9,7 @@ export interface MatchingPreferencesState {
   ageMin: number;
   ageMax: number;
   requiredTags: string[];
+  radiusMiles: number;
 }
 
 const DEFAULTS: MatchingPreferencesState = {
@@ -17,6 +18,7 @@ const DEFAULTS: MatchingPreferencesState = {
   ageMin: 0,
   ageMax: 10,
   requiredTags: [],
+  radiusMiles: 10,
 };
 
 export function useMatchingPreferences() {
@@ -47,6 +49,7 @@ export function useMatchingPreferences() {
         ageMin: data.age_min,
         ageMax: data.age_max,
         requiredTags: data.required_tags,
+        radiusMiles: data.radius_miles ?? 10,
       });
     }
 
@@ -66,6 +69,7 @@ export function useMatchingPreferences() {
           age_min: prefs.ageMin,
           age_max: prefs.ageMax,
           required_tags: prefs.requiredTags,
+          radius_miles: prefs.radiusMiles,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "user_id" }

@@ -371,6 +371,7 @@ export interface Database {
           age_min: number;
           age_max: number;
           required_tags: string[];
+          radius_miles: number;
           updated_at: string;
         };
         Insert: {
@@ -381,6 +382,7 @@ export interface Database {
           age_min?: number;
           age_max?: number;
           required_tags?: string[];
+          radius_miles?: number;
           updated_at?: string;
         };
         Update: {
@@ -391,6 +393,7 @@ export interface Database {
           age_min?: number;
           age_max?: number;
           required_tags?: string[];
+          radius_miles?: number;
           updated_at?: string;
         };
         Relationships: [

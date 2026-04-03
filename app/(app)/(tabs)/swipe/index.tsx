@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, Pressable, Linking, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SwipeDeck } from "@/components/swipe/SwipeDeck";
@@ -6,9 +6,11 @@ import { MatchOverlay } from "@/components/swipe/MatchOverlay";
 import { PetSwitcher } from "@/components/PetSwitcher";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { useSwipe } from "@/hooks/useSwipe";
+import { useUserLocation } from "@/hooks/useUserLocation";
 
 export default function SwipeScreen() {
   const router = useRouter();
+  const { hasLocation, loading: locationLoading, requestLocation } = useUserLocation();
   const {
     myPet,
     pets,
@@ -23,10 +25,46 @@ export default function SwipeScreen() {
     resetDeck,
   } = useSwipe();
 
-  if (loading) {
+  if (loading || locationLoading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
+      <View className="flex-1 items-center justify-center bg-gray-50">
         <ActivityIndicator size="large" color="#5A8A4F" />
+      </View>
+    );
+  }
+
+  if (!hasLocation) {
+    const handleEnableLocation = async () => {
+      const granted = await requestLocation();
+      if (!granted) {
+        Alert.alert(
+          "Location Required",
+          "Please enable location access for SocialSnout in your device Settings to discover pets near you.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Open Settings", onPress: () => Linking.openSettings() },
+          ]
+        );
+      }
+    };
+
+    return (
+      <View className="flex-1 items-center justify-center bg-gray-50 px-6">
+        <Ionicons name="location-outline" size={64} color="#D4D1CA" />
+        <Text className="text-xl font-bold text-gray-900 mt-4">
+          Location Required
+        </Text>
+        <Text className="text-base text-gray-500 mt-2 text-center">
+          Discover needs your location to find pets nearby. Enable location access to start swiping!
+        </Text>
+        <Pressable
+          onPress={handleEnableLocation}
+          className="bg-primary-500 rounded-full px-6 py-3 mt-6"
+        >
+          <Text className="text-white font-semibold text-base">
+            Enable Location
+          </Text>
+        </Pressable>
       </View>
     );
   }

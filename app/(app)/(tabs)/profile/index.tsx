@@ -8,6 +8,7 @@ import {
   Image,
   Pressable,
   Dimensions,
+  Share,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -90,6 +91,17 @@ export default function ProfileScreen() {
         },
       ]
     );
+  };
+
+  const handleInvite = async () => {
+    try {
+      await Share.share({
+        message:
+          "Join me on SocialSnout! It's a social app for pets to find friends, playdates, and more. 🐾",
+      });
+    } catch {
+      // user cancelled share
+    }
   };
 
   const pet = activePet;
@@ -230,6 +242,35 @@ export default function ProfileScreen() {
                   </Text>
                   <Text className="text-sm text-gray-500">
                     Find your park pals
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#A8A49C" />
+            </Pressable>
+
+            <Pressable
+              onPress={handleInvite}
+              className="flex-row items-center justify-between bg-gray-50 rounded-2xl p-4 mt-2"
+            >
+              <View className="flex-row items-center gap-3">
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: "#FDF6F2",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Ionicons name="mail-outline" size={20} color="#C4754A" />
+                </View>
+                <View>
+                  <Text className="text-base font-semibold text-gray-900">
+                    Invite a Friend
+                  </Text>
+                  <Text className="text-sm text-gray-500">
+                    Bring more pals to the park
                   </Text>
                 </View>
               </View>
