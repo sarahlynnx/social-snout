@@ -8,7 +8,6 @@ import {
   Image,
   Pressable,
   Dimensions,
-  Share,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,6 +20,7 @@ import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { InfoPills } from "@/components/profile/InfoPills";
 import { PromptCard } from "@/components/profile/PromptCard";
+import { InviteModal } from "@/components/InviteModal";
 import type { User, PetPrompt } from "@/types/database";
 
 function getAgeSubtitle(age: number): string {
@@ -93,16 +93,7 @@ export default function ProfileScreen() {
     );
   };
 
-  const handleInvite = async () => {
-    try {
-      await Share.share({
-        message:
-          "Join me on SocialSnout! It's a social app for pets to find friends, playdates, and more. 🐾",
-      });
-    } catch {
-      // user cancelled share
-    }
-  };
+  const [inviteVisible, setInviteVisible] = useState(false);
 
   const pet = activePet;
   const displayName =
@@ -115,6 +106,7 @@ export default function ProfileScreen() {
   const photoSize = Math.floor((Dimensions.get("window").width - 48 - 16) / 3);
 
   return (
+    <>
     <ScrollView
       className="flex-1 bg-gray-50"
       contentContainerStyle={{ paddingBottom: 40 }}
@@ -249,7 +241,7 @@ export default function ProfileScreen() {
             </Pressable>
 
             <Pressable
-              onPress={handleInvite}
+              onPress={() => setInviteVisible(true)}
               className="flex-row items-center justify-between bg-gray-50 rounded-2xl p-4 mt-2"
             >
               <View className="flex-row items-center gap-3">
@@ -318,5 +310,11 @@ export default function ProfileScreen() {
         </View>
       )}
     </ScrollView>
+
+    <InviteModal
+      visible={inviteVisible}
+      onClose={() => setInviteVisible(false)}
+    />
+  </>
   );
 }

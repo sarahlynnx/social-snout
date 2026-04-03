@@ -435,6 +435,35 @@ export interface Database {
           },
         ];
       };
+      invites: {
+        Row: {
+          id: string;
+          inviter_id: string;
+          invited_email: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          inviter_id: string;
+          invited_email: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          inviter_id?: string;
+          invited_email?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "invites_inviter_id_fkey";
+            columns: ["inviter_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {};
     Functions: {
