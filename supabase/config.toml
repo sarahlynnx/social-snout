@@ -1,0 +1,4 @@
+project_id = "social-snout"
+
+[functions.invite-user]
+verify_jwt = false

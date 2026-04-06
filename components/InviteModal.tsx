@@ -13,7 +13,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/hooks/useAuth";
 
 // TODO: Replace with actual App Store / Play Store URL when published
 const APP_LINK = "https://socialsnout.app";
@@ -24,14 +23,15 @@ interface InviteModalProps {
 }
 
 export function InviteModal({ visible, onClose }: InviteModalProps) {
-  const { session } = useAuth();
   const [showEmailInput, setShowEmailInput] = useState(false);
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   const handleClose = () => {
     setShowEmailInput(false);
     setEmail("");
+    setSentTo(null);
     onClose();
   };
 
@@ -56,22 +56,18 @@ export function InviteModal({ visible, onClose }: InviteModalProps) {
     }
 
     setSending(true);
-    const { error } = await supabase
-      .from("invites")
-      .upsert(
-        { inviter_id: session!.user.id, invited_email: trimmed },
-        { onConflict: "inviter_id,invited_email" }
-      );
+    const { data, error } = await supabase.functions.invoke("invite-user", {
+      body: { email: trimmed },
+    });
     setSending(false);
 
-    if (error) {
-      Alert.alert("Error", "Failed to send invite. Please try again.");
-    } else {
+    if (error || data?.error) {
       Alert.alert(
-        "Invite Sent!",
-        `We'll let ${trimmed} know about SocialSnout.`
+        "Error",
+        data?.error || "Failed to send invite. Please try again."
       );
-      handleClose();
+    } else {
+      setSentTo(trimmed);
     }
   };
 
@@ -99,6 +95,39 @@ export function InviteModal({ visible, onClose }: InviteModalProps) {
               <View className="w-10 h-1 rounded-full bg-gray-300" />
             </View>
 
+            {sentTo ? (
+              <View className="items-center pt-2 pb-2">
+                <View
+                  style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: 36,
+                    backgroundColor: "#F4F7F4",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Ionicons name="checkmark" size={40} color="#5A8A4F" />
+                </View>
+                <Text className="text-xl font-bold text-gray-900 mt-4">
+                  Invite sent!
+                </Text>
+                <Text className="text-sm text-gray-500 mt-2 text-center px-4">
+                  We&apos;ll let the following friend know about SocialSnout:
+                </Text>
+                <Text
+                  className="text-base font-semibold text-primary-600 mt-2 text-center"
+                  numberOfLines={1}
+                  ellipsizeMode="middle"
+                >
+                  {sentTo}
+                </Text>
+                <View className="w-full mt-6">
+                  <Button title="Done" onPress={handleClose} />
+                </View>
+              </View>
+            ) : (
+              <>
             <Text className="text-xl font-bold text-gray-900 mb-1">
               Invite a Friend
             </Text>
@@ -189,6 +218,8 @@ export function InviteModal({ visible, onClose }: InviteModalProps) {
                   <Text className="text-sm text-gray-500">Back</Text>
                 </Pressable>
               </View>
+            )}
+              </>
             )}
           </Pressable>
         </KeyboardAvoidingView>
