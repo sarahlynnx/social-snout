@@ -30,10 +30,11 @@
       },
       "package": "com.socialsnout.app",
       "permissions": [
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE"
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -51,6 +52,13 @@
           "locationWhenInUsePermission": "SocialSnout needs your location to find nearby pets."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "64957fc9-803d-491a-952e-3e9ca446b7c1"
+      }
+    },
+    "owner": "sarahlynnx"
   }
 }
