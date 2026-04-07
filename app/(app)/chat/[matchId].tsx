@@ -187,7 +187,7 @@ export default function ChatScreen() {
         style={{ paddingTop: insets.top + 8 }}
       >
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Ionicons name="chevron-back" size={28} color="#1F2937" />
+          <Ionicons name="chevron-back" size={28} color="#3D3A33" />
         </Pressable>
         <Pressable
           className="flex-row items-center flex-1 ml-3"
