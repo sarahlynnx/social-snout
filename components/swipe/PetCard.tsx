@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, Image, Pressable, Dimensions } from "react-native";
+import { View, Text, Pressable, Dimensions } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { Avatar } from "@/components/ui/Avatar";
 import { PET_SIZE_LABELS } from "@/constants";
@@ -49,8 +50,10 @@ export function PetCard({ pet, onOpenProfile }: PetCardProps) {
         {currentPhoto ? (
           <Image
             source={{ uri: currentPhoto }}
-            className="w-full h-full"
-            resizeMode="cover"
+            style={{ width: "100%", height: "100%" }}
+            contentFit="cover"
+            transition={150}
+            cachePolicy="memory-disk"
           />
         ) : (
           <View className="w-full h-full items-center justify-center bg-gray-200">

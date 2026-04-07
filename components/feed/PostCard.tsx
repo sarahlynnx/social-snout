@@ -1,4 +1,5 @@
-import { View, Text, Pressable, Image, Dimensions } from "react-native";
+import { View, Text, Pressable, Dimensions } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { POST_TYPE_LABELS, POST_TYPE_COLORS } from "@/constants";
 import { ReactionBar } from "@/components/feed/ReactionBar";
@@ -47,6 +48,9 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
           <Image
             source={{ uri: petPhoto }}
             style={{ width: 40, height: 40, borderRadius: 20 }}
+            contentFit="cover"
+            transition={150}
+            cachePolicy="memory-disk"
           />
         ) : (
           <View className="w-10 h-10 rounded-full bg-primary-100 items-center justify-center">
@@ -91,6 +95,9 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
             <Image
               source={{ uri: post.images[0] }}
               style={{ width: imageWidth, height: imageWidth, borderRadius: 12 }}
+              contentFit="cover"
+              transition={150}
+              cachePolicy="memory-disk"
             />
           ) : (
             post.images.slice(0, 4).map((uri, i) => (
@@ -102,6 +109,9 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
                   height: (imageWidth - 8) / 2,
                   borderRadius: 12,
                 }}
+                contentFit="cover"
+                transition={150}
+                cachePolicy="memory-disk"
               />
             ))
           )}

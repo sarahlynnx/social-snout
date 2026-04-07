@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, Pressable, Image } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { REACTION_EMOJIS } from "@/constants";
 import { ReactionPicker } from "@/components/feed/ReactionPicker";
@@ -71,6 +72,9 @@ function CommentItem({
               height: isReply ? 24 : 28,
               borderRadius: isReply ? 12 : 14,
             }}
+            contentFit="cover"
+            transition={150}
+            cachePolicy="memory-disk"
           />
         ) : (
           <View

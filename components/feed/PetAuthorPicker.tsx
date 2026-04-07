@@ -1,4 +1,5 @@
-import { View, Text, Pressable, Image, Modal, FlatList } from "react-native";
+import { View, Text, Pressable, Modal, FlatList } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import type { Pet } from "@/types/database";
 
@@ -58,6 +59,9 @@ export function PetAuthorPicker({
                     <Image
                       source={{ uri: photo }}
                       style={{ width: 44, height: 44, borderRadius: 22 }}
+                      contentFit="cover"
+                      transition={150}
+                      cachePolicy="memory-disk"
                     />
                   ) : (
                     <View className="w-11 h-11 rounded-full bg-primary-100 items-center justify-center">

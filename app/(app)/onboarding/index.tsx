@@ -4,12 +4,12 @@ import {
   Text,
   ScrollView,
   Pressable,
-  Image,
   Alert,
   KeyboardAvoidingView,
   Platform,
   TextInput,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
@@ -249,7 +249,13 @@ export default function OnboardingScreen() {
                 className="relative"
                 style={{ overflow: "visible" }}
               >
-                <Image source={{ uri }} className="w-24 h-24 rounded-xl" />
+                <Image
+                  source={{ uri }}
+                  className="w-24 h-24 rounded-xl"
+                  contentFit="cover"
+                  transition={150}
+                  cachePolicy="memory-disk"
+                />
                 <Pressable
                   onPress={() => removePhoto(index)}
                   className="absolute -top-2 -right-2 bg-red-500 rounded-full w-6 h-6 items-center justify-center"

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Image, Pressable, Dimensions } from "react-native";
+import { View, Pressable, Dimensions } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -22,8 +23,10 @@ export function PhotoCarousel({ photos, height = SCREEN_WIDTH * 0.85 }: PhotoCar
       {currentPhoto ? (
         <Image
           source={{ uri: currentPhoto }}
-          className="w-full h-full"
-          resizeMode="cover"
+          style={{ width: "100%", height: "100%" }}
+          contentFit="cover"
+          transition={150}
+          cachePolicy="memory-disk"
         />
       ) : (
         <View className="w-full h-full items-center justify-center">

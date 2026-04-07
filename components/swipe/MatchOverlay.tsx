@@ -1,4 +1,5 @@
-import { View, Text, Image } from "react-native";
+import { View, Text } from "react-native";
+import { Image } from "expo-image";
 import { Button } from "@/components/ui/Button";
 import type { SwipeablePet, Pet } from "@/types/database";
 
@@ -36,6 +37,9 @@ export function MatchOverlay({
               <Image
                 source={{ uri: myPhoto }}
                 className="w-28 h-28 rounded-full border-4 border-primary-500"
+                contentFit="cover"
+                transition={150}
+                cachePolicy="memory-disk"
               />
             ) : (
               <View className="w-28 h-28 rounded-full bg-gray-200 border-4 border-primary-500 items-center justify-center">
@@ -56,6 +60,9 @@ export function MatchOverlay({
               <Image
                 source={{ uri: theirPhoto }}
                 className="w-28 h-28 rounded-full border-4 border-primary-500"
+                contentFit="cover"
+                transition={150}
+                cachePolicy="memory-disk"
               />
             ) : (
               <View className="w-28 h-28 rounded-full bg-gray-200 border-4 border-primary-500 items-center justify-center">

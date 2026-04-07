@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { View, TextInput, Pressable, Image, Text, Keyboard } from "react-native";
+import { View, TextInput, Pressable, Text, Keyboard } from "react-native";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import type { Pet } from "@/types/database";
 
@@ -61,6 +62,9 @@ export function CommentInput({
           <Image
             source={{ uri: petPhoto }}
             style={{ width: 32, height: 32, borderRadius: 16 }}
+            contentFit="cover"
+            transition={150}
+            cachePolicy="memory-disk"
           />
         ) : (
           <View className="w-8 h-8 rounded-full bg-primary-100 items-center justify-center">
