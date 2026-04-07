@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import Slider from "@react-native-community/slider";
 import { Button } from "@/components/ui/Button";
 import {
   useMatchingPreferences,
@@ -118,40 +119,27 @@ export default function MatchingPreferencesScreen() {
 
       {/* Distance Radius */}
       <View className="px-6 py-4">
-        <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
-          Distance
-        </Text>
-        <Text className="text-sm text-gray-500 mb-3">
-          Show pets within {radiusMiles} {radiusMiles === 1 ? "mile" : "miles"}
-        </Text>
-        <View className="flex-row flex-wrap gap-2">
-          {[5, 10, 15, 25, 50, 100].map((miles) => {
-            const isSelected = radiusMiles === miles;
-            return (
-              <Pressable
-                key={miles}
-                onPress={() => setRadiusMiles(miles)}
-                style={{
-                  paddingVertical: 8,
-                  paddingHorizontal: 14,
-                  borderRadius: 999,
-                  borderWidth: 2,
-                  borderColor: isSelected ? "#5A8A4F" : "#E8E6E1",
-                  backgroundColor: isSelected ? "#F4F7F4" : "#fff",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 13,
-                    fontWeight: isSelected ? "600" : "400",
-                    color: isSelected ? "#5A8A4F" : "#5C584F",
-                  }}
-                >
-                  {miles} mi
-                </Text>
-              </Pressable>
-            );
-          })}
+        <View className="flex-row items-center justify-between mb-3">
+          <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+            Distance
+          </Text>
+          <Text className="text-sm font-semibold text-primary-600">
+            {radiusMiles} {radiusMiles === 1 ? "mile" : "miles"}
+          </Text>
+        </View>
+        <Slider
+          minimumValue={1}
+          maximumValue={100}
+          step={1}
+          value={radiusMiles}
+          onValueChange={setRadiusMiles}
+          minimumTrackTintColor="#5A8A4F"
+          maximumTrackTintColor="#E8E6E1"
+          thumbTintColor="#5A8A4F"
+        />
+        <View className="flex-row justify-between mt-1">
+          <Text className="text-xs text-gray-400">1 mi</Text>
+          <Text className="text-xs text-gray-400">100 mi</Text>
         </View>
       </View>
 
