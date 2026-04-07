@@ -17,13 +17,15 @@ export function useSwipe() {
   const [swiping, setSwiping] = useState(false);
   const lastPetId = useRef<string | null>(null);
 
-  // Fetch swipeable pets via RPC
+  // Fetch swipeable pets
   const fetchPets = useCallback(
     async (petId: string) => {
+      const t0 = Date.now();
       const { data, error } = await supabase.rpc("get_swipeable_pets", {
         p_pet_id: petId,
         p_limit: BATCH_SIZE,
       });
+      console.log(`[useSwipe] get_swipeable_pets RPC: ${Date.now() - t0}ms`);
 
       if (error) {
         setError(error.message);
@@ -69,7 +71,7 @@ export function useSwipe() {
     init();
   }, [activePet, fetchPets]);
 
-  // Auto-fetch more when running low (but not while a swipe is in-flight)
+  // Auto-fetch more when running low 
   useEffect(() => {
     const remaining = pets.length - currentIndex;
     if (remaining <= FETCH_THRESHOLD && remaining > 0 && activePet && !swiping) {
@@ -82,7 +84,6 @@ export function useSwipe() {
     async (petId: string, direction: SwipeDirection) => {
       if (!activePet) return;
 
-      // Advance to next card immediately for snappy feel
       setCurrentIndex((prev) => prev + 1);
       setSwiping(true);
 
@@ -98,7 +99,7 @@ export function useSwipe() {
           return;
         }
 
-        // Check if we got a match
+        // Check for match
         if (data && data.matched) {
           const matched = pets.find((p) => p.id === petId);
           if (matched) {

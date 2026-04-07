@@ -10,7 +10,12 @@ import { useUserLocation } from "@/hooks/useUserLocation";
 
 export default function SwipeScreen() {
   const router = useRouter();
-  const { hasLocation, loading: locationLoading, requestLocation } = useUserLocation();
+  const {
+    hasLocation,
+    loading: locationLoading,
+    requesting: locationRequesting,
+    requestLocation,
+  } = useUserLocation();
   const {
     myPet,
     pets,
@@ -18,17 +23,21 @@ export default function SwipeScreen() {
     loading,
     error,
     matchedPet,
-    matchId,
     hasMore,
     recordSwipe,
     dismissMatch,
     resetDeck,
   } = useSwipe();
 
-  if (loading || locationLoading) {
+  if (loading || locationLoading || locationRequesting) {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50">
         <ActivityIndicator size="large" color="#5A8A4F" />
+        {locationRequesting && (
+          <Text className="text-sm text-gray-500 mt-3">
+            Finding pets nearby...
+          </Text>
+        )}
       </View>
     );
   }

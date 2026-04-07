@@ -5,8 +5,14 @@ import { DEFAULT_RADIUS_MILES, FEED_PAGE_SIZE } from "@/constants";
 import type { PostWithDetails, PostType } from "@/types/database";
 
 export function useFeed() {
-  const { latitude, longitude, hasLocation, loading: locationLoading, requestLocation } =
-    useUserLocation();
+  const {
+    latitude,
+    longitude,
+    hasLocation,
+    loading: locationLoading,
+    requesting: locationRequesting,
+    requestLocation,
+  } = useUserLocation();
   const [posts, setPosts] = useState<PostWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,6 +24,7 @@ export function useFeed() {
   const fetchPosts = useCallback(
     async (cursor: string | null, reset: boolean) => {
       if (!latitude || !longitude) return;
+      const t0 = Date.now();
 
       const { data: idRows, error: rpcError } = await supabase.rpc(
         "nearby_post_ids",
@@ -30,6 +37,7 @@ export function useFeed() {
           p_type: activeFilter,
         }
       );
+      console.log(`[useFeed] nearby_post_ids RPC: ${Date.now() - t0}ms`);
 
       if (rpcError) {
         setError(rpcError.message);
@@ -61,6 +69,7 @@ export function useFeed() {
         )
         .in("id", postIds)
         .order("created_at", { ascending: false });
+      console.log(`[useFeed] hydrate posts query: ${Date.now() - t0}ms`);
 
       if (error) {
         console.error("Failed to fetch posts:", error.message);
@@ -130,6 +139,7 @@ export function useFeed() {
     hasMore,
     hasLocation,
     locationLoading,
+    locationRequesting,
     requestLocation,
     activeFilter,
     setFilter,

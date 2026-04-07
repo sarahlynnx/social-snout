@@ -21,6 +21,7 @@ export default function FeedScreen() {
     hasMore,
     hasLocation,
     locationLoading,
+    locationRequesting,
     requestLocation,
     activeFilter,
     setFilter,
@@ -35,10 +36,15 @@ export default function FeedScreen() {
     toggleReaction(postId, session.user.id, type);
   };
 
-  if (locationLoading) {
+  if (locationLoading || locationRequesting) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#5A8A4F" />
+        {locationRequesting && (
+          <Text className="text-sm text-gray-500 mt-3">
+            Finding posts in your area...
+          </Text>
+        )}
       </View>
     );
   }

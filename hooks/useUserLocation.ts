@@ -15,7 +15,6 @@ interface UserLocation {
 function parseLocation(raw: unknown): UserLocation | null {
   if (!raw) return null;
 
-  // GeoJSON object: { type: "Point", coordinates: [lng, lat] }
   if (typeof raw === "object" && raw !== null) {
     const geo = raw as Record<string, unknown>;
     if (geo.type === "Point" && Array.isArray(geo.coordinates) && geo.coordinates.length === 2) {
@@ -48,8 +47,10 @@ export function useUserLocation() {
   const { session } = useAuth();
   const [location, setLocation] = useState<UserLocation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [requesting, setRequesting] = useState(false);
 
   const fetchLocation = useCallback(async () => {
+    const t0 = Date.now();
     if (!session?.user) {
       setLocation(null);
       setLoading(false);
@@ -61,6 +62,7 @@ export function useUserLocation() {
       .select("location")
       .eq("id", session.user.id)
       .single();
+    console.log(`[useUserLocation] fetch users.location: ${Date.now() - t0}ms`);
 
     if (error || !data?.location) {
       setLocation(null);
@@ -71,6 +73,9 @@ export function useUserLocation() {
     const parsed = parseLocation(data.location);
     if (parsed && parsed.latitude === 0 && parsed.longitude === 0) {
       const coords = await getCurrentLocation();
+      console.log(
+        `[useUserLocation] fallback getCurrentLocation: ${Date.now() - t0}ms`
+      );
       if (coords) {
         setLocation(coords);
       } else {
@@ -89,24 +94,36 @@ export function useUserLocation() {
 
   const requestLocation = useCallback(async () => {
     if (!session?.user) return false;
+    const t0 = Date.now();
+    setRequesting(true);
 
-    const coords = await getCurrentLocation();
-    if (!coords) return false;
+    try {
+      const coords = await getCurrentLocation();
+      console.log(
+        `[useUserLocation] requestLocation getCurrentLocation: ${Date.now() - t0}ms`
+      );
+      if (!coords) return false;
 
-    const { error } = await supabase
-      .from("users")
-      .update({
-        location: `SRID=4326;POINT(${coords.longitude} ${coords.latitude})`,
-      })
-      .eq("id", session.user.id);
+      const { error } = await supabase
+        .from("users")
+        .update({
+          location: `SRID=4326;POINT(${coords.longitude} ${coords.latitude})`,
+        })
+        .eq("id", session.user.id);
+      console.log(
+        `[useUserLocation] requestLocation save to supabase: ${Date.now() - t0}ms`
+      );
 
-    if (error) {
-      console.error("Failed to save location:", error.message);
-      return false;
+      if (error) {
+        console.error("Failed to save location:", error.message);
+        return false;
+      }
+
+      setLocation(coords);
+      return true;
+    } finally {
+      setRequesting(false);
     }
-
-    setLocation(coords);
-    return true;
   }, [session]);
 
   return {
@@ -114,6 +131,7 @@ export function useUserLocation() {
     longitude: location?.longitude ?? null,
     hasLocation: location !== null,
     loading,
+    requesting,
     requestLocation,
   };
 }
