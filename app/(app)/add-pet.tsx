@@ -240,7 +240,7 @@ export default function AddPetScreen() {
               <View key={index} className="relative" style={{ overflow: "visible" }}>
                 <Image
                   source={{ uri }}
-                  className="w-24 h-24 rounded-xl"
+                  style={{ width: 96, height: 96, borderRadius: 12 }}
                   contentFit="cover"
                   transition={150}
                   cachePolicy="memory-disk"
