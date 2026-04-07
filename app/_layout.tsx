@@ -2,6 +2,7 @@ import "../global.css";
 import { useEffect } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function RootLayout() {
@@ -30,5 +31,10 @@ export default function RootLayout() {
     );
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false }} />
+    </>
+  );
 }
