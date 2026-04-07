@@ -4,17 +4,18 @@ import {
   Text,
   ScrollView,
   Pressable,
-  Image,
   Alert,
   KeyboardAvoidingView,
   Platform,
   TextInput,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { useActivePet } from "@/contexts/ActivePetContext";
+import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { supabase } from "@/lib/supabase";
 import { uploadPetPhoto } from "@/lib/storage";
 import { Button } from "@/components/ui/Button";
@@ -49,6 +50,21 @@ export default function AddPetScreen() {
   const [photos, setPhotos] = useState<string[]>([]);
   const [prompts, setPrompts] = useState<PetPrompt[]>([]);
   const [loading, setLoading] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+
+  const hasUnsavedChanges =
+    !justSaved &&
+    !loading &&
+    (name.trim().length > 0 ||
+      breed.length > 0 ||
+      customBreed.length > 0 ||
+      age.length > 0 ||
+      bio.trim().length > 0 ||
+      selectedTags.length > 0 ||
+      photos.length > 0 ||
+      prompts.length > 0);
+
+  useUnsavedChangesWarning(hasUnsavedChanges);
 
   const breeds = type === "DOG" ? DOG_BREEDS : CAT_BREEDS;
 
@@ -170,6 +186,7 @@ export default function AddPetScreen() {
 
       // Refresh context — refreshPets auto-selects the newest pet
       await refreshPets();
+      setJustSaved(true);
       router.back();
     } catch (error) {
       Alert.alert(
@@ -224,6 +241,9 @@ export default function AddPetScreen() {
                 <Image
                   source={{ uri }}
                   className="w-24 h-24 rounded-xl"
+                  contentFit="cover"
+                  transition={150}
+                  cachePolicy="memory-disk"
                 />
                 <Pressable
                   onPress={() => removePhoto(index)}

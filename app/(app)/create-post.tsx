@@ -4,18 +4,19 @@ import {
   Text,
   ScrollView,
   Pressable,
-  Image,
   Alert,
   KeyboardAvoidingView,
   Platform,
   TextInput,
 } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { useActivePet } from "@/contexts/ActivePetContext";
 import { useUserLocation } from "@/hooks/useUserLocation";
+import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { supabase } from "@/lib/supabase";
 import { uploadPostImage } from "@/lib/storage";
 import { PetAuthorPicker } from "@/components/feed/PetAuthorPicker";
@@ -52,6 +53,12 @@ export default function CreatePostScreen() {
   const [content, setContent] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+
+  const hasUnsavedChanges =
+    !justSaved && !loading && (content.trim().length > 0 || images.length > 0);
+
+  useUnsavedChangesWarning(hasUnsavedChanges);
 
   const petPhoto = selectedPet?.photos?.[0];
 
@@ -107,6 +114,7 @@ export default function CreatePostScreen() {
 
       if (error) throw error;
 
+      setJustSaved(true);
       router.back();
     } catch (error) {
       Alert.alert(
@@ -155,6 +163,9 @@ export default function CreatePostScreen() {
             <Image
               source={{ uri: petPhoto }}
               style={{ width: 36, height: 36, borderRadius: 18 }}
+              contentFit="cover"
+              transition={150}
+              cachePolicy="memory-disk"
             />
           ) : (
             <View className="w-9 h-9 rounded-full bg-primary-100 items-center justify-center">
@@ -231,6 +242,9 @@ export default function CreatePostScreen() {
                 <Image
                   source={{ uri }}
                   className="w-24 h-24 rounded-xl"
+                  contentFit="cover"
+                  transition={150}
+                  cachePolicy="memory-disk"
                 />
                 <Pressable
                   onPress={() => removeImage(index)}

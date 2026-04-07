@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "@/lib/supabase";
 import { uploadPetPhoto } from "@/lib/storage";
+import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
@@ -37,6 +38,7 @@ export default function EditPetScreen() {
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
 
   const [name, setName] = useState("");
   const [type, setType] = useState<PetType>("DOG");
@@ -48,6 +50,21 @@ export default function EditPetScreen() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
   const [prompts, setPrompts] = useState<PetPrompt[]>([]);
+
+  const hasUnsavedChanges = useMemo(() => {
+    if (!pet || justSaved || saving) return false;
+    if (name !== pet.name) return true;
+    if (type !== pet.type) return true;
+    if (size !== pet.size) return true;
+    if ((bio || "") !== (pet.bio || "")) return true;
+    if (JSON.stringify(selectedTags) !== JSON.stringify(pet.tags)) return true;
+    if (JSON.stringify(photos) !== JSON.stringify(pet.photos)) return true;
+    const originalPrompts = Array.isArray(pet.prompts) ? pet.prompts : [];
+    if (JSON.stringify(prompts) !== JSON.stringify(originalPrompts)) return true;
+    return false;
+  }, [pet, justSaved, saving, name, type, size, bio, selectedTags, photos, prompts]);
+
+  useUnsavedChangesWarning(hasUnsavedChanges);
 
   const breeds = type === "DOG" ? DOG_BREEDS : CAT_BREEDS;
 
@@ -230,6 +247,7 @@ export default function EditPetScreen() {
 
       if (error) throw error;
 
+      setJustSaved(true);
       router.back();
     } catch (error) {
       Alert.alert(
