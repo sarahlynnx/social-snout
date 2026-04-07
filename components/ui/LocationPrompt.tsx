@@ -1,16 +1,27 @@
-import { View, Text, Linking, Platform } from "react-native";
+import { View, Text, Linking, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Button } from "@/components/ui/Button";
 
 interface LocationPromptProps {
   onRequestLocation: () => Promise<boolean>;
+  description: string;
 }
 
-export function LocationPrompt({ onRequestLocation }: LocationPromptProps) {
+export function LocationPrompt({
+  onRequestLocation,
+  description,
+}: LocationPromptProps) {
   const handleEnable = async () => {
-    const saved = await onRequestLocation();
-    if (!saved && Platform.OS === "ios") {
-      Linking.openSettings();
+    const granted = await onRequestLocation();
+    if (!granted) {
+      Alert.alert(
+        "Location Needed",
+        "Enable location access for SocialSnout in your device Settings to see pets in your neighborhood.",
+        [
+          { text: "Not Now", style: "cancel" },
+          { text: "Open Settings", onPress: () => Linking.openSettings() },
+        ]
+      );
     }
   };
 
@@ -23,7 +34,7 @@ export function LocationPrompt({ onRequestLocation }: LocationPromptProps) {
         Enable Location
       </Text>
       <Text className="text-base text-gray-500 mt-2 text-center leading-6">
-        We need your location to show posts from pets in your neighborhood.
+        {description}
       </Text>
       <View className="mt-6 w-full">
         <Button title="Enable Location" onPress={handleEnable} />

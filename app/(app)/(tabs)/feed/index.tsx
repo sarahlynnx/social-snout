@@ -6,7 +6,7 @@ import { useFeed } from "@/hooks/useFeed";
 import { useReactions } from "@/hooks/useReactions";
 import { PostCard } from "@/components/feed/PostCard";
 import { PostTypeFilter } from "@/components/feed/PostTypeFilter";
-import { LocationPrompt } from "@/components/feed/LocationPrompt";
+import { LocationPrompt } from "@/components/ui/LocationPrompt";
 import { ErrorState } from "@/components/ui/ErrorState";
 import type { PostWithDetails, ReactionType } from "@/types/database";
 
@@ -51,8 +51,11 @@ export default function FeedScreen() {
 
   if (!hasLocation) {
     return (
-      <View className="flex-1 bg-white">
-        <LocationPrompt onRequestLocation={requestLocation} />
+      <View className="flex-1 bg-gray-50">
+        <LocationPrompt
+          onRequestLocation={requestLocation}
+          description="We need your location to show posts from pets in your neighborhood."
+        />
       </View>
     );
   }
