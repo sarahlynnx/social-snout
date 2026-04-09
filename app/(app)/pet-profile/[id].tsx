@@ -9,12 +9,14 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { supabase } from "@/lib/supabase";
 import { PetProfileView } from "@/components/profile/PetProfileView";
 import type { Pet, User } from "@/types/database";
 
 export default function PetProfileScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { id, matchId } = useLocalSearchParams<{
     id: string;
     matchId?: string;
@@ -99,7 +101,7 @@ export default function PetProfileScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}>
         {pet && (
           <PetProfileView
             pet={pet}

@@ -12,6 +12,7 @@ import { Image } from "expo-image";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { supabase } from "@/lib/supabase";
 import { uploadPetPhoto } from "@/lib/storage";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
@@ -34,6 +35,7 @@ import type { PetType, PetSize, Pet, PetPrompt } from "@/types/database";
 export default function EditPetScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const insets = useSafeAreaInsets();
 
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,9 +62,21 @@ export default function EditPetScreen() {
     if (JSON.stringify(selectedTags) !== JSON.stringify(pet.tags)) return true;
     if (JSON.stringify(photos) !== JSON.stringify(pet.photos)) return true;
     const originalPrompts = Array.isArray(pet.prompts) ? pet.prompts : [];
-    if (JSON.stringify(prompts) !== JSON.stringify(originalPrompts)) return true;
+    if (JSON.stringify(prompts) !== JSON.stringify(originalPrompts))
+      return true;
     return false;
-  }, [pet, justSaved, saving, name, type, size, bio, selectedTags, photos, prompts]);
+  }, [
+    pet,
+    justSaved,
+    saving,
+    name,
+    type,
+    size,
+    bio,
+    selectedTags,
+    photos,
+    prompts,
+  ]);
 
   useUnsavedChangesWarning(hasUnsavedChanges);
 
@@ -91,12 +105,10 @@ export default function EditPetScreen() {
       setPhotos(data.photos);
       setPrompts(Array.isArray(data.prompts) ? data.prompts : []);
 
-      // Map age back to picker value
       if (data.age === 0) setAge("<1");
       else if (data.age >= 10) setAge("10+");
       else setAge(String(data.age));
 
-      // Map breed — check if it's in the breed list or custom
       const breedList = data.type === "DOG" ? DOG_BREEDS : CAT_BREEDS;
       const savedBreed = data.breed || "";
 
@@ -219,7 +231,6 @@ export default function EditPetScreen() {
 
     setSaving(true);
     try {
-      // Upload any new local photos (existing URLs start with http)
       const finalPhotos: string[] = [];
       for (const photo of photos) {
         if (photo.startsWith("http")) {
@@ -270,7 +281,7 @@ export default function EditPetScreen() {
   return (
     <View className="flex-1 bg-white">
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         automaticallyAdjustKeyboardInsets

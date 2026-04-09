@@ -13,6 +13,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/hooks/useAuth";
 import { useActivePet } from "@/contexts/ActivePetContext";
 import { supabase } from "@/lib/supabase";
@@ -38,6 +39,7 @@ export default function OnboardingScreen() {
   const { session } = useAuth();
   const { refreshPets } = useActivePet();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [name, setName] = useState("");
   const [type, setType] = useState<PetType>("DOG");
@@ -172,14 +174,12 @@ export default function OnboardingScreen() {
 
     setLoading(true);
     try {
-      // Upload user avatar
       const avatarUrl = await uploadAvatar(avatarUri, session!.user.id);
       await supabase
         .from("users")
         .update({ avatar_url: avatarUrl })
         .eq("id", session!.user.id);
 
-      // Upload pet photos
       const uploadedUrls: string[] = [];
       for (const photoUri of photos) {
         const url = await uploadPetPhoto(photoUri);
@@ -223,7 +223,7 @@ export default function OnboardingScreen() {
       className="flex-1 bg-white"
     >
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >

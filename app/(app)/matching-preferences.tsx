@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Slider from "@react-native-community/slider";
 import { Button } from "@/components/ui/Button";
 import {
@@ -34,6 +35,7 @@ const AGE_OPTIONS = [
 
 export default function MatchingPreferencesScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { preferences, loading, saving, savePreferences } =
     useMatchingPreferences();
 
@@ -107,7 +109,7 @@ export default function MatchingPreferencesScreen() {
   return (
     <ScrollView
       className="flex-1 bg-white"
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
     >
       {/* Header */}
       <View className="px-6 pt-16 pb-4">

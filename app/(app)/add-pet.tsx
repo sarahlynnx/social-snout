@@ -13,6 +13,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/hooks/useAuth";
 import { useActivePet } from "@/contexts/ActivePetContext";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
@@ -38,6 +39,7 @@ export default function AddPetScreen() {
   const { session } = useAuth();
   const { refreshPets } = useActivePet();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [name, setName] = useState("");
   const [type, setType] = useState<PetType>("DOG");
@@ -82,7 +84,10 @@ export default function AddPetScreen() {
 
   const pickImage = async () => {
     if (photos.length >= MAX_PET_PHOTOS) {
-      Alert.alert("Limit Reached", `You can add up to ${MAX_PET_PHOTOS} photos.`);
+      Alert.alert(
+        "Limit Reached",
+        `You can add up to ${MAX_PET_PHOTOS} photos.`
+      );
       return;
     }
 
@@ -109,7 +114,10 @@ export default function AddPetScreen() {
         return prev.filter((p) => p.question !== question);
       }
       if (prev.length >= MAX_PET_PROMPTS) {
-        Alert.alert("Limit Reached", `You can answer up to ${MAX_PET_PROMPTS} prompts.`);
+        Alert.alert(
+          "Limit Reached",
+          `You can answer up to ${MAX_PET_PROMPTS} prompts.`
+        );
         return prev;
       }
       return [...prev, { question, answer: "" }];
@@ -184,7 +192,6 @@ export default function AddPetScreen() {
 
       if (error) throw error;
 
-      // Refresh context — refreshPets auto-selects the newest pet
       await refreshPets();
       setJustSaved(true);
       router.back();
@@ -204,7 +211,7 @@ export default function AddPetScreen() {
       className="flex-1 bg-white"
     >
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         keyboardShouldPersistTaps="handled"
       >
         {/* Header with close button */}
@@ -227,9 +234,7 @@ export default function AddPetScreen() {
 
         {/* Photos */}
         <View className="px-6 py-4">
-          <Text className="text-sm font-medium text-gray-700 mb-3">
-            Photos
-          </Text>
+          <Text className="text-sm font-medium text-gray-700 mb-3">Photos</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -237,7 +242,11 @@ export default function AddPetScreen() {
             style={{ overflow: "visible" }}
           >
             {photos.map((uri, index) => (
-              <View key={index} className="relative" style={{ overflow: "visible" }}>
+              <View
+                key={index}
+                className="relative"
+                style={{ overflow: "visible" }}
+              >
                 <Image
                   source={{ uri }}
                   style={{ width: 96, height: 96, borderRadius: 12 }}
@@ -338,7 +347,9 @@ export default function AddPetScreen() {
               <TextInput
                 className="mt-3 border border-gray-200 rounded-xl px-4 text-gray-900"
                 style={{ fontSize: 16, minHeight: 48 }}
-                placeholder={breed === "Mixed" ? "e.g. Lab/Poodle" : "Enter breed"}
+                placeholder={
+                  breed === "Mixed" ? "e.g. Lab/Poodle" : "Enter breed"
+                }
                 value={customBreed}
                 onChangeText={setCustomBreed}
                 autoCapitalize="words"
@@ -348,9 +359,7 @@ export default function AddPetScreen() {
 
           {/* Age */}
           <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Age
-            </Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2">Age</Text>
             <View className="flex-row flex-wrap gap-2">
               {PET_AGE_OPTIONS.map((option) => (
                 <Pressable
@@ -378,9 +387,7 @@ export default function AddPetScreen() {
 
           {/* Size */}
           <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Size
-            </Text>
+            <Text className="text-sm font-medium text-gray-700 mb-2">Size</Text>
             <View className="gap-2">
               {PET_SIZES.map((petSize) => (
                 <Pressable
@@ -407,7 +414,9 @@ export default function AddPetScreen() {
           {/* Bio */}
           <Input
             label="Bio (optional)"
-            placeholder={`Tell us about ${name.trim() ? `${name.trim()}'s` : "your pet's"} personality...`}
+            placeholder={`Tell us about ${
+              name.trim() ? `${name.trim()}'s` : "your pet's"
+            } personality...`}
             value={bio}
             onChangeText={setBio}
             multiline
@@ -480,7 +489,9 @@ export default function AddPetScreen() {
                         style={{ fontSize: 16, minHeight: 48 }}
                         placeholder="Write your answer..."
                         value={selected.answer}
-                        onChangeText={(text) => updatePromptAnswer(question, text)}
+                        onChangeText={(text) =>
+                          updatePromptAnswer(question, text)
+                        }
                         autoCapitalize="sentences"
                       />
                     )}
