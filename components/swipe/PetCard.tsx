@@ -37,6 +37,7 @@ export function PetCard({ pet, onOpenProfile }: PetCardProps) {
         : `${pet.age} yr${pet.age === 1 ? "" : "s"}`;
 
   const breedDisplay = pet.breed?.replace(/^(Mixed|Other) — /, "") ?? null;
+  const genderSymbol = pet.gender === "MALE" ? "♂" : pet.gender === "FEMALE" ? "♀" : null;
 
   return (
     <View
@@ -97,7 +98,9 @@ export function PetCard({ pet, onOpenProfile }: PetCardProps) {
         {/* Name + Age */}
         <View className="flex-row items-baseline gap-2">
           <Text className="text-2xl font-bold text-gray-900">{pet.name}</Text>
-          <Text className="text-base text-gray-400">{ageDisplay}</Text>
+          <Text className="text-base text-gray-400">
+            {ageDisplay}{genderSymbol ? ` · ${genderSymbol}` : ""}
+          </Text>
         </View>
 
         {/* Breed + Size */}

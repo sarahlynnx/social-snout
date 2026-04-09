@@ -26,6 +26,8 @@ import {
   PET_SIZES,
   PET_SIZE_LABELS,
   PET_AGE_OPTIONS,
+  PET_GENDERS,
+  PET_GENDER_LABELS,
   DOG_BREEDS,
   CAT_BREEDS,
   TEMPERAMENT_TAGS,
@@ -33,7 +35,7 @@ import {
   PET_PROMPTS,
   MAX_PET_PROMPTS,
 } from "@/constants";
-import type { PetType, PetSize, PetPrompt } from "@/types/database";
+import type { PetType, PetSize, PetGender, PetPrompt } from "@/types/database";
 
 export default function OnboardingScreen() {
   const { session } = useAuth();
@@ -46,6 +48,7 @@ export default function OnboardingScreen() {
   const [breed, setBreed] = useState("");
   const [customBreed, setCustomBreed] = useState("");
   const [age, setAge] = useState("");
+  const [gender, setGender] = useState<PetGender>("UNKNOWN");
   const [size, setSize] = useState<PetSize>("MEDIUM");
   const [bio, setBio] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -193,6 +196,7 @@ export default function OnboardingScreen() {
         breed: getFinalBreed(),
         age: age === "<1" ? 0 : age === "10+" ? 10 : Number(age),
         size,
+        gender,
         bio: bio.trim() || null,
         photos: uploadedUrls,
         tags: selectedTags,
@@ -381,6 +385,34 @@ export default function OnboardingScreen() {
                     }`}
                   >
                     {option.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+
+          {/* Gender */}
+          <View>
+            <Text className="text-sm font-medium text-gray-700 mb-2">Gender</Text>
+            <View className="flex-row flex-wrap gap-2">
+              {PET_GENDERS.map((g) => (
+                <Pressable
+                  key={g}
+                  onPress={() => setGender(g)}
+                  className={`py-2 px-3 rounded-full border ${
+                    gender === g
+                      ? "border-primary-500 bg-primary-50"
+                      : "border-gray-200 bg-white"
+                  }`}
+                >
+                  <Text
+                    className={`text-sm ${
+                      gender === g
+                        ? "text-primary-600 font-medium"
+                        : "text-gray-600"
+                    }`}
+                  >
+                    {PET_GENDER_LABELS[g]}
                   </Text>
                 </Pressable>
               ))}

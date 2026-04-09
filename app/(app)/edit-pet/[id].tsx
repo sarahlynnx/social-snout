@@ -23,6 +23,8 @@ import {
   PET_SIZES,
   PET_SIZE_LABELS,
   PET_AGE_OPTIONS,
+  PET_GENDERS,
+  PET_GENDER_LABELS,
   DOG_BREEDS,
   CAT_BREEDS,
   TEMPERAMENT_TAGS,
@@ -30,7 +32,7 @@ import {
   PET_PROMPTS,
   MAX_PET_PROMPTS,
 } from "@/constants";
-import type { PetType, PetSize, Pet, PetPrompt } from "@/types/database";
+import type { PetType, PetSize, PetGender, Pet, PetPrompt } from "@/types/database";
 
 export default function EditPetScreen() {
   const router = useRouter();
@@ -47,6 +49,7 @@ export default function EditPetScreen() {
   const [breed, setBreed] = useState("");
   const [customBreed, setCustomBreed] = useState("");
   const [age, setAge] = useState("");
+  const [gender, setGender] = useState<PetGender>("UNKNOWN");
   const [size, setSize] = useState<PetSize>("MEDIUM");
   const [bio, setBio] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -57,9 +60,13 @@ export default function EditPetScreen() {
     if (!pet || justSaved || saving) return false;
     if (name !== pet.name) return true;
     if (type !== pet.type) return true;
+    if (breed !== (pet.breed || "")) return true;
+    const originalAge = pet.age === 0 ? "<1" : pet.age >= 10 ? "10+" : String(pet.age);
+    if (age !== originalAge) return true;
+    if (gender !== (pet.gender ?? "UNKNOWN")) return true;
     if (size !== pet.size) return true;
     if ((bio || "") !== (pet.bio || "")) return true;
-    if (JSON.stringify(selectedTags) !== JSON.stringify(pet.tags)) return true;
+    if (JSON.stringify(selectedTags.slice().sort()) !== JSON.stringify((pet.tags || []).slice().sort())) return true;
     if (JSON.stringify(photos) !== JSON.stringify(pet.photos)) return true;
     const originalPrompts = Array.isArray(pet.prompts) ? pet.prompts : [];
     if (JSON.stringify(prompts) !== JSON.stringify(originalPrompts))
@@ -71,6 +78,9 @@ export default function EditPetScreen() {
     saving,
     name,
     type,
+    breed,
+    age,
+    gender,
     size,
     bio,
     selectedTags,
@@ -108,6 +118,8 @@ export default function EditPetScreen() {
       if (data.age === 0) setAge("<1");
       else if (data.age >= 10) setAge("10+");
       else setAge(String(data.age));
+
+      setGender(data.gender ?? "UNKNOWN");
 
       const breedList = data.type === "DOG" ? DOG_BREEDS : CAT_BREEDS;
       const savedBreed = data.breed || "";
@@ -248,6 +260,7 @@ export default function EditPetScreen() {
           type,
           breed: getFinalBreed(),
           age: age === "<1" ? 0 : age === "10+" ? 10 : Number(age),
+          gender,
           size,
           bio: bio.trim() || null,
           photos: finalPhotos,
@@ -439,6 +452,34 @@ export default function EditPetScreen() {
                     }`}
                   >
                     {option.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+
+          {/* Gender */}
+          <View>
+            <Text className="text-sm font-medium text-gray-700 mb-2">Gender</Text>
+            <View className="flex-row flex-wrap gap-2">
+              {PET_GENDERS.map((g) => (
+                <Pressable
+                  key={g}
+                  onPress={() => setGender(g)}
+                  className={`py-2 px-3 rounded-full border ${
+                    gender === g
+                      ? "border-primary-500 bg-primary-50"
+                      : "border-gray-200 bg-white"
+                  }`}
+                >
+                  <Text
+                    className={`text-sm ${
+                      gender === g
+                        ? "text-primary-600 font-medium"
+                        : "text-gray-600"
+                    }`}
+                  >
+                    {PET_GENDER_LABELS[g]}
                   </Text>
                 </Pressable>
               ))}

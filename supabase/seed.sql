@@ -58,14 +58,13 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 -- 3. PETS (18 pets: 14 dogs, 4 cats)
 -- ============================================================================
--- Photo URLs from Pexels (free, stable, real pet images)
 
-INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags, prompts) VALUES
+INSERT INTO pets (id, owner_id, name, type, breed, age, size, gender, bio, photos, tags, prompts) VALUES
 
   -- ===== Emma's pets (2) =====
   ('b1111111-1111-1111-1111-111111111111',
    'a1111111-1111-1111-1111-111111111111',
-   'Buddy', 'DOG', 'Golden Retriever', 3, 'LARGE',
+   'Buddy', 'DOG', 'Golden Retriever', 3, 'LARGE', 'MALE',
    'Buddy is the friendliest pup in the park. Loves fetch, swimming, and making new friends. Never met a stranger!',
    ARRAY[
      'https://images.pexels.com/photos/2253275/pexels-photo-2253275.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -77,7 +76,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
 
   ('b2222222-2222-2222-2222-222222222222',
    'a1111111-1111-1111-1111-111111111111',
-   'Luna', 'CAT', 'Siamese', 2, 'SMALL',
+   'Luna', 'CAT', 'Siamese', 2, 'SMALL', 'FEMALE',
    'Luna is sassy but secretly a cuddle bug. Will judge you from across the room, then curl up in your lap.',
    ARRAY[
      'https://images.pexels.com/photos/991831/pexels-photo-991831.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -89,7 +88,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
   -- ===== Mike's pets (2) =====
   ('b3333333-3333-3333-3333-333333333333',
    'a2222222-2222-2222-2222-222222222222',
-   'Mochi', 'DOG', 'Corgi', 4, 'MEDIUM',
+   'Mochi', 'DOG', 'Corgi', 4, 'MEDIUM', 'MALE',
    'Short legs, big personality. Mochi thinks he rules the house (he does). Expert herder of children and other dogs.',
    ARRAY[
      'https://images.pexels.com/photos/3196887/pexels-photo-3196887.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -101,7 +100,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
 
   ('b3333333-3333-3333-3333-222222222222',
    'a2222222-2222-2222-2222-222222222222',
-   'Ziggy', 'DOG', 'French Bulldog', 2, 'SMALL',
+   'Ziggy', 'DOG', 'French Bulldog', 2, 'SMALL', 'MALE',
    'All snort, no bite. Ziggy communicates exclusively through dramatic sighs and will steal your spot on the couch the second you stand up.',
    ARRAY[
      'https://images.pexels.com/photos/4587971/pexels-photo-4587971.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -113,7 +112,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
   -- ===== Lisa's pets (2) =====
   ('b4444444-4444-4444-4444-444444444444',
    'a3333333-3333-3333-3333-333333333333',
-   'Kiko', 'DOG', 'Shiba Inu', 1, 'MEDIUM',
+   'Kiko', 'DOG', 'Shiba Inu', 1, 'MEDIUM', 'FEMALE',
    'Much wow. Very floof. Kiko is an independent thinker who loves hikes and will scream if you try to give her a bath.',
    ARRAY[
      'https://images.pexels.com/photos/3828097/pexels-photo-3828097.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -125,7 +124,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
 
   ('b5555555-5555-5555-5555-555555555555',
    'a3333333-3333-3333-3333-333333333333',
-   'Bear', 'CAT', 'Maine Coon', 5, 'LARGE',
+   'Bear', 'CAT', 'Maine Coon', 5, 'LARGE', 'MALE',
    'Bear is basically a small dog in a cat body. Follows you around, plays fetch, and weighs 22 lbs of pure fluff.',
    ARRAY[
      'https://images.pexels.com/photos/1444321/pexels-photo-1444321.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -138,7 +137,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
   -- ===== James's pet (1) =====
   ('b6666666-6666-6666-6666-666666666666',
    'a4444444-4444-4444-4444-444444444444',
-   'Rosie', 'DOG', 'Mixed — Lab/Pittie', 6, 'LARGE',
+   'Rosie', 'DOG', 'Mixed — Lab/Pittie', 6, 'LARGE', 'FEMALE',
    'Rosie is a rescue who went from scared shelter pup to the happiest girl alive. Loves belly rubs and gentle walks.',
    ARRAY[
      'https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -151,7 +150,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
   -- ===== Priya's pets (2) =====
   ('b7777777-7777-7777-7777-777777777777',
    'a5555555-5555-5555-5555-555555555555',
-   'Chai', 'DOG', 'Beagle', 3, 'MEDIUM',
+   'Chai', 'DOG', 'Beagle', 3, 'MEDIUM', 'MALE',
    'Chai has a nose that could find a treat hidden in a vault. Howls at squirrels, sleeps like an angel, and lives for snack time.',
    ARRAY[
      'https://images.pexels.com/photos/6568941/pexels-photo-6568941.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -163,7 +162,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
 
   ('b7777777-7777-7777-7777-888888888888',
    'a5555555-5555-5555-5555-555555555555',
-   'Nala', 'CAT', 'Ragdoll', 4, 'MEDIUM',
+   'Nala', 'CAT', 'Ragdoll', 4, 'MEDIUM', 'FEMALE',
    'Nala is a living cloud who goes completely limp when you pick her up. Purrs like a motorboat and insists on being in every video call.',
    ARRAY[
      'https://images.pexels.com/photos/1543793/pexels-photo-1543793.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -175,7 +174,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
   -- ===== Marcus's pets (2) =====
   ('b8888888-8888-8888-8888-111111111111',
    'a6666666-6666-6666-6666-666666666666',
-   'Rolo', 'DOG', 'Great Dane', 4, 'LARGE',
+   'Rolo', 'DOG', 'Great Dane', 4, 'LARGE', 'MALE',
    'Rolo thinks he is a lap dog despite being 140lbs. Will lean on you until you accept your fate as his personal furniture.',
    ARRAY[
      'https://images.pexels.com/photos/1629781/pexels-photo-1629781.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -187,7 +186,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
 
   ('b8888888-8888-8888-8888-222222222222',
    'a6666666-6666-6666-6666-666666666666',
-   'Pepper', 'DOG', 'Australian Shepherd', 2, 'MEDIUM',
+   'Pepper', 'DOG', 'Australian Shepherd', 2, 'MEDIUM', 'FEMALE',
    'Pepper has more energy than should be legal. Knows 30 tricks, herds the roomba, and will outsmart you at every turn.',
    ARRAY[
      'https://images.pexels.com/photos/5257588/pexels-photo-5257588.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -200,7 +199,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
   -- ===== Sofia's pet (1) =====
   ('b9999999-9999-9999-9999-111111111111',
    'a7777777-7777-7777-7777-777777777777',
-   'Olive', 'DOG', 'Dachshund', 5, 'SMALL',
+   'Olive', 'DOG', 'Dachshund', 5, 'SMALL', 'FEMALE',
    'Olive is 15 inches of pure attitude. Burrows under every blanket, barks at dogs 10x her size, and is the queen of the house.',
    ARRAY[
      'https://images.pexels.com/photos/3397939/pexels-photo-3397939.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -213,7 +212,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
   -- ===== Kenji's pets (3) =====
   ('ba000000-0000-0000-0000-111111111111',
    'a8888888-8888-8888-8888-888888888888',
-   'Yuki', 'DOG', 'Husky', 3, 'LARGE',
+   'Yuki', 'DOG', 'Husky', 3, 'LARGE', 'FEMALE',
    'Yuki has opinions and she WILL share them. Talks back, argues about walk routes, and melts hearts with those blue eyes.',
    ARRAY[
      'https://images.pexels.com/photos/3715587/pexels-photo-3715587.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -225,7 +224,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
 
   ('ba000000-0000-0000-0000-222222222222',
    'a8888888-8888-8888-8888-888888888888',
-   'Tofu', 'DOG', 'Shiba Inu', 1, 'MEDIUM',
+   'Tofu', 'DOG', 'Shiba Inu', 1, 'MEDIUM', 'MALE',
    'Tofu is peak Shiba: aloof, dramatic, and 100% on his own schedule. But when he decides to cuddle, your heart will explode.',
    ARRAY[
      'https://images.pexels.com/photos/4587997/pexels-photo-4587997.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -236,7 +235,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
 
   ('ba000000-0000-0000-0000-333333333333',
    'a8888888-8888-8888-8888-888888888888',
-   'Miso', 'CAT', 'Tabby', 7, 'MEDIUM',
+   'Miso', 'CAT', 'Tabby', 7, 'MEDIUM', 'MALE',
    'Senior gentleman Miso has seen it all and is not impressed. Loves chin scratches, warm spots, and judging the dogs from the windowsill.',
    ARRAY[
      'https://images.pexels.com/photos/1170986/pexels-photo-1170986.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -248,7 +247,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
   -- ===== Hannah's pets (2) =====
   ('bb000000-0000-0000-0000-111111111111',
    'a9999999-9999-9999-9999-999999999999',
-   'Scout', 'DOG', 'Border Collie', 2, 'MEDIUM',
+   'Scout', 'DOG', 'Border Collie', 2, 'MEDIUM', 'FEMALE',
    'Scout is the smartest dog you will ever meet. Knows every trick in the book and invented a few of her own. Will herd your children.',
    ARRAY[
      'https://images.pexels.com/photos/2820134/pexels-photo-2820134.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -260,7 +259,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
 
   ('bb000000-0000-0000-0000-222222222222',
    'a9999999-9999-9999-9999-999999999999',
-   'Maple', 'DOG', 'Labradoodle', 1, 'MEDIUM',
+   'Maple', 'DOG', 'Labradoodle', 1, 'MEDIUM', 'FEMALE',
    'Maple is a fluffy goofball who thinks everyone is her best friend. Still in her puppy brain era and proud of it.',
    ARRAY[
      'https://images.pexels.com/photos/4587999/pexels-photo-4587999.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -272,7 +271,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
   -- ===== Diego's pets (2) =====
   ('bc000000-0000-0000-0000-111111111111',
    'aa000000-0000-0000-0000-000000000000',
-   'Bruno', 'DOG', 'Mixed — Pit Bull', 4, 'LARGE',
+   'Bruno', 'DOG', 'Mixed — Pit Bull', 4, 'LARGE', 'MALE',
    'Bruno is a certified velvet hippo. 80lbs of wiggles, kisses, and love. Will lean on you and never let go.',
    ARRAY[
      'https://images.pexels.com/photos/2607541/pexels-photo-2607541.jpeg?auto=compress&cs=tinysrgb&w=600',
@@ -284,7 +283,7 @@ INSERT INTO pets (id, owner_id, name, type, breed, age, size, bio, photos, tags,
 
   ('bc000000-0000-0000-0000-222222222222',
    'aa000000-0000-0000-0000-000000000000',
-   'Churro', 'DOG', 'Chihuahua', 8, 'SMALL',
+   'Churro', 'DOG', 'Chihuahua', 8, 'SMALL', 'MALE',
    'Churro is elderly, opinionated, and 4lbs of pure authority. Will nap in your hoodie pocket and growl at anyone who looks at him wrong.',
    ARRAY[
      'https://images.pexels.com/photos/4587995/pexels-photo-4587995.jpeg?auto=compress&cs=tinysrgb&w=600',

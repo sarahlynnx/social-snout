@@ -2,6 +2,7 @@ export type PetPrompt = { question: string; answer: string };
 
 export type PetType = "DOG" | "CAT";
 export type PetSize = "SMALL" | "MEDIUM" | "LARGE";
+export type PetGender = "MALE" | "FEMALE" | "UNKNOWN";
 export type SwipeDirection = "RIGHT" | "LEFT";
 export type PostType = "GENERAL" | "LOST_PET" | "EVENT" | "PHOTO";
 export type ReactionType = "HEART" | "LAUGH" | "WOW" | "IDEA" | "SAD";
@@ -45,6 +46,7 @@ export interface Database {
           breed: string | null;
           age: number;
           size: PetSize;
+          gender: PetGender;
           bio: string | null;
           photos: string[];
           tags: string[];
@@ -59,6 +61,7 @@ export interface Database {
           breed?: string | null;
           age: number;
           size: PetSize;
+          gender?: PetGender;
           bio?: string | null;
           photos?: string[];
           tags?: string[];
@@ -73,6 +76,7 @@ export interface Database {
           breed?: string | null;
           age?: number;
           size?: PetSize;
+          gender?: PetGender;
           bio?: string | null;
           photos?: string[];
           tags?: string[];
@@ -368,6 +372,7 @@ export interface Database {
           user_id: string;
           pet_types: PetType[];
           sizes: PetSize[];
+          genders: PetGender[];
           age_min: number;
           age_max: number;
           required_tags: string[];
@@ -379,6 +384,7 @@ export interface Database {
           user_id: string;
           pet_types?: PetType[];
           sizes?: PetSize[];
+          genders?: PetGender[];
           age_min?: number;
           age_max?: number;
           required_tags?: string[];
@@ -390,6 +396,7 @@ export interface Database {
           user_id?: string;
           pet_types?: PetType[];
           sizes?: PetSize[];
+          genders?: PetGender[];
           age_min?: number;
           age_max?: number;
           required_tags?: string[];
@@ -548,6 +555,7 @@ export type MatchingPreferences = Database["public"]["Tables"]["matching_prefere
 export type SwipeablePet = Pet & {
   owner_name: string;
   owner_avatar_url: string | null;
+  gender: PetGender;
 };
 
 export type MatchWithProfiles = Match & {

@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
-import type { PetType, PetSize } from "@/types/database";
+import type { PetType, PetSize, PetGender } from "@/types/database";
 
 export interface MatchingPreferencesState {
   petTypes: PetType[];
   sizes: PetSize[];
+  genders: PetGender[];
   ageMin: number;
   ageMax: number;
   requiredTags: string[];
@@ -15,6 +16,7 @@ export interface MatchingPreferencesState {
 const DEFAULTS: MatchingPreferencesState = {
   petTypes: ["DOG", "CAT"],
   sizes: ["SMALL", "MEDIUM", "LARGE"],
+  genders: ["MALE", "FEMALE", "UNKNOWN"],
   ageMin: 0,
   ageMax: 10,
   requiredTags: [],
@@ -46,6 +48,7 @@ export function useMatchingPreferences() {
       setPreferences({
         petTypes: data.pet_types as PetType[],
         sizes: data.sizes as PetSize[],
+        genders: data.genders as PetGender[],
         ageMin: data.age_min,
         ageMax: data.age_max,
         requiredTags: data.required_tags,
@@ -66,6 +69,7 @@ export function useMatchingPreferences() {
           user_id: session.user.id,
           pet_types: prefs.petTypes,
           sizes: prefs.sizes,
+          genders: prefs.genders,
           age_min: prefs.ageMin,
           age_max: prefs.ageMax,
           required_tags: prefs.requiredTags,

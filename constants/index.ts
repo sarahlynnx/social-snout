@@ -10,6 +10,13 @@ export const PET_SIZE_LABELS: Record<string, string> = {
   LARGE: "Large (60+ lbs)",
 };
 
+export const PET_GENDERS = ["MALE", "FEMALE"] as const;
+export const PET_GENDER_LABELS: Record<string, string> = {
+  MALE: "Male",
+  FEMALE: "Female",
+  UNKNOWN: "Unknown",
+};
+
 export const PET_AGE_OPTIONS = [
   { label: "Less than 1 year", value: "<1" },
   { label: "1 year", value: "1" },

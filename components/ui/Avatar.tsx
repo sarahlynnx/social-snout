@@ -9,9 +9,9 @@ interface AvatarProps {
 }
 
 const sizeMap = {
-  sm: "w-10 h-10",
-  md: "w-16 h-16",
-  lg: "w-24 h-24",
+  sm: { width: 40, height: 40 },
+  md: { width: 64, height: 64 },
+  lg: { width: 96, height: 96 },
 };
 
 const textSizeMap = {
@@ -34,10 +34,9 @@ export function Avatar({ uri, name, size = "md", className = "" }: AvatarProps) 
     return (
       <Image
         source={{ uri }}
-        className={`${sizeMap[size]} rounded-full ${className}`}
+        style={{ ...sizeMap[size], borderRadius: sizeMap[size].width / 2 }}
         contentFit="cover"
         transition={150}
-        cachePolicy="memory-disk"
       />
     );
   }

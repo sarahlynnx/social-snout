@@ -16,8 +16,8 @@ import {
   useMatchingPreferences,
   type MatchingPreferencesState,
 } from "@/hooks/useMatchingPreferences";
-import { PET_SIZES, PET_SIZE_LABELS, TEMPERAMENT_TAGS } from "@/constants";
-import type { PetType, PetSize } from "@/types/database";
+import { PET_SIZES, PET_SIZE_LABELS, PET_GENDERS, PET_GENDER_LABELS, TEMPERAMENT_TAGS } from "@/constants";
+import type { PetType, PetSize, PetGender } from "@/types/database";
 
 const AGE_OPTIONS = [
   { label: "<1", value: 0 },
@@ -41,6 +41,7 @@ export default function MatchingPreferencesScreen() {
 
   const [petTypes, setPetTypes] = useState<PetType[]>(preferences.petTypes);
   const [sizes, setSizes] = useState<PetSize[]>(preferences.sizes);
+  const [genders, setGenders] = useState<PetGender[]>(preferences.genders);
   const [ageMin, setAgeMin] = useState(preferences.ageMin);
   const [ageMax, setAgeMax] = useState(preferences.ageMax);
   const [requiredTags, setRequiredTags] = useState<string[]>(
@@ -52,6 +53,7 @@ export default function MatchingPreferencesScreen() {
     if (!loading) {
       setPetTypes(preferences.petTypes);
       setSizes(preferences.sizes);
+      setGenders(preferences.genders);
       setAgeMin(preferences.ageMin);
       setAgeMax(preferences.ageMax);
       setRequiredTags(preferences.requiredTags);
@@ -72,6 +74,16 @@ export default function MatchingPreferencesScreen() {
     });
   };
 
+  const toggleGender = (gender: PetGender) => {
+    setGenders((prev) => {
+      if (prev.includes(gender)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((g) => g !== gender);
+      }
+      return [...prev, gender];
+    });
+  };
+
   const toggleTag = (tag: string) => {
     setRequiredTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
@@ -82,6 +94,7 @@ export default function MatchingPreferencesScreen() {
     const prefs: MatchingPreferencesState = {
       petTypes,
       sizes,
+      genders,
       ageMin,
       ageMax,
       requiredTags,
@@ -213,6 +226,37 @@ export default function MatchingPreferencesScreen() {
               Both
             </Text>
           </Pressable>
+        </View>
+      </View>
+
+      {/* Gender */}
+      <View className="px-6 py-4">
+        <Text className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+          Gender
+        </Text>
+        <View className="flex-row flex-wrap gap-2">
+          {PET_GENDERS.map((g) => {
+            const isSelected = genders.includes(g);
+            return (
+              <Pressable
+                key={g}
+                onPress={() => toggleGender(g)}
+                className={`py-2.5 px-4 rounded-full border-2 ${
+                  isSelected
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-gray-200 bg-white"
+                }`}
+              >
+                <Text
+                  className={`text-sm ${
+                    isSelected ? "text-primary-600 font-semibold" : "text-gray-600"
+                  }`}
+                >
+                  {PET_GENDER_LABELS[g]}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
       </View>
 

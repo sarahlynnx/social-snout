@@ -27,14 +27,19 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
   const currentPet = pets[currentIndex];
   const nextPet = pets[currentIndex + 1];
 
+  const currentPetRef = useRef(currentPet);
+  currentPetRef.current = currentPet;
+  const onSwipeRef = useRef(onSwipe);
+  onSwipeRef.current = onSwipe;
+
   const handleSwipeComplete = useCallback(
     (direction: "RIGHT" | "LEFT") => {
-      if (currentPet) {
-        onSwipe(currentPet.id, direction);
+      if (currentPetRef.current) {
+        onSwipeRef.current(currentPetRef.current.id, direction);
       }
       position.setValue({ x: 0, y: 0 });
     },
-    [currentPet, onSwipe, position]
+    [position]
   );
 
   const animateOff = useCallback(
@@ -49,6 +54,9 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
     [position, handleSwipeComplete]
   );
 
+  const animateOffRef = useRef(animateOff);
+  animateOffRef.current = animateOff;
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
@@ -60,9 +68,9 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
       ),
       onPanResponderRelease: (_, gesture) => {
         if (gesture.dx > SWIPE_THRESHOLD) {
-          animateOff("RIGHT");
+          animateOffRef.current("RIGHT");
         } else if (gesture.dx < -SWIPE_THRESHOLD) {
-          animateOff("LEFT");
+          animateOffRef.current("LEFT");
         } else {
           Animated.spring(position, {
             toValue: { x: 0, y: 0 },
@@ -122,7 +130,7 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
         {nextPet && (
           <Animated.View
             className="absolute"
-            style={[{ width: "100%", transform: [{ scale: nextScale }] }]}
+            style={[{ width: "100%", zIndex: 1, transform: [{ scale: nextScale }] }]}
           >
             <PetCard pet={nextPet} />
           </Animated.View>
@@ -130,7 +138,7 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
 
         {/* Current card (top, draggable) */}
         <Animated.View
-          style={[{ width: "100%" }, cardStyle]}
+          style={[{ width: "100%", zIndex: 2 }, cardStyle]}
           {...panResponder.panHandlers}
         >
           {/* Like stamp */}
