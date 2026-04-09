@@ -95,7 +95,7 @@ export default function FeedScreen() {
             currentUserId={session?.user?.id}
           />
         )}
-        contentContainerStyle={{ paddingVertical: 12, gap: 12 }}
+        contentContainerStyle={{ paddingTop: 12, paddingBottom: 100, gap: 12 }}
         onEndReached={fetchMore}
         onEndReachedThreshold={0.5}
         refreshControl={
@@ -123,8 +123,11 @@ export default function FeedScreen() {
       {/* Floating Action Button */}
       <Pressable
         onPress={() => router.push("/(app)/create-post")}
-        className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary-500 items-center justify-center"
+        className="w-14 h-14 rounded-full bg-primary-500 items-center justify-center"
         style={{
+          position: "absolute",
+          right: 24,
+          bottom: 24,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.25,

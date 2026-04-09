@@ -13,6 +13,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/hooks/useAuth";
 import { useActivePet } from "@/contexts/ActivePetContext";
 import { useUserLocation } from "@/hooks/useUserLocation";
@@ -46,6 +47,7 @@ export default function CreatePostScreen() {
   const { activePet, allPets } = useActivePet();
   const { latitude, longitude } = useUserLocation();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [selectedPet, setSelectedPet] = useState<Pet | null>(activePet);
   const [petPickerVisible, setPetPickerVisible] = useState(false);
@@ -151,7 +153,7 @@ export default function CreatePostScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         keyboardShouldPersistTaps="handled"
       >
         {/* Posting as */}

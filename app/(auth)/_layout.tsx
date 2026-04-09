@@ -1,15 +1,24 @@
 import { Stack } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AuthLayout() {
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "#FFFFFF",
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+      }}
+    >
       <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: "#FFFFFF" },
         }}
       />
-    </SafeAreaView>
+    </View>
   );
 }

@@ -109,7 +109,7 @@ export default function ProfileScreen() {
     <>
     <ScrollView
       className="flex-1 bg-gray-50"
-      contentContainerStyle={{ paddingBottom: 40 }}
+      contentContainerStyle={{ paddingBottom: 100 }}
     >
       {/* Pet switcher header */}
       <View className="px-4 pt-2 pb-2">

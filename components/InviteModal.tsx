@@ -10,6 +10,7 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
@@ -27,6 +28,7 @@ export function InviteModal({ visible, onClose }: InviteModalProps) {
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
 
   const handleClose = () => {
     setShowEmailInput(false);
@@ -88,7 +90,8 @@ export function InviteModal({ visible, onClose }: InviteModalProps) {
         >
           <Pressable
             onPress={() => {}}
-            className="bg-white rounded-t-3xl px-6 pt-4 pb-10"
+            className="bg-white rounded-t-3xl px-6 pt-4"
+            style={{ paddingBottom: insets.bottom + 16 }}
           >
             {/* Handle bar */}
             <View className="items-center mb-4">

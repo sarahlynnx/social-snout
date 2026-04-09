@@ -1,6 +1,7 @@
 import { View, Text, Pressable, Modal, FlatList } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Pet } from "@/types/database";
 
 interface PetAuthorPickerProps {
@@ -18,6 +19,7 @@ export function PetAuthorPicker({
   onSelect,
   onClose,
 }: PetAuthorPickerProps) {
+  const insets = useSafeAreaInsets();
   return (
     <Modal
       visible={visible}
@@ -29,7 +31,11 @@ export function PetAuthorPicker({
         className="flex-1 bg-black/40 justify-end"
         onPress={onClose}
       >
-        <Pressable className="bg-white rounded-t-3xl pb-10" onPress={() => {}}>
+        <Pressable
+          className="bg-white rounded-t-3xl"
+          style={{ paddingBottom: insets.bottom + 16 }}
+          onPress={() => {}}
+        >
           <View className="items-center pt-3 pb-4">
             <View className="w-10 h-1 bg-gray-300 rounded-full" />
           </View>

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function RootLayout() {
@@ -25,16 +26,18 @@ export default function RootLayout() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "white" }}>
-        <ActivityIndicator size="large" color="#5A8A4F" />
-      </View>
+      <SafeAreaProvider>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "white" }}>
+          <ActivityIndicator size="large" color="#5A8A4F" />
+        </View>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }} />
-    </>
+    </SafeAreaProvider>
   );
 }

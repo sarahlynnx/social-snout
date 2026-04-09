@@ -114,6 +114,7 @@ export default function MatchesScreen() {
           data={filteredMatches}
           keyExtractor={(item) => item.id}
           renderItem={renderMatch}
+          contentContainerStyle={{ paddingBottom: 24 }}
           ItemSeparatorComponent={() => (
             <View className="h-px bg-gray-100 ml-24" />
           )}

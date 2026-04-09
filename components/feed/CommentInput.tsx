@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { View, TextInput, Pressable, Text, Keyboard } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Pet } from "@/types/database";
 
 interface CommentInputProps {
@@ -20,6 +21,7 @@ export function CommentInput({
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef<TextInput>(null);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (replyingTo) {
@@ -57,7 +59,10 @@ export function CommentInput({
         </View>
       )}
 
-      <View className="flex-row items-center px-4 pt-3 pb-8 gap-3">
+      <View
+        className="flex-row items-center px-4 pt-3 gap-3"
+        style={{ paddingBottom: insets.bottom + 8 }}
+      >
         {petPhoto ? (
           <Image
             source={{ uri: petPhoto }}
