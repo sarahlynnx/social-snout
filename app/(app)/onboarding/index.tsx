@@ -251,10 +251,8 @@ export default function OnboardingScreen() {
               >
                 <Image
                   source={{ uri }}
-                  className="w-24 h-24 rounded-xl"
+                  style={{ width: 96, height: 96, borderRadius: 12 }}
                   contentFit="cover"
-                  transition={150}
-                  cachePolicy="memory-disk"
                 />
                 <Pressable
                   onPress={() => removePhoto(index)}
@@ -521,7 +519,8 @@ export default function OnboardingScreen() {
                 <View className="relative">
                   <Image
                     source={{ uri: avatarUri }}
-                    className="w-28 h-28 rounded-full"
+                    style={{ width: 112, height: 112, borderRadius: 56 }}
+                    contentFit="cover"
                   />
                   <View className="absolute bottom-0 right-0 bg-primary-500 rounded-full w-8 h-8 items-center justify-center">
                     <Ionicons name="camera" size={16} color="white" />

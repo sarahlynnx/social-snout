@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Platform, Pressable } from "react-native";
+import { Platform, Pressable, View } from "react-native";
 import { Stack, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { ActivePetProvider, useActivePet } from "@/contexts/ActivePetContext";
@@ -32,23 +32,27 @@ function ModalCloseButton() {
 }
 
 function AppLayoutInner() {
-  const router = useRouter();
   const { allPets, loading } = useActivePet();
   const { session } = useAuth();
 
   useEffect(() => {
     if (loading) return;
-
-    if (allPets.length === 0) {
-      router.replace("/(app)/onboarding");
-    }
-  }, [loading, allPets]);
-
-  useEffect(() => {
     if (session?.user?.id) {
       saveUserLocation(session.user.id).catch(() => {});
     }
-  }, [session]);
+  }, [loading, session]);
+
+  if (loading) {
+    return <View className="flex-1 bg-gray-50" />;
+  }
+
+  if (allPets.length === 0) {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="onboarding/index" options={{ gestureEnabled: false }} />
+      </Stack>
+    );
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
