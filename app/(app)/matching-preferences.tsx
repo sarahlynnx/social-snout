@@ -16,6 +16,7 @@ import {
   useMatchingPreferences,
   type MatchingPreferencesState,
 } from "@/hooks/useMatchingPreferences";
+import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { PET_SIZES, PET_SIZE_LABELS, PET_GENDERS, PET_GENDER_LABELS, TEMPERAMENT_TAGS } from "@/constants";
 import type { PetType, PetSize, PetGender } from "@/types/database";
 
@@ -48,6 +49,7 @@ export default function MatchingPreferencesScreen() {
     preferences.requiredTags
   );
   const [radiusMiles, setRadiusMiles] = useState(preferences.radiusMiles);
+  const [justSaved, setJustSaved] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -60,6 +62,19 @@ export default function MatchingPreferencesScreen() {
       setRadiusMiles(preferences.radiusMiles);
     }
   }, [loading, preferences]);
+
+  const hasUnsavedChanges =
+    !justSaved &&
+    !loading &&
+    ([...petTypes].sort().join() !== [...preferences.petTypes].sort().join() ||
+      [...sizes].sort().join() !== [...preferences.sizes].sort().join() ||
+      [...genders].sort().join() !== [...preferences.genders].sort().join() ||
+      ageMin !== preferences.ageMin ||
+      ageMax !== preferences.ageMax ||
+      [...requiredTags].sort().join() !== [...preferences.requiredTags].sort().join() ||
+      radiusMiles !== preferences.radiusMiles);
+
+  useUnsavedChangesWarning(hasUnsavedChanges);
 
   const selectPetType = (type: PetType) => setPetTypes([type]);
   const setBoth = () => setPetTypes(["DOG", "CAT"]);
@@ -103,6 +118,7 @@ export default function MatchingPreferencesScreen() {
 
     const success = await savePreferences(prefs);
     if (success) {
+      setJustSaved(true);
       router.back();
     } else {
       Alert.alert("Error", "Failed to save preferences. Please try again.");

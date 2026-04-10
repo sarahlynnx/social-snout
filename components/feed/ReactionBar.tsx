@@ -54,37 +54,43 @@ export function ReactionBar({
     : "#5C584F";
 
   return (
-    <View
-      style={{ position: "relative" }}
-      className="flex-row items-center pt-3 border-t border-gray-100"
-    >
-      {/* Like pill */}
-      <Pressable
-        onPress={handleTap}
-        onLongPress={() => setPickerVisible(true)}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 4,
-          paddingHorizontal: 12,
-          paddingVertical: 4,
-          borderRadius: 999,
-          backgroundColor: hasReacted ? "#F4F7F4" : "#F5F4F0",
-          borderWidth: hasReacted ? 1 : 0,
-          borderColor: hasReacted ? "#C5D7C0" : "transparent",
-        }}
-      >
-        {hasReacted ? (
-          <Image source={likeImage} style={{ width: 18, height: 18 }} />
-        ) : (
-          <Ionicons name="heart-outline" size={18} color="#A8A49C" />
-        )}
-        {totalReactions > 0 && (
-          <Text style={{ color: likeColor, fontSize: 12, fontWeight: "600" }}>
-            {totalReactions}
-          </Text>
-        )}
-      </Pressable>
+    <View className="flex-row items-center pt-3 border-t border-gray-100">
+      {/* Like pill — tap to toggle reaction, long-press to open picker */}
+      <View style={{ position: "relative", zIndex: 10, overflow: "visible" }}>
+        <Pressable
+          onPress={handleTap}
+          onLongPress={() => setPickerVisible(true)}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+            paddingHorizontal: 12,
+            paddingVertical: 4,
+            borderRadius: 999,
+            backgroundColor: hasReacted ? "#F4F7F4" : "#F5F4F0",
+            borderWidth: hasReacted ? 1 : 0,
+            borderColor: hasReacted ? "#C5D7C0" : "transparent",
+          }}
+        >
+          {hasReacted ? (
+            <Image source={likeImage} style={{ width: 18, height: 18 }} />
+          ) : (
+            <Ionicons name="heart-outline" size={18} color="#A8A49C" />
+          )}
+          {totalReactions > 0 && (
+            <Text style={{ color: likeColor, fontSize: 12, fontWeight: "600" }}>
+              {totalReactions}
+            </Text>
+          )}
+        </Pressable>
+
+        <ReactionPicker
+          visible={pickerVisible}
+          currentReaction={myReaction?.type}
+          onSelect={onReact}
+          onClose={() => setPickerVisible(false)}
+        />
+      </View>
 
       {/* Comment pill */}
       <Pressable
@@ -124,13 +130,6 @@ export function ReactionBar({
       >
         <Ionicons name="arrow-redo-outline" size={16} color="#5C584F" />
       </Pressable>
-
-      <ReactionPicker
-        visible={pickerVisible}
-        currentReaction={myReaction?.type}
-        onSelect={onReact}
-        onClose={() => setPickerVisible(false)}
-      />
     </View>
   );
 }

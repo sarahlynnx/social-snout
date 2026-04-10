@@ -134,7 +134,10 @@ export default function CreatePostScreen() {
       className="flex-1 bg-white"
     >
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 pt-16 pb-3 border-b border-gray-100">
+      <View
+        className="flex-row items-center justify-between px-4 pb-3 border-b border-gray-100"
+        style={{ paddingTop: Math.max(insets.top, 16) }}
+      >
         <Pressable onPress={() => router.back()} className="py-1">
           <Text className="text-base text-gray-500">Cancel</Text>
         </Pressable>
