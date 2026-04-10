@@ -8,7 +8,8 @@ import {
   RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 import { useMatches } from "@/hooks/useMatches";
 import { useActivePet } from "@/contexts/ActivePetContext";
 import { PetSwitcher } from "@/components/PetSwitcher";
@@ -19,6 +20,8 @@ export default function MatchesScreen() {
   const router = useRouter();
   const { matches, loading, error, refresh } = useMatches();
   const { activePet } = useActivePet();
+
+  useFocusEffect(useCallback(() => { refresh(); }, []));
 
   const filteredMatches = activePet
     ? matches.filter(

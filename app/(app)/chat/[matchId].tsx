@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useFocusEffect } from "expo-router";
 import {
   View,
   Text,
@@ -41,6 +42,19 @@ export default function ChatScreen() {
   const flatListRef = useRef<FlatList>(null);
 
   const userId = session?.user?.id;
+
+  // Mark messages as read when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      if (!userId) return;
+      supabase
+        .from("messages")
+        .update({ read: true })
+        .eq("match_id", matchId)
+        .neq("sender_id", userId)
+        .eq("read", false);
+    }, [matchId, userId])
+  );
 
   // Track keyboard visibility
   useEffect(() => {
@@ -178,7 +192,7 @@ export default function ChatScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-white"
     >
       {/* Header */}
