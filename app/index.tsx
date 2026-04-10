@@ -14,7 +14,7 @@ export default function Index() {
   }
 
   if (session) {
-    return <Redirect href="/(app)/(tabs)/swipe" />;
+    return <Redirect href="/(app)" />;
   }
 
   return <Redirect href="/(auth)/login" />;
