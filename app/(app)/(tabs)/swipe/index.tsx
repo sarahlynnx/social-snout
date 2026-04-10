@@ -104,7 +104,7 @@ export default function SwipeScreen() {
               No More Pets Nearby
             </Text>
             <Text className="text-base text-gray-500 mt-2 text-center">
-              Check back later for new furry friends in your area!
+              Check back later, or expand your search distance to find more furry friends.
             </Text>
           </View>
         )}

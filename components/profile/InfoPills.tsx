@@ -1,12 +1,13 @@
 import { View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { PET_SIZE_LABELS } from "@/constants";
-import type { PetSize } from "@/types/database";
+import { PET_SIZE_LABELS, PET_GENDER_LABELS } from "@/constants";
+import type { PetGender, PetSize } from "@/types/database";
 
 interface InfoPillsProps {
   breed?: string | null;
   age: number;
   size: PetSize;
+  gender?: PetGender | null;
 }
 
 function formatAge(age: number) {
@@ -24,12 +25,13 @@ function Pill({ icon, label }: { icon: keyof typeof Ionicons.glyphMap; label: st
   );
 }
 
-export function InfoPills({ breed, age, size }: InfoPillsProps) {
+export function InfoPills({ breed, age, size, gender }: InfoPillsProps) {
   return (
     <View className="flex-row flex-wrap gap-2">
       {breed && <Pill icon="paw" label={breed} />}
       <Pill icon="calendar" label={formatAge(age)} />
       <Pill icon="resize" label={PET_SIZE_LABELS[size]} />
+      {gender && <Pill icon="male-female" label={PET_GENDER_LABELS[gender]} />}
     </View>
   );
 }

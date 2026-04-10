@@ -38,6 +38,10 @@ export function PetCard({ pet, onOpenProfile }: PetCardProps) {
 
   const breedDisplay = pet.breed?.replace(/^(Mixed|Other) — /, "") ?? null;
   const genderSymbol = pet.gender === "MALE" ? "♂" : pet.gender === "FEMALE" ? "♀" : null;
+  const bioText = pet.bio
+    ? pet.bio.length > 120 ? pet.bio.slice(0, 120).trimEnd() + "…" : pet.bio
+    : null;
+  const firstPrompt = Array.isArray(pet.prompts) && pet.prompts.length > 0 ? pet.prompts[0] : null;
 
   return (
     <View
@@ -93,8 +97,8 @@ export function PetCard({ pet, onOpenProfile }: PetCardProps) {
         )}
       </View>
 
-      {/* Info section */}
-      <View className="px-5 py-4">
+      {/* Info section — tappable to open profile */}
+      <Pressable onPress={onOpenProfile} className="px-5 py-4 active:opacity-70">
         {/* Name + Age */}
         <View className="flex-row items-baseline gap-2">
           <Text className="text-2xl font-bold text-gray-900">{pet.name}</Text>
@@ -139,6 +143,19 @@ export function PetCard({ pet, onOpenProfile }: PetCardProps) {
           </View>
         )}
 
+        {/* Bio */}
+        {bioText && (
+          <Text className="text-sm text-gray-600 mt-3 leading-5">{bioText}</Text>
+        )}
+
+        {/* First prompt */}
+        {firstPrompt && (
+          <View className="mt-3 bg-gray-50 rounded-2xl px-3 py-2.5">
+            <Text className="text-xs text-gray-400 mb-1">{firstPrompt.question}</Text>
+            <Text className="text-sm text-gray-700">{firstPrompt.answer}</Text>
+          </View>
+        )}
+
         {/* Owner info */}
         <View className="flex-row items-center gap-2 mt-3 pt-3 border-t border-gray-100">
           <Avatar
@@ -148,7 +165,7 @@ export function PetCard({ pet, onOpenProfile }: PetCardProps) {
           />
           <Text className="text-sm text-gray-500">{pet.owner_name}</Text>
         </View>
-      </View>
+      </Pressable>
     </View>
   );
 }

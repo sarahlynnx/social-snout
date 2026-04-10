@@ -28,7 +28,12 @@ interface PostCardProps {
   currentUserId: string | undefined;
 }
 
-export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProps) {
+export function PostCard({
+  post,
+  onPress,
+  onReact,
+  currentUserId,
+}: PostCardProps) {
   const petPhoto = post.pet?.photos?.[0];
   const petName = post.pet?.name ?? post.author.name;
   const petBreed = post.pet?.breed;
@@ -41,9 +46,12 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
   const imageWidth = screenWidth - 72; // mx-4 (32) + px-5 (40) = 72
 
   return (
-    <Pressable onPress={onPress} className="bg-white mx-4 rounded-2xl px-5 py-4 active:bg-gray-50">
-      {/* Header: pet avatar + name + time + type badge */}
-      <View className="flex-row items-center">
+    <View className="bg-white mx-4 rounded-2xl px-5 py-4">
+      {/* Header */}
+      <Pressable
+        onPress={onPress}
+        className="flex-row items-center active:opacity-70"
+      >
         {petPhoto ? (
           <Image
             source={{ uri: petPhoto }}
@@ -67,7 +75,10 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
                 style={{ backgroundColor: typeColor + "15" }}
                 className="px-2 py-0.5 rounded-full"
               >
-                <Text style={{ color: typeColor }} className="text-xs font-medium">
+                <Text
+                  style={{ color: typeColor }}
+                  className="text-xs font-medium"
+                >
                   {typeLabel}
                 </Text>
               </View>
@@ -78,45 +89,51 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
           )}
         </View>
         <Text className="text-xs text-gray-400">{timeAgo}</Text>
-      </View>
+      </Pressable>
 
-      {/* Content */}
-      <Text
-        className="text-base text-gray-800 mt-3 leading-6"
-        numberOfLines={5}
-      >
-        {post.content}
-      </Text>
+      {/* Content: tappable to open post */}
+      <Pressable onPress={onPress} className="active:opacity-70">
+        <Text
+          className="text-base text-gray-800 mt-3 leading-6"
+          numberOfLines={5}
+        >
+          {post.content}
+        </Text>
 
-      {/* Images */}
-      {imageCount > 0 && (
-        <View className="mt-3 flex-row flex-wrap gap-2">
-          {imageCount === 1 ? (
-            <Image
-              source={{ uri: post.images[0] }}
-              style={{ width: imageWidth, height: imageWidth, borderRadius: 12 }}
-              contentFit="cover"
-              transition={150}
-              cachePolicy="memory-disk"
-            />
-          ) : (
-            post.images.slice(0, 4).map((uri, i) => (
+        {/* Images */}
+        {imageCount > 0 && (
+          <View className="mt-3 flex-row flex-wrap gap-2">
+            {imageCount === 1 ? (
               <Image
-                key={i}
-                source={{ uri }}
+                source={{ uri: post.images[0] }}
                 style={{
-                  width: (imageWidth - 8) / 2,
-                  height: (imageWidth - 8) / 2,
+                  width: imageWidth,
+                  height: imageWidth,
                   borderRadius: 12,
                 }}
                 contentFit="cover"
                 transition={150}
                 cachePolicy="memory-disk"
               />
-            ))
-          )}
-        </View>
-      )}
+            ) : (
+              post.images.slice(0, 4).map((uri, i) => (
+                <Image
+                  key={i}
+                  source={{ uri }}
+                  style={{
+                    width: (imageWidth - 8) / 2,
+                    height: (imageWidth - 8) / 2,
+                    borderRadius: 12,
+                  }}
+                  contentFit="cover"
+                  transition={150}
+                  cachePolicy="memory-disk"
+                />
+              ))
+            )}
+          </View>
+        )}
+      </Pressable>
 
       {/* Reaction bar + comment count */}
       <View className="mt-3">
@@ -128,6 +145,6 @@ export function PostCard({ post, onPress, onReact, currentUserId }: PostCardProp
           onCommentPress={onPress}
         />
       </View>
-    </Pressable>
+    </View>
   );
 }

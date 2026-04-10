@@ -36,7 +36,7 @@ export function MatchOverlay({
             {myPhoto ? (
               <Image
                 source={{ uri: myPhoto }}
-                className="w-28 h-28 rounded-full border-4 border-primary-500"
+                style={{ width: 112, height: 112, borderRadius: 56, borderWidth: 4, borderColor: "#5A8A4F" }}
                 contentFit="cover"
                 transition={150}
                 cachePolicy="memory-disk"
@@ -59,7 +59,7 @@ export function MatchOverlay({
             {theirPhoto ? (
               <Image
                 source={{ uri: theirPhoto }}
-                className="w-28 h-28 rounded-full border-4 border-primary-500"
+                style={{ width: 112, height: 112, borderRadius: 56, borderWidth: 4, borderColor: "#5A8A4F" }}
                 contentFit="cover"
                 transition={150}
                 cachePolicy="memory-disk"

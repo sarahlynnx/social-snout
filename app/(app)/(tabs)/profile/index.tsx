@@ -103,7 +103,7 @@ export default function ProfileScreen() {
   const previewPet = () => pet && router.push(`/(app)/pet-profile/${pet.id}`);
   const prompts: PetPrompt[] =
     pet && Array.isArray(pet.prompts) ? pet.prompts : [];
-  const photoSize = Math.floor((Dimensions.get("window").width - 48 - 16) / 3);
+  const photoSize = Math.floor((Dimensions.get("window").width - 64 - 16) / 3);
 
   return (
     <>
@@ -166,7 +166,7 @@ export default function ProfileScreen() {
           {/* Basics section */}
           <View className="bg-white rounded-2xl p-4">
             <SectionHeader icon="paw" title="Basics" />
-            <InfoPills breed={pet.breed} age={pet.age} size={pet.size} />
+            <InfoPills breed={pet.breed} age={pet.age} size={pet.size} gender={pet.gender} />
           </View>
 
           {/* Bio section */}

@@ -167,6 +167,8 @@ export default function MatchingPreferencesScreen() {
           minimumTrackTintColor="#5A8A4F"
           maximumTrackTintColor="#E8E6E1"
           thumbTintColor="#5A8A4F"
+          style={{ height: 48 }}
+          tapToSeek
         />
         <View className="flex-row justify-between mt-1">
           <Text className="text-xs text-gray-400">1 mi</Text>

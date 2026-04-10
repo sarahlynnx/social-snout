@@ -24,8 +24,9 @@ export function ReactionBar({
 }: ReactionBarProps) {
   const [pickerVisible, setPickerVisible] = useState(false);
 
-  const myReaction = reactions.find((r) => r.user_id === currentUserId);
-  const totalReactions = reactions.length;
+  const safeReactions = reactions ?? [];
+  const myReaction = safeReactions.find((r) => r.user_id === currentUserId);
+  const totalReactions = safeReactions.length;
 
   const handleTap = () => {
     if (myReaction) {

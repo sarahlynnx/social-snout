@@ -30,7 +30,7 @@ export function PetProfileView({
         <Text className="text-2xl font-bold text-gray-900">{pet.name}</Text>
 
         {/* Info pills */}
-        <InfoPills breed={pet.breed} age={pet.age} size={pet.size} />
+        <InfoPills breed={pet.breed} age={pet.age} size={pet.size} gender={pet.gender} />
 
         {/* Bio */}
         {pet.bio ? (
