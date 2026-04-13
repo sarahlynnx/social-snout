@@ -38,12 +38,10 @@ export default function ChatScreen() {
   const [matchInfo, setMatchInfo] = useState<MatchInfo | null>(null);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   const userId = session?.user?.id;
 
-  // Mark messages as read when screen is focused
   useFocusEffect(
     useCallback(() => {
       if (!userId) return;
@@ -56,25 +54,19 @@ export default function ChatScreen() {
     }, [matchId, userId])
   );
 
-  // Track keyboard visibility
-  useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardWillShow", () => setKeyboardVisible(true));
-    const hideSub = Keyboard.addListener("keyboardWillHide", () => setKeyboardVisible(false));
-    return () => { showSub.remove(); hideSub.remove(); };
-  }, []);
-
-  // Fetch match info for the header
   useEffect(() => {
     async function fetchMatchInfo() {
       const { data: match } = await supabase
         .from("matches")
-        .select(`
+        .select(
+          `
           *,
           pet_a:pets!matches_pet_a_id_fkey(name, photos, breed),
           pet_b:pets!matches_pet_b_id_fkey(name, photos, breed),
           owner_a:users!matches_user_a_id_fkey(name),
           owner_b:users!matches_user_b_id_fkey(name)
-        `)
+        `
+        )
         .eq("id", matchId)
         .single();
 
@@ -113,7 +105,6 @@ export default function ChatScreen() {
     setSending(false);
   }, [text, sending, sendMessage]);
 
-  // Scroll to bottom when new messages arrive
   const scrollToBottom = useCallback(() => {
     if (messages.length > 0) {
       flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
@@ -132,9 +123,9 @@ export default function ChatScreen() {
         minute: "2-digit",
       });
 
-      // Show date separator
       const reversedIndex = messages.length - 1 - index;
-      const prevMessage = reversedIndex > 0 ? messages[reversedIndex - 1] : null;
+      const prevMessage =
+        reversedIndex > 0 ? messages[reversedIndex - 1] : null;
       const currentDate = new Date(item.created_at).toDateString();
       const prevDate = prevMessage
         ? new Date(prevMessage.created_at).toDateString()
@@ -207,7 +198,9 @@ export default function ChatScreen() {
           className="flex-row items-center flex-1 ml-3"
           onPress={() => {
             if (matchInfo?.petId) {
-              router.push(`/(app)/pet-profile/${matchInfo.petId}?matchId=${matchId}`);
+              router.push(
+                `/(app)/pet-profile/${matchInfo.petId}?matchId=${matchId}`
+              );
             }
           }}
         >
@@ -242,6 +235,8 @@ export default function ChatScreen() {
         renderItem={renderMessage}
         inverted
         contentContainerStyle={{ paddingVertical: 12 }}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center py-20">
             <Ionicons name="chatbubble-outline" size={48} color="#D4D1CA" />
@@ -255,7 +250,7 @@ export default function ChatScreen() {
       {/* Input */}
       <View
         className="border-t border-gray-100 bg-white"
-        style={{ paddingBottom: keyboardVisible ? 4 : (insets.bottom || 8) }}
+        style={{ paddingBottom: insets.bottom || 8 }}
       >
         <View className="flex-row items-center px-4 pt-3 pb-2 gap-3">
           <TextInput

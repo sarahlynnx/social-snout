@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { View } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, Redirect } from "expo-router";
 import { ActivePetProvider, useActivePet } from "@/contexts/ActivePetContext";
 import { useAuth } from "@/hooks/useAuth";
 import { saveUserLocation } from "@/lib/location";
@@ -24,9 +24,12 @@ function AppLayoutInner() {
 
   if (allPets.length === 0) {
     return (
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="onboarding/index" options={{ gestureEnabled: false }} />
-      </Stack>
+      <>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="onboarding/index" options={{ gestureEnabled: false }} />
+        </Stack>
+        <Redirect href="/(app)/onboarding/index" />
+      </>
     );
   }
 

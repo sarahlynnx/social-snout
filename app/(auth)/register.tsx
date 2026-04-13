@@ -108,6 +108,8 @@ export default function RegisterScreen() {
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets
       >
         <View className="flex-1 justify-center px-6 py-12">
           <View className="items-center mb-12">
