@@ -13,10 +13,11 @@ function AppLayoutInner() {
 
   useEffect(() => {
     if (loading) return;
+    if (allPets.length === 0) return;
     if (session?.user?.id) {
       saveUserLocation(session.user.id).catch(() => {});
     }
-  }, [loading, session]);
+  }, [loading, allPets.length, session]);
 
   if (loading) {
     return <View className="flex-1 bg-gray-50" />;

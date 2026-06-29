@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
+import * as Linking from "expo-linking";
 import { supabase } from "@/lib/supabase";
+
+const getEmailRedirectTo = () => {
+  try {
+    return Linking.createURL("/(auth)/login");
+  } catch {
+    return undefined;
+  }
+};
 
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
@@ -25,7 +34,7 @@ export function useAuth() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } },
+      options: { data: { name }, emailRedirectTo: getEmailRedirectTo() },
     });
     if (error) throw error;
 
@@ -64,12 +73,15 @@ export function useAuth() {
     const { error } = await supabase.auth.resend({
       type: "signup",
       email,
+      options: { emailRedirectTo: getEmailRedirectTo() },
     });
     if (error) throw error;
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: getEmailRedirectTo(),
+    });
     if (error) throw error;
   };
 

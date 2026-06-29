@@ -66,11 +66,13 @@ describe("useAuth", () => {
       );
     });
 
-    expect(mockSignUp).toHaveBeenCalledWith({
-      email: "test@test.com",
-      password: "password123",
-      options: { data: { name: "Test User" } },
-    });
+    expect(mockSignUp).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: "test@test.com",
+        password: "password123",
+        options: expect.objectContaining({ data: { name: "Test User" } }),
+      })
+    );
     expect(signUpResult.needsEmailConfirmation).toBe(false);
   });
 
@@ -185,10 +187,12 @@ describe("useAuth", () => {
       await result.current.resendVerification("test@test.com");
     });
 
-    expect(mockResend).toHaveBeenCalledWith({
-      type: "signup",
-      email: "test@test.com",
-    });
+    expect(mockResend).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "signup",
+        email: "test@test.com",
+      })
+    );
   });
 
   it("resetPassword calls resetPasswordForEmail", async () => {
@@ -207,7 +211,10 @@ describe("useAuth", () => {
       await result.current.resetPassword("test@test.com");
     });
 
-    expect(mockResetPasswordForEmail).toHaveBeenCalledWith("test@test.com");
+    expect(mockResetPasswordForEmail).toHaveBeenCalledWith(
+      "test@test.com",
+      expect.any(Object)
+    );
   });
 
   it("deleteAccount calls RPC and signs out", async () => {
