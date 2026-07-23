@@ -44,3 +44,11 @@ yarn-error.*
 # Supabase CLI local state
 supabase/.temp/
 supabase/.branches/
+
+/docs/*
+!/docs/android-e2e-setup.md
+
+# Android E2E test artifacts
+/build
+maestro-report.xml
+.maestro/tests/

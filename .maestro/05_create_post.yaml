@@ -1,0 +1,41 @@
+appId: com.socialsnout.app
+name: Create post - write and submit
+env:
+  EMAIL: "emma.johnson@test.com"
+  PASSWORD: "password123"
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/login.yaml
+- tapOn:
+    text: "Feed"
+# Feed has its own location gate; dismiss it if present.
+- runFlow: subflows/enable_location.yaml
+# Open the create-post screen via the FAB
+- extendedWaitUntil:
+    visible:
+      id: "feed-create-post-fab"
+    timeout: 15000
+- tapOn:
+    id: "feed-create-post-fab"
+- assertVisible:
+    text: "New Post"
+# Select a post type (General is the default; tap it to be explicit)
+- tapOn:
+    text: "General"
+# Write content
+- tapOn:
+    id: "create-post-content"
+- inputText: "Buddy had a great day at the park"
+- hideKeyboard
+# Submit should now be enabled (content is non-empty)
+- assertVisible:
+    id: "create-post-submit"
+- tapOn:
+    id: "create-post-submit"
+# Back on the feed, the new post should appear (may need to scroll up to the top)
+- extendedWaitUntil:
+    visible:
+      text: "Buddy had a great day.*"
+    timeout: 15000

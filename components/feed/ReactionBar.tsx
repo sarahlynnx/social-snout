@@ -59,6 +59,7 @@ export function ReactionBar({
       {/* Like pill — tap to toggle reaction, long-press to open picker */}
       <View style={{ position: "relative", zIndex: 10, overflow: "visible" }}>
         <Pressable
+          testID="reaction-like"
           onPress={handleTap}
           onLongPress={() => setPickerVisible(true)}
           style={{

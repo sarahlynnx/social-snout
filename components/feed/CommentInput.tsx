@@ -79,6 +79,7 @@ export function CommentInput({
 
         <TextInput
           ref={inputRef}
+          testID="comment-input"
           className="flex-1 bg-gray-100 rounded-full px-4 text-gray-900"
           style={{
             fontSize: 14,
@@ -98,7 +99,7 @@ export function CommentInput({
           multiline
         />
 
-        <Pressable onPress={handleSubmit} disabled={!text.trim() || submitting}>
+        <Pressable testID="comment-submit" onPress={handleSubmit} disabled={!text.trim() || submitting}>
           <Ionicons
             name="send"
             size={22}

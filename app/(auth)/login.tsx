@@ -102,6 +102,7 @@ export default function LoginScreen() {
 
           <View className="gap-4">
             <Input
+              testID="login-email"
               label="Email"
               placeholder="you@example.com"
               value={email}
@@ -112,6 +113,7 @@ export default function LoginScreen() {
             />
 
             <Input
+              testID="login-password"
               label="Password"
               placeholder="Enter your password"
               value={password}
@@ -121,6 +123,7 @@ export default function LoginScreen() {
             />
 
             <Button
+              testID="login-submit"
               title="Sign In"
               onPress={handleLogin}
               loading={loading}

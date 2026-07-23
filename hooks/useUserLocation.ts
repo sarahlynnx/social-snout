@@ -35,12 +35,49 @@ function parseLocation(raw: unknown): UserLocation | null {
       return { longitude: parseFloat(match[1]), latitude: parseFloat(match[2]) };
     }
     if (/^[0-9a-fA-F]+$/.test(raw) && raw.length > 10) {
-
-      return { latitude: 0, longitude: 0 };
+      const decoded = parseWkbHexPoint(raw);
+      if (decoded) return decoded;
     }
   }
 
   return null;
+}
+
+/**
+ * Decode a PostGIS (E)WKB hex string for a POINT into lng/lat.
+ * PostgREST returns geography columns as WKB hex by default, e.g.
+ * "0101000020E6100000...". Handles both little- and big-endian and the
+ * optional SRID flag (EWKB).
+ */
+function parseWkbHexPoint(hex: string): UserLocation | null {
+  try {
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < bytes.length; i++) {
+      bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+    }
+    const view = new DataView(bytes.buffer);
+    let offset = 0;
+
+    const littleEndian = view.getUint8(offset) === 1;
+    offset += 1;
+
+    const geomType = view.getUint32(offset, littleEndian);
+    offset += 4;
+
+    // Point type is 1; low bits identify the type, high bit 0x20000000 = SRID present.
+    if ((geomType & 0xff) !== 1) return null;
+    if (geomType & 0x20000000) {
+      offset += 4;
+    }
+
+    const lng = view.getFloat64(offset, littleEndian);
+    const lat = view.getFloat64(offset + 8, littleEndian);
+    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+    if (lng === 0 && lat === 0) return null;
+    return { longitude: lng, latitude: lat };
+  } catch {
+    return null;
+  }
 }
 
 export function useUserLocation() {

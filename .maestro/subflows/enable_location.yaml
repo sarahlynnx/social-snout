@@ -1,0 +1,16 @@
+# If the "Enable Location" gate is showing, tap it and wait for the mock GPS
+# fix to be saved. No-op if the gate isn't present.
+appId: com.socialsnout.app
+---
+- runFlow:
+    when:
+      visible:
+        text: "Enable Location"
+    commands:
+      - tapOn:
+          text: "Enable Location"
+          index: 1
+      - extendedWaitUntil:
+          notVisible:
+            text: "Enable Location"
+          timeout: 10000

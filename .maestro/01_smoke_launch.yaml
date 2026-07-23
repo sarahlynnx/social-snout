@@ -1,0 +1,10 @@
+appId: com.socialsnout.app
+name: Smoke - App launches to login/onboarding
+---
+- launchApp:
+    clearState: true
+# Lands on the login screen (SocialSnout branding + Sign In)
+- assertVisible:
+    text: "SocialSnout"
+- assertVisible:
+    id: "login-email"

@@ -1,0 +1,52 @@
+appId: com.socialsnout.app
+name: Feed - browse, filter, react, comment
+env:
+  EMAIL: "emma.johnson@test.com"
+  PASSWORD: "password123"
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/login.yaml
+- tapOn:
+    text: "Feed"
+# Feed has its own location gate; dismiss it if present.
+- runFlow: subflows/enable_location.yaml
+- assertVisible:
+    text: "Feed"
+# Pull to refresh
+- swipe:
+    start: 50%, 30%
+    end: 50%, 85%
+# Filter chips
+- tapOn:
+    text: "Events"
+- tapOn:
+    text: "Photos"
+- tapOn:
+    text: "All"
+# React to the first visible post (wait for posts to load first)
+- extendedWaitUntil:
+    visible:
+      id: "reaction-like"
+    timeout: 15000
+- tapOn:
+    id: "reaction-like"
+    index: 0
+# Open the first post detail and add a comment
+- tapOn:
+    point: 50%, 45%
+- assertVisible:
+    id: "comment-input"
+- tapOn:
+    id: "comment-input"
+- inputText: "Such a cute pup"
+# Dismiss keyboard so the send button isn't covered
+- hideKeyboard
+- tapOn:
+    id: "comment-submit"
+- extendedWaitUntil:
+    visible:
+      text: "Such a cute pup.*"
+    timeout: 10000
+- back

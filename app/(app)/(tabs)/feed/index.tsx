@@ -122,6 +122,7 @@ export default function FeedScreen() {
 
       {/* Floating Action Button */}
       <Pressable
+        testID="feed-create-post-fab"
         onPress={() => router.push("/(app)/create-post")}
         className="w-14 h-14 rounded-full bg-primary-500 items-center justify-center"
         style={{

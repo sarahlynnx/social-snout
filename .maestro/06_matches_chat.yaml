@@ -1,0 +1,37 @@
+appId: com.socialsnout.app
+name: Matches - open chat and send a message
+env:
+  EMAIL: "emma.johnson@test.com"
+  PASSWORD: "password123"
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/login.yaml
+- runFlow: subflows/enable_location.yaml
+- tapOn:
+    text: "Matches"
+- assertVisible:
+    text: "Matches"
+# Open the first match in the list
+- tapOn:
+    point: 50%, 25%
+# Chat screen
+- assertVisible:
+    id: "chat-input"
+# Send a message
+- tapOn:
+    id: "chat-input"
+- inputText: "Hi! Would our dogs like a playdate?"
+# Dismiss the keyboard so the send button isn't covered
+- hideKeyboard
+- tapOn:
+    id: "chat-send"
+- assertVisible:
+    text: "Hi! Would our dogs like a playdate.*"
+- back
+# Regression guard: returning from a chat must NOT clear the matches list.
+- assertVisible:
+    text: "Matches"
+- assertNotVisible:
+    text: "No Matches Yet"

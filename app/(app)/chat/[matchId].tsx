@@ -263,6 +263,7 @@ export default function ChatScreen() {
               paddingBottom: 8,
               textAlignVertical: "center",
             }}
+            testID="chat-input"
             placeholder="Type a message..."
             placeholderTextColor="#A8A49C"
             value={text}
@@ -270,6 +271,7 @@ export default function ChatScreen() {
             multiline
           />
           <Pressable
+            testID="chat-send"
             onPress={handleSend}
             disabled={!text.trim() || sending}
             hitSlop={8}

@@ -143,6 +143,7 @@ export default function CreatePostScreen() {
         </Pressable>
         <Text className="text-base font-bold text-gray-900">New Post</Text>
         <Pressable
+          testID="create-post-submit"
           onPress={handleSubmit}
           disabled={loading || !content.trim()}
           className={`py-1.5 px-4 rounded-full ${
@@ -222,6 +223,7 @@ export default function CreatePostScreen() {
         {/* Content input */}
         <View className="px-4">
           <TextInput
+            testID="create-post-content"
             className="text-base text-gray-900 leading-6"
             style={{ fontSize: 16, minHeight: 120 }}
             placeholder={PLACEHOLDERS[postType]}

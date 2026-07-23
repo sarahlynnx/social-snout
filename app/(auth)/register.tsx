@@ -126,6 +126,7 @@ export default function RegisterScreen() {
 
           <View className="gap-4">
             <Input
+              testID="register-name"
               label="Name"
               placeholder="Your name"
               value={name}
@@ -135,6 +136,7 @@ export default function RegisterScreen() {
             />
 
             <Input
+              testID="register-email"
               label="Email"
               placeholder="you@example.com"
               value={email}
@@ -145,6 +147,7 @@ export default function RegisterScreen() {
             />
 
             <Input
+              testID="register-password"
               label="Password"
               placeholder="At least 6 characters"
               value={password}
@@ -154,6 +157,7 @@ export default function RegisterScreen() {
             />
 
             <Button
+              testID="register-submit"
               title="Create Account"
               onPress={handleRegister}
               loading={loading}

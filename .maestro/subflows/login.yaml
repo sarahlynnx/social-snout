@@ -1,0 +1,18 @@
+# Reusable login subflow. Call with:
+#   - runFlow:
+#       file: subflows/login.yaml
+#       env: { EMAIL: "...", PASSWORD: "..." }
+appId: com.socialsnout.app
+---
+- tapOn:
+    id: "login-email"
+- inputText: "${EMAIL}"
+- tapOn:
+    id: "login-password"
+- inputText: "${PASSWORD}"
+# Dismiss the keyboard so it doesn't cover the Sign In button
+- hideKeyboard
+- tapOn:
+    id: "login-submit"
+- assertVisible:
+    text: ".*Feed.*|.*Discover.*|.*Profile.*"

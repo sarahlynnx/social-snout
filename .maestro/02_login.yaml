@@ -1,0 +1,10 @@
+appId: com.socialsnout.app
+name: Login flow
+env:
+  EMAIL: "emma.johnson@test.com"
+  PASSWORD: "password123"
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/login.yaml

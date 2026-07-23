@@ -21,7 +21,7 @@ export default function MatchesScreen() {
   const { matches, loading, error, refresh } = useMatches();
   const { activePet } = useActivePet();
 
-  useFocusEffect(useCallback(() => { refresh(); }, []));
+  useFocusEffect(useCallback(() => { refresh(); }, [refresh]));
 
   const filteredMatches = activePet
     ? matches.filter(

@@ -1,0 +1,40 @@
+appId: com.socialsnout.app
+name: Register - create account (stops at email verification)
+---
+- launchApp:
+    clearState: true
+# From login, go to Sign Up
+- tapOn:
+    text: "Sign Up"
+- assertVisible:
+    text: "Create Account"
+# Fill name
+- tapOn:
+    id: "register-name"
+- inputText: "Maestro Tester"
+- assertVisible:
+    text: "Maestro Tester"
+# Fill email. Use a @test.com address so verification emails can never reach a
+# real inbox. inputRandomText gives a unique local part to avoid "already
+# registered" on repeat runs.
+- tapOn:
+    id: "register-email"
+- inputText: "maestro-"
+- inputRandomText:
+    length: 8
+- inputText: "@test.com"
+# The password field sits behind the keyboard. Dismiss it first so the tap
+# lands on the field (otherwise focus stays on email and the password text
+# gets appended to the email — "...@example.compassword123").
+- pressKey: Back
+- tapOn:
+    id: "register-password"
+- inputText: "password123"
+- pressKey: Back
+- tapOn:
+    id: "register-submit"
+# Sign-up requires email verification; app shows a "We sent a verification link" screen.
+- extendedWaitUntil:
+    visible:
+      text: ".*[Vv]erif.*|.*sent.*|.*Resend.*"
+    timeout: 15000

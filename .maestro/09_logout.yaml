@@ -1,0 +1,25 @@
+appId: com.socialsnout.app
+name: Logout - sign out from Profile returns to login
+env:
+  EMAIL: "emma.johnson@test.com"
+  PASSWORD: "password123"
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/login.yaml
+- tapOn:
+    text: "Profile"
+- scrollUntilVisible:
+    element:
+      text: "Sign Out"
+    direction: DOWN
+- tapOn:
+    text: "Sign Out"
+# Confirm the Alert
+- tapOn:
+    text: "Sign Out"
+    index: 1
+# Back at the login screen
+- assertVisible:
+    id: "login-email"

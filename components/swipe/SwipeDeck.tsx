@@ -171,12 +171,14 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
       {/* Action buttons */}
       <View className="flex-row items-center justify-center gap-8 mt-6">
         <Pressable
+          testID="swipe-pass"
           onPress={() => animateOff("LEFT")}
           className="w-16 h-16 rounded-full border-2 border-red-400 items-center justify-center bg-white active:bg-red-50"
         >
           <Ionicons name="close" size={32} color="#F87171" />
         </Pressable>
         <Pressable
+          testID="swipe-like"
           onPress={() => animateOff("RIGHT")}
           className="w-16 h-16 rounded-full border-2 border-green-400 items-center justify-center bg-white active:bg-green-50"
         >

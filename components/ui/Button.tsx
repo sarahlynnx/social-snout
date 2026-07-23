@@ -7,6 +7,7 @@ interface ButtonProps {
   loading?: boolean;
   disabled?: boolean;
   className?: string;
+  testID?: string;
 }
 
 export function Button({
@@ -16,6 +17,7 @@ export function Button({
   loading = false,
   disabled = false,
   className = "",
+  testID,
 }: ButtonProps) {
   const baseStyles = "py-4 px-6 rounded-2xl items-center justify-center flex-row";
 
@@ -35,6 +37,7 @@ export function Button({
 
   return (
     <Pressable
+      testID={testID}
       onPress={onPress}
       disabled={isDisabled}
       className={`${baseStyles} ${variantStyles[variant]} ${isDisabled ? "opacity-50" : ""} ${className}`}
