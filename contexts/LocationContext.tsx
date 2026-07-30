@@ -1,4 +1,10 @@
-import { useState, useCallback, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { getCurrentLocation } from "@/lib/location";
@@ -8,17 +14,42 @@ interface UserLocation {
   longitude: number;
 }
 
-/**
- * Attempt to parse the geography column from Supabase.
- * PostgREST returns geography in varying formats depending on config.
- */
+export type LocationStatus = "loading" | "ready" | "unavailable";
+
+interface LocationContextType {
+  latitude: number | null;
+  longitude: number | null;
+  hasLocation: boolean;
+  status: LocationStatus;
+  loading: boolean;
+  requesting: boolean;
+  requestLocation: () => Promise<boolean>;
+}
+
+const LocationContext = createContext<LocationContextType>({
+  latitude: null,
+  longitude: null,
+  hasLocation: false,
+  status: "loading",
+  loading: true,
+  requesting: false,
+  requestLocation: async () => false,
+});
+
 function parseLocation(raw: unknown): UserLocation | null {
   if (!raw) return null;
 
   if (typeof raw === "object" && raw !== null) {
     const geo = raw as Record<string, unknown>;
-    if (geo.type === "Point" && Array.isArray(geo.coordinates) && geo.coordinates.length === 2) {
-      return { longitude: geo.coordinates[0] as number, latitude: geo.coordinates[1] as number };
+    if (
+      geo.type === "Point" &&
+      Array.isArray(geo.coordinates) &&
+      geo.coordinates.length === 2
+    ) {
+      return {
+        longitude: geo.coordinates[0] as number,
+        latitude: geo.coordinates[1] as number,
+      };
     }
   }
 
@@ -26,13 +57,18 @@ function parseLocation(raw: unknown): UserLocation | null {
     try {
       const parsed = JSON.parse(raw);
       if (parsed.type === "Point" && parsed.coordinates?.length === 2) {
-        return { longitude: parsed.coordinates[0], latitude: parsed.coordinates[1] };
+        return {
+          longitude: parsed.coordinates[0],
+          latitude: parsed.coordinates[1],
+        };
       }
-    } catch {
-    }
+    } catch {}
     const match = raw.match(/POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)/);
     if (match) {
-      return { longitude: parseFloat(match[1]), latitude: parseFloat(match[2]) };
+      return {
+        longitude: parseFloat(match[1]),
+        latitude: parseFloat(match[2]),
+      };
     }
     if (/^[0-9a-fA-F]+$/.test(raw) && raw.length > 10) {
       const decoded = parseWkbHexPoint(raw);
@@ -43,12 +79,6 @@ function parseLocation(raw: unknown): UserLocation | null {
   return null;
 }
 
-/**
- * Decode a PostGIS (E)WKB hex string for a POINT into lng/lat.
- * PostgREST returns geography columns as WKB hex by default, e.g.
- * "0101000020E6100000...". Handles both little- and big-endian and the
- * optional SRID flag (EWKB).
- */
 function parseWkbHexPoint(hex: string): UserLocation | null {
   try {
     const bytes = new Uint8Array(hex.length / 2);
@@ -64,7 +94,6 @@ function parseWkbHexPoint(hex: string): UserLocation | null {
     const geomType = view.getUint32(offset, littleEndian);
     offset += 4;
 
-    // Point type is 1; low bits identify the type, high bit 0x20000000 = SRID present.
     if ((geomType & 0xff) !== 1) return null;
     if (geomType & 0x20000000) {
       offset += 4;
@@ -80,16 +109,21 @@ function parseWkbHexPoint(hex: string): UserLocation | null {
   }
 }
 
-export function useUserLocation() {
+export function LocationProvider({ children }: { children: React.ReactNode }) {
   const { session } = useAuth();
   const [location, setLocation] = useState<UserLocation | null>(null);
+  const [status, setStatus] = useState<LocationStatus>("loading");
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
 
   const fetchLocation = useCallback(async () => {
     const t0 = Date.now();
+    setStatus("loading");
+    setLoading(true);
+
     if (!session?.user) {
       setLocation(null);
+      setStatus("unavailable");
       setLoading(false);
       return;
     }
@@ -99,10 +133,11 @@ export function useUserLocation() {
       .select("location")
       .eq("id", session.user.id)
       .single();
-    console.log(`[useUserLocation] fetch users.location: ${Date.now() - t0}ms`);
+    console.log(`[LocationContext] fetch users.location: ${Date.now() - t0}ms`);
 
     if (error || !data?.location) {
       setLocation(null);
+      setStatus("unavailable");
       setLoading(false);
       return;
     }
@@ -111,15 +146,18 @@ export function useUserLocation() {
     if (parsed && parsed.latitude === 0 && parsed.longitude === 0) {
       const coords = await getCurrentLocation();
       console.log(
-        `[useUserLocation] fallback getCurrentLocation: ${Date.now() - t0}ms`
+        `[LocationContext] fallback getCurrentLocation: ${Date.now() - t0}ms`
       );
       if (coords) {
         setLocation(coords);
+        setStatus("ready");
       } else {
         setLocation(null);
+        setStatus("unavailable");
       }
     } else {
       setLocation(parsed);
+      setStatus(parsed ? "ready" : "unavailable");
     }
 
     setLoading(false);
@@ -137,7 +175,9 @@ export function useUserLocation() {
     try {
       const coords = await getCurrentLocation();
       console.log(
-        `[useUserLocation] requestLocation getCurrentLocation: ${Date.now() - t0}ms`
+        `[LocationContext] requestLocation getCurrentLocation: ${
+          Date.now() - t0
+        }ms`
       );
       if (!coords) return false;
 
@@ -148,7 +188,9 @@ export function useUserLocation() {
         })
         .eq("id", session.user.id);
       console.log(
-        `[useUserLocation] requestLocation save to supabase: ${Date.now() - t0}ms`
+        `[LocationContext] requestLocation save to supabase: ${
+          Date.now() - t0
+        }ms`
       );
 
       if (error) {
@@ -157,18 +199,30 @@ export function useUserLocation() {
       }
 
       setLocation(coords);
+      setStatus("ready");
       return true;
     } finally {
       setRequesting(false);
     }
   }, [session]);
 
-  return {
-    latitude: location?.latitude ?? null,
-    longitude: location?.longitude ?? null,
-    hasLocation: location !== null,
-    loading,
-    requesting,
-    requestLocation,
-  };
+  return (
+    <LocationContext.Provider
+      value={{
+        latitude: location?.latitude ?? null,
+        longitude: location?.longitude ?? null,
+        hasLocation: location !== null,
+        status,
+        loading,
+        requesting,
+        requestLocation,
+      }}
+    >
+      {children}
+    </LocationContext.Provider>
+  );
+}
+
+export function useLocation() {
+  return useContext(LocationContext);
 }

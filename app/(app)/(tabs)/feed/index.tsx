@@ -19,8 +19,7 @@ export default function FeedScreen() {
     error,
     refreshing,
     hasMore,
-    hasLocation,
-    locationLoading,
+    locationStatus,
     locationRequesting,
     requestLocation,
     activeFilter,
@@ -36,7 +35,7 @@ export default function FeedScreen() {
     toggleReaction(postId, session.user.id, type);
   };
 
-  if (locationLoading || locationRequesting) {
+  if (locationStatus === "loading" || locationRequesting) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#5A8A4F" />
@@ -49,7 +48,7 @@ export default function FeedScreen() {
     );
   }
 
-  if (!hasLocation) {
+  if (locationStatus === "unavailable") {
     return (
       <View className="flex-1 bg-gray-50">
         <LocationPrompt

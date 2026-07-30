@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
-import { useUserLocation } from "@/hooks/useUserLocation";
-import { DEFAULT_RADIUS_MILES, FEED_PAGE_SIZE } from "@/constants";
+import { useLocation } from "@/contexts/LocationContext";
+import { FEED_PAGE_SIZE } from "@/constants";
 import type { PostWithDetails, PostType } from "@/types/database";
 
 export function useFeed() {
@@ -9,10 +9,11 @@ export function useFeed() {
     latitude,
     longitude,
     hasLocation,
+    status: locationStatus,
     loading: locationLoading,
     requesting: locationRequesting,
     requestLocation,
-  } = useUserLocation();
+  } = useLocation();
   const [posts, setPosts] = useState<PostWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +32,6 @@ export function useFeed() {
         {
           lat: latitude,
           lng: longitude,
-          radius_miles: DEFAULT_RADIUS_MILES,
           cursor_created_at: cursor,
           page_size: FEED_PAGE_SIZE,
           p_type: activeFilter,
@@ -97,7 +97,8 @@ export function useFeed() {
   );
 
   useEffect(() => {
-    if (locationLoading || !hasLocation) {
+    if (locationStatus === "loading") return;
+    if (locationStatus === "unavailable") {
       setLoading(false);
       return;
     }
@@ -109,7 +110,7 @@ export function useFeed() {
       setLoading(false);
     }
     init();
-  }, [hasLocation, locationLoading, fetchPosts]);
+  }, [locationStatus, fetchPosts]);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -138,6 +139,7 @@ export function useFeed() {
     refreshing,
     hasMore,
     hasLocation,
+    locationStatus,
     locationLoading,
     locationRequesting,
     requestLocation,

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { View } from "react-native";
 import { Stack, Redirect } from "expo-router";
 import { ActivePetProvider, useActivePet } from "@/contexts/ActivePetContext";
+import { LocationProvider } from "@/contexts/LocationContext";
 import { useAuth } from "@/hooks/useAuth";
 import { saveUserLocation } from "@/lib/location";
 
@@ -55,7 +56,9 @@ function AppLayoutInner() {
 export default function AppLayout() {
   return (
     <ActivePetProvider>
-      <AppLayoutInner />
+      <LocationProvider>
+        <AppLayoutInner />
+      </LocationProvider>
     </ActivePetProvider>
   );
 }

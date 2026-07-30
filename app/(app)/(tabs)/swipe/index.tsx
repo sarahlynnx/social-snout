@@ -7,16 +7,15 @@ import { PetSwitcher } from "@/components/PetSwitcher";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { LocationPrompt } from "@/components/ui/LocationPrompt";
 import { useSwipe } from "@/hooks/useSwipe";
-import { useUserLocation } from "@/hooks/useUserLocation";
+import { useLocation } from "@/contexts/LocationContext";
 
 export default function SwipeScreen() {
   const router = useRouter();
   const {
-    hasLocation,
-    loading: locationLoading,
+    status: locationStatus,
     requesting: locationRequesting,
     requestLocation,
-  } = useUserLocation();
+  } = useLocation();
   const {
     myPet,
     pets,
@@ -30,7 +29,7 @@ export default function SwipeScreen() {
     resetDeck,
   } = useSwipe();
 
-  if (loading || locationLoading || locationRequesting) {
+  if (loading || locationStatus === "loading" || locationRequesting) {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50">
         <ActivityIndicator size="large" color="#5A8A4F" />
@@ -43,7 +42,7 @@ export default function SwipeScreen() {
     );
   }
 
-  if (!hasLocation) {
+  if (locationStatus === "unavailable") {
     return (
       <View className="flex-1 bg-gray-50">
         <LocationPrompt

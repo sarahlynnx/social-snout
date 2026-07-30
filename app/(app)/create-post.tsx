@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/hooks/useAuth";
 import { useActivePet } from "@/contexts/ActivePetContext";
-import { useUserLocation } from "@/hooks/useUserLocation";
+import { useLocation } from "@/contexts/LocationContext";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 import { supabase } from "@/lib/supabase";
 import { uploadPostImage } from "@/lib/storage";
@@ -45,7 +45,7 @@ const PLACEHOLDERS: Record<PostType, string> = {
 export default function CreatePostScreen() {
   const { session } = useAuth();
   const { activePet, allPets } = useActivePet();
-  const { latitude, longitude } = useUserLocation();
+  const { latitude, longitude } = useLocation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
