@@ -163,25 +163,37 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     const userId = session.user.id;
-
     const permitted = await hasLocationPermission();
 
-    let coords: UserLocation | null = null;
-    if (permitted) {
-      coords = await saveFreshLocation(userId);
-    }
-    if (!coords) {
-      coords = await readSavedLocation(userId);
+    const saved = await readSavedLocation(userId);
+    if (saved) {
+      setLocation(saved);
+      setStatus("ready");
+      setLoading(false);
+    } else if (!permitted) {
+      // No saved location and no permission → show the gate now.
+      setLocation(null);
+      setStatus("unavailable");
+      setLoading(false);
     }
     console.log(
-      `[LocationContext] resolve location (permitted=${permitted}): ${
+      `[LocationContext] saved location resolved (permitted=${permitted}): ${
         Date.now() - t0
       }ms`
     );
 
-    setLocation(coords);
-    setStatus(coords ? "ready" : "unavailable");
-    setLoading(false);
+    if (permitted) {
+      const fresh = await saveFreshLocation(userId);
+      if (fresh) {
+        setLocation(fresh);
+        setStatus("ready");
+      } else if (!saved) {
+        // Permitted but GPS failed and nothing saved → fall back to the gate.
+        setLocation(null);
+        setStatus("unavailable");
+      }
+      setLoading(false);
+    }
   }, [session, saveFreshLocation, readSavedLocation]);
 
   useEffect(() => {
