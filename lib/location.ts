@@ -5,6 +5,10 @@ export async function requestLocationPermission(): Promise<boolean> {
   const { status } = await Location.requestForegroundPermissionsAsync();
   return status === "granted";
 }
+export async function hasLocationPermission(): Promise<boolean> {
+  const { status } = await Location.getForegroundPermissionsAsync();
+  return status === "granted";
+}
 
 export async function getCurrentLocation(): Promise<{
   latitude: number;

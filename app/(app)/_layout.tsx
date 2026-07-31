@@ -1,24 +1,12 @@
-import { useEffect } from "react";
 import { View } from "react-native";
 import { Stack, Redirect } from "expo-router";
 import { ActivePetProvider, useActivePet } from "@/contexts/ActivePetContext";
 import { LocationProvider } from "@/contexts/LocationContext";
-import { useAuth } from "@/hooks/useAuth";
-import { saveUserLocation } from "@/lib/location";
 
 const androidModalOptions = { presentation: "modal" as const };
 
 function AppLayoutInner() {
   const { allPets, loading } = useActivePet();
-  const { session } = useAuth();
-
-  useEffect(() => {
-    if (loading) return;
-    if (allPets.length === 0) return;
-    if (session?.user?.id) {
-      saveUserLocation(session.user.id).catch(() => {});
-    }
-  }, [loading, allPets.length, session]);
 
   if (loading) {
     return <View className="flex-1 bg-gray-50" />;
@@ -28,7 +16,10 @@ function AppLayoutInner() {
     return (
       <>
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="onboarding/index" options={{ gestureEnabled: false }} />
+          <Stack.Screen
+            name="onboarding/index"
+            options={{ gestureEnabled: false }}
+          />
         </Stack>
         <Redirect href="/(app)/onboarding/index" />
       </>
@@ -45,7 +36,10 @@ function AppLayoutInner() {
       <Stack.Screen name="edit-pet/[id]" options={androidModalOptions} />
       <Stack.Screen name="pet-profile/[id]" options={androidModalOptions} />
       <Stack.Screen name="add-pet" options={androidModalOptions} />
-      <Stack.Screen name="create-post" options={{ presentation: "modal" as const }} />
+      <Stack.Screen
+        name="create-post"
+        options={{ presentation: "modal" as const }}
+      />
       <Stack.Screen name="post/[id]" options={androidModalOptions} />
       <Stack.Screen name="matching-preferences" options={androidModalOptions} />
       <Stack.Screen name="chat/[matchId]" />

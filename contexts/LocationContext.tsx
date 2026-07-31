@@ -7,7 +7,7 @@ import {
 } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
-import { getCurrentLocation } from "@/lib/location";
+import { getCurrentLocation, hasLocationPermission } from "@/lib/location";
 
 interface UserLocation {
   latitude: number;
@@ -116,6 +116,41 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
 
+  const readSavedLocation = useCallback(
+    async (userId: string): Promise<UserLocation | null> => {
+      const { data, error } = await supabase
+        .from("users")
+        .select("location")
+        .eq("id", userId)
+        .single();
+      if (error || !data?.location) return null;
+      const parsed = parseLocation(data.location);
+      if (parsed && parsed.latitude === 0 && parsed.longitude === 0)
+        return null;
+      return parsed;
+    },
+    []
+  );
+
+  const saveFreshLocation = useCallback(
+    async (userId: string): Promise<UserLocation | null> => {
+      const coords = await getCurrentLocation();
+      if (!coords) return null;
+      const { error } = await supabase
+        .from("users")
+        .update({
+          location: `SRID=4326;POINT(${coords.longitude} ${coords.latitude})`,
+        })
+        .eq("id", userId);
+      if (error) {
+        console.error("Failed to save location:", error.message);
+        return coords;
+      }
+      return coords;
+    },
+    []
+  );
+
   const fetchLocation = useCallback(async () => {
     const t0 = Date.now();
     setStatus("loading");
@@ -127,41 +162,27 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
       return;
     }
+    const userId = session.user.id;
 
-    const { data, error } = await supabase
-      .from("users")
-      .select("location")
-      .eq("id", session.user.id)
-      .single();
-    console.log(`[LocationContext] fetch users.location: ${Date.now() - t0}ms`);
+    const permitted = await hasLocationPermission();
 
-    if (error || !data?.location) {
-      setLocation(null);
-      setStatus("unavailable");
-      setLoading(false);
-      return;
+    let coords: UserLocation | null = null;
+    if (permitted) {
+      coords = await saveFreshLocation(userId);
     }
-
-    const parsed = parseLocation(data.location);
-    if (parsed && parsed.latitude === 0 && parsed.longitude === 0) {
-      const coords = await getCurrentLocation();
-      console.log(
-        `[LocationContext] fallback getCurrentLocation: ${Date.now() - t0}ms`
-      );
-      if (coords) {
-        setLocation(coords);
-        setStatus("ready");
-      } else {
-        setLocation(null);
-        setStatus("unavailable");
-      }
-    } else {
-      setLocation(parsed);
-      setStatus(parsed ? "ready" : "unavailable");
+    if (!coords) {
+      coords = await readSavedLocation(userId);
     }
+    console.log(
+      `[LocationContext] resolve location (permitted=${permitted}): ${
+        Date.now() - t0
+      }ms`
+    );
 
+    setLocation(coords);
+    setStatus(coords ? "ready" : "unavailable");
     setLoading(false);
-  }, [session]);
+  }, [session, saveFreshLocation, readSavedLocation]);
 
   useEffect(() => {
     fetchLocation();
@@ -169,42 +190,17 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
 
   const requestLocation = useCallback(async () => {
     if (!session?.user) return false;
-    const t0 = Date.now();
     setRequesting(true);
-
     try {
-      const coords = await getCurrentLocation();
-      console.log(
-        `[LocationContext] requestLocation getCurrentLocation: ${
-          Date.now() - t0
-        }ms`
-      );
+      const coords = await saveFreshLocation(session.user.id);
       if (!coords) return false;
-
-      const { error } = await supabase
-        .from("users")
-        .update({
-          location: `SRID=4326;POINT(${coords.longitude} ${coords.latitude})`,
-        })
-        .eq("id", session.user.id);
-      console.log(
-        `[LocationContext] requestLocation save to supabase: ${
-          Date.now() - t0
-        }ms`
-      );
-
-      if (error) {
-        console.error("Failed to save location:", error.message);
-        return false;
-      }
-
       setLocation(coords);
       setStatus("ready");
       return true;
     } finally {
       setRequesting(false);
     }
-  }, [session]);
+  }, [session, saveFreshLocation]);
 
   return (
     <LocationContext.Provider
