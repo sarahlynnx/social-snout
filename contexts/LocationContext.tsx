@@ -35,6 +35,20 @@ const LocationContext = createContext<LocationContextType>({
   requesting: false,
   requestLocation: async () => false,
 });
+const MOVE_THRESHOLD_MILES = 0.25;
+
+function distanceMiles(a: UserLocation, b: UserLocation): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 3958.8;
+  const dLat = toRad(b.latitude - a.latitude);
+  const dLng = toRad(b.longitude - a.longitude);
+  const lat1 = toRad(a.latitude);
+  const lat2 = toRad(b.latitude);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
 
 function parseLocation(raw: unknown): UserLocation | null {
   if (!raw) return null;
@@ -163,35 +177,35 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     const userId = session.user.id;
-    const permitted = await hasLocationPermission();
 
     const saved = await readSavedLocation(userId);
     if (saved) {
       setLocation(saved);
       setStatus("ready");
       setLoading(false);
-    } else if (!permitted) {
-      // No saved location and no permission → show the gate now.
-      setLocation(null);
-      setStatus("unavailable");
-      setLoading(false);
     }
     console.log(
-      `[LocationContext] saved location resolved (permitted=${permitted}): ${
-        Date.now() - t0
-      }ms`
+      `[LocationContext] saved location resolved: ${Date.now() - t0}ms`
     );
 
+    const permitted = await hasLocationPermission();
     if (permitted) {
       const fresh = await saveFreshLocation(userId);
       if (fresh) {
-        setLocation(fresh);
+        const moved =
+          !saved || distanceMiles(saved, fresh) > MOVE_THRESHOLD_MILES;
+        if (moved) {
+          setLocation(fresh);
+        }
         setStatus("ready");
       } else if (!saved) {
-        // Permitted but GPS failed and nothing saved → fall back to the gate.
         setLocation(null);
         setStatus("unavailable");
       }
+      setLoading(false);
+    } else if (!saved) {
+      setLocation(null);
+      setStatus("unavailable");
       setLoading(false);
     }
   }, [session, saveFreshLocation, readSavedLocation]);
