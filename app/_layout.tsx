@@ -20,14 +20,21 @@ export default function RootLayout() {
     if (!session && inAppGroup) {
       router.replace("/(auth)/login");
     } else if (session && inAuthGroup) {
-      router.replace("/(app)/(tabs)/swipe");
+      router.replace("/(app)");
     }
   }, [session, loading, segments]);
 
   if (loading) {
     return (
       <SafeAreaProvider>
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "white" }}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "white",
+          }}
+        >
           <ActivityIndicator size="large" color="#5A8A4F" />
         </View>
       </SafeAreaProvider>
