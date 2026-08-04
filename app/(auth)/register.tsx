@@ -8,7 +8,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
@@ -16,11 +16,13 @@ import { Input } from "@/components/ui/Input";
 
 export default function RegisterScreen() {
   const { signUp, resendVerification } = useAuth();
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingVerification, setPendingVerification] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
   const [resending, setResending] = useState(false);
 
   const handleRegister = async () => {
@@ -37,7 +39,9 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       const result = await signUp(email.trim(), password, name.trim());
-      if (result.needsEmailConfirmation) {
+      if (result.emailAlreadyExists) {
+        setEmailExists(true);
+      } else if (result.needsEmailConfirmation) {
         setPendingVerification(true);
       }
     } catch (error) {
@@ -64,6 +68,42 @@ export default function RegisterScreen() {
       setResending(false);
     }
   };
+
+  if (emailExists) {
+    return (
+      <View className="flex-1 justify-center items-center px-6 bg-white">
+        <Ionicons name="person-circle-outline" size={64} color="#5A8A4F" />
+        <Text className="text-2xl font-bold text-gray-900 mt-6 text-center">
+          Already Have an Account?
+        </Text>
+        <Text className="text-base text-gray-500 mt-3 text-center leading-6">
+          An account may already exist for{"\n"}
+          <Text className="font-semibold text-gray-700">{email.trim()}</Text>
+        </Text>
+        <Text className="text-sm text-gray-400 mt-2 text-center">
+          Try signing in, or go back and use a different email.
+        </Text>
+
+        <Button
+          title="Sign In"
+          onPress={() => router.replace("/(auth)/login")}
+          className="mt-8 w-full"
+        />
+
+        <Pressable
+          className="mt-4"
+          onPress={() => {
+            setEmailExists(false);
+            setPassword("");
+          }}
+        >
+          <Text className="text-primary-500 font-semibold">
+            Use a Different Email
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   if (pendingVerification) {
     return (

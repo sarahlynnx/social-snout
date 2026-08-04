@@ -38,8 +38,11 @@ export function useAuth() {
     });
     if (error) throw error;
 
+    const emailAlreadyExists =
+      !!data.user && (data.user.identities?.length ?? 0) === 0 && !data.session;
+
     const needsEmailConfirmation =
-      data.user && !data.session;
+      !!data.user && !data.session && !emailAlreadyExists;
 
     if (data.user && data.session) {
       const { error: profileError } = await supabase.from("users").insert({
@@ -52,7 +55,7 @@ export function useAuth() {
       if (profileError) throw profileError;
     }
 
-    return { ...data, needsEmailConfirmation };
+    return { ...data, needsEmailConfirmation, emailAlreadyExists };
   };
 
   const signIn = async (email: string, password: string) => {
