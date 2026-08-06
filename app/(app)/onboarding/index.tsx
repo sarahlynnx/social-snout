@@ -1,14 +1,6 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-} from "react-native";
+import { View, Text, ScrollView, Pressable, Alert, TextInput } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
@@ -221,16 +213,13 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-      className="flex-1 bg-white"
+    <KeyboardAwareScrollView
+      style={{ flex: 1, backgroundColor: "white" }}
+      contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
+      bottomOffset={24}
     >
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-      >
         <View className="px-6 pt-16 pb-4">
           <Text className="text-3xl font-bold text-gray-900">Add Your Pet</Text>
           <Text className="text-base text-gray-500 mt-2">
@@ -577,7 +566,6 @@ export default function OnboardingScreen() {
             className="mt-4"
           />
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 }

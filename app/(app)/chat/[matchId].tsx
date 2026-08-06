@@ -7,11 +7,10 @@ import {
   TextInput,
   Pressable,
   Image,
-  KeyboardAvoidingView,
-  Platform,
   ActivityIndicator,
   Keyboard,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -182,10 +181,7 @@ export default function ChatScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-white"
-    >
+    <View className="flex-1 bg-white">
       {/* Header */}
       <View
         className="flex-row items-center px-4 pb-3 border-b border-gray-100 bg-white"
@@ -228,63 +224,68 @@ export default function ChatScreen() {
       </View>
 
       {/* Messages */}
-      <FlatList
-        ref={flatListRef}
-        data={[...messages].reverse()}
-        keyExtractor={(item) => item.id}
-        renderItem={renderMessage}
-        inverted
-        contentContainerStyle={{ paddingVertical: 12 }}
-        keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets
-        ListEmptyComponent={
-          <View className="flex-1 items-center justify-center py-20">
-            <Ionicons name="chatbubble-outline" size={48} color="#D4D1CA" />
-            <Text className="text-base text-gray-400 mt-3">
-              Say hi to {matchInfo?.petName ?? "your match"}!
-            </Text>
-          </View>
-        }
-      />
-
-      {/* Input */}
-      <View
-        className="border-t border-gray-100 bg-white"
-        style={{ paddingBottom: insets.bottom || 8 }}
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={0}
+        className="flex-1"
       >
-        <View className="flex-row items-center px-4 pt-3 pb-2 gap-3">
-          <TextInput
-            className="flex-1 bg-gray-100 rounded-full px-4 text-gray-900"
-            style={{
-              fontSize: 15,
-              minHeight: 36,
-              maxHeight: 100,
-              paddingTop: 8,
-              paddingBottom: 8,
-              textAlignVertical: "center",
-            }}
-            testID="chat-input"
-            placeholder="Type a message..."
-            placeholderTextColor="#A8A49C"
-            value={text}
-            onChangeText={setText}
-            multiline
-          />
-          <Pressable
-            testID="chat-send"
-            onPress={handleSend}
-            disabled={!text.trim() || sending}
-            hitSlop={8}
-          >
-            <Ionicons
-              name="send"
-              size={24}
-              color={text.trim() && !sending ? "#5A8A4F" : "#D4D1CA"}
+        <FlatList
+          ref={flatListRef}
+          data={[...messages].reverse()}
+          keyExtractor={(item) => item.id}
+          renderItem={renderMessage}
+          inverted
+          contentContainerStyle={{ paddingVertical: 12 }}
+          keyboardShouldPersistTaps="handled"
+          ListEmptyComponent={
+            <View className="flex-1 items-center justify-center py-20">
+              <Ionicons name="chatbubble-outline" size={48} color="#D4D1CA" />
+              <Text className="text-base text-gray-400 mt-3">
+                Say hi to {matchInfo?.petName ?? "your match"}!
+              </Text>
+            </View>
+          }
+        />
+
+        {/* Input */}
+        <View
+          className="border-t border-gray-100 bg-white"
+          style={{ paddingBottom: insets.bottom || 8 }}
+        >
+          <View className="flex-row items-center px-4 pt-3 pb-2 gap-3">
+            <TextInput
+              className="flex-1 bg-gray-100 rounded-full px-4 text-gray-900"
+              style={{
+                fontSize: 15,
+                minHeight: 36,
+                maxHeight: 100,
+                paddingTop: 8,
+                paddingBottom: 8,
+                textAlignVertical: "center",
+              }}
+              testID="chat-input"
+              placeholder="Type a message..."
+              placeholderTextColor="#A8A49C"
+              value={text}
+              onChangeText={setText}
+              multiline
             />
-          </Pressable>
+            <Pressable
+              testID="chat-send"
+              onPress={handleSend}
+              disabled={!text.trim() || sending}
+              hitSlop={8}
+            >
+              <Ionicons
+                name="send"
+                size={24}
+                color={text.trim() && !sending ? "#5A8A4F" : "#D4D1CA"}
+              />
+            </Pressable>
+          </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 

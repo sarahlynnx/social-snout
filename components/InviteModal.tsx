@@ -1,14 +1,6 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  Modal,
-  Pressable,
-  Share,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { View, Text, Modal, Pressable, Share, Alert } from "react-native";
+import { KeyboardStickyView } from "react-native-keyboard-controller";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Input } from "@/components/ui/Input";
@@ -85,9 +77,7 @@ export function InviteModal({ visible, onClose }: InviteModalProps) {
         style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
         onPress={handleClose}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
+        <KeyboardStickyView offset={{ closed: 0, opened: insets.bottom }}>
           <Pressable
             onPress={() => {}}
             className="bg-white rounded-t-3xl px-6 pt-4"
@@ -225,7 +215,7 @@ export function InviteModal({ visible, onClose }: InviteModalProps) {
               </>
             )}
           </Pressable>
-        </KeyboardAvoidingView>
+        </KeyboardStickyView>
       </Pressable>
     </Modal>
   );

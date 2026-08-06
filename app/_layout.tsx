@@ -1,15 +1,28 @@
 import "../global.css";
 import { useEffect } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+import * as SplashScreen from "expo-splash-screen";
 import { useAuth } from "@/hooks/useAuth";
+import { useMinimumDelay } from "@/hooks/useMinimumDelay";
+
+SplashScreen.preventAutoHideAsync();
+
+const SPLASH_MIN_MS = 1200;
 
 export default function RootLayout() {
   const { session, loading } = useAuth();
   const router = useRouter();
   const segments = useSegments();
+  const minTimeElapsed = useMinimumDelay(SPLASH_MIN_MS);
+
+  useEffect(() => {
+    if (!loading && minTimeElapsed) {
+      SplashScreen.hideAsync();
+    }
+  }, [loading, minTimeElapsed]);
 
   useEffect(() => {
     if (loading) return;
@@ -24,27 +37,12 @@ export default function RootLayout() {
     }
   }, [session, loading, segments]);
 
-  if (loading) {
-    return (
-      <SafeAreaProvider>
-        <View
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "white",
-          }}
-        >
-          <ActivityIndicator size="large" color="#5A8A4F" />
-        </View>
-      </SafeAreaProvider>
-    );
-  }
-
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }} />
+      <KeyboardProvider>
+        <StatusBar style="dark" />
+        <Stack screenOptions={{ headerShown: false }} />
+      </KeyboardProvider>
     </SafeAreaProvider>
   );
 }

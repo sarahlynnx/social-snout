@@ -1,14 +1,6 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-} from "react-native";
+import { View, Text, ScrollView, Pressable, Alert, TextInput } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
@@ -206,14 +198,12 @@ export default function AddPetScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      className="flex-1 bg-white"
+    <KeyboardAwareScrollView
+      style={{ flex: 1, backgroundColor: "white" }}
+      contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
+      keyboardShouldPersistTaps="handled"
+      bottomOffset={24}
     >
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
-        keyboardShouldPersistTaps="handled"
-      >
         {/* Header with close button */}
         <View className="flex-row items-center justify-between px-6 pt-16 pb-4">
           <View>
@@ -509,7 +499,6 @@ export default function AddPetScreen() {
             className="mt-4"
           />
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 }

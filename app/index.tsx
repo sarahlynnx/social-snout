@@ -1,16 +1,12 @@
 import { Redirect } from "expo-router";
+import { View } from "react-native";
 import { useAuth } from "@/hooks/useAuth";
-import { ActivityIndicator, View } from "react-native";
 
 export default function Index() {
   const { session, loading } = useAuth();
 
   if (loading) {
-    return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#5A8A4F" />
-      </View>
-    );
+    return <View style={{ flex: 1, backgroundColor: "#5A8A4F" }} />;
   }
 
   if (session) {

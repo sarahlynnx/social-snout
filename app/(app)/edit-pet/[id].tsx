@@ -8,6 +8,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Image } from "expo-image";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
@@ -293,11 +294,11 @@ export default function EditPetScreen() {
 
   return (
     <View className="flex-1 bg-white">
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        automaticallyAdjustKeyboardInsets
+        bottomOffset={24}
       >
         <View className="px-6 pt-16 pb-4">
           <Text className="text-3xl font-bold text-gray-900">Edit Pet</Text>
@@ -612,7 +613,7 @@ export default function EditPetScreen() {
             className="mt-4"
           />
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 }

@@ -5,10 +5,9 @@ import {
   ScrollView,
   Pressable,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   TextInput,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
@@ -66,7 +65,10 @@ export default function CreatePostScreen() {
 
   const pickImage = async () => {
     if (images.length >= MAX_POST_IMAGES) {
-      Alert.alert("Limit Reached", `You can add up to ${MAX_POST_IMAGES} photos.`);
+      Alert.alert(
+        "Limit Reached",
+        `You can add up to ${MAX_POST_IMAGES} photos.`
+      );
       return;
     }
 
@@ -129,11 +131,7 @@ export default function CreatePostScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      className="flex-1 bg-white"
-    >
-      {/* Header */}
+    <View className="flex-1 bg-white">
       <View
         className="flex-row items-center justify-between px-4 pb-3 border-b border-gray-100"
         style={{ paddingTop: Math.max(insets.top, 16) }}
@@ -156,9 +154,10 @@ export default function CreatePostScreen() {
         </Pressable>
       </View>
 
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         keyboardShouldPersistTaps="handled"
+        bottomOffset={24}
       >
         {/* Posting as */}
         <Pressable
@@ -193,7 +192,11 @@ export default function CreatePostScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12, gap: 8 }}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            gap: 8,
+          }}
         >
           {POST_TYPE_OPTIONS.map((option) => {
             const isActive = postType === option.value;
@@ -241,11 +244,19 @@ export default function CreatePostScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16, gap: 12, paddingTop: 12 }}
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+              gap: 12,
+              paddingTop: 12,
+            }}
             style={{ overflow: "visible" }}
           >
             {images.map((uri, index) => (
-              <View key={index} className="relative" style={{ overflow: "visible" }}>
+              <View
+                key={index}
+                className="relative"
+                style={{ overflow: "visible" }}
+              >
                 <Image
                   source={{ uri }}
                   style={{ width: 96, height: 96, borderRadius: 12 }}
@@ -274,7 +285,7 @@ export default function CreatePostScreen() {
             <Text className="text-sm text-gray-500">Add Photo</Text>
           </Pressable>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Pet author picker */}
       <PetAuthorPicker
@@ -284,6 +295,6 @@ export default function CreatePostScreen() {
         onSelect={setSelectedPet}
         onClose={() => setPetPickerVisible(false)}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 }

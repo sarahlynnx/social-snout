@@ -8,7 +8,7 @@
     "scheme": "socialsnout",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash-icon-transparent.png",
       "resizeMode": "contain",
       "backgroundColor": "#5A8A4F"
     },
@@ -22,6 +22,7 @@
       }
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "backgroundColor": "#5A8A4F",
         "foregroundImage": "./assets/adaptive-icon-foreground.png",
