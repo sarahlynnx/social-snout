@@ -17,7 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useActivePet } from "@/contexts/ActivePetContext";
 import { supabase } from "@/lib/supabase";
 import { uploadPetPhoto, uploadAvatar } from "@/lib/storage";
-import { saveUserLocation } from "@/lib/location";
+import { useLocation } from "@/contexts/LocationContext";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
@@ -39,6 +39,7 @@ import type { PetType, PetSize, PetGender, PetPrompt } from "@/types/database";
 export default function OnboardingScreen() {
   const { session } = useAuth();
   const { refreshPets } = useActivePet();
+  const { requestLocation } = useLocation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -213,8 +214,7 @@ export default function OnboardingScreen() {
       if (error) throw error;
 
       await refreshPets();
-
-      saveUserLocation(session!.user.id).catch(() => {});
+      requestLocation().catch(() => {});
 
       router.replace("/(app)/(tabs)/swipe");
     } catch (error) {

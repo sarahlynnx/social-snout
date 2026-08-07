@@ -1,5 +1,4 @@
 import * as Location from "expo-location";
-import { supabase } from "@/lib/supabase";
 
 export async function requestLocationPermission(): Promise<boolean> {
   const { status } = await Location.requestForegroundPermissionsAsync();
@@ -32,27 +31,4 @@ export async function getCurrentLocation(): Promise<{
     console.warn("getCurrentLocation failed:", error);
     return null;
   }
-}
-
-/**
- * Get current location and save it to the user's profile.
- * Returns true if saved, false if permission denied or error.
- */
-export async function saveUserLocation(userId: string): Promise<boolean> {
-  const coords = await getCurrentLocation();
-  if (!coords) return false;
-
-  const { error } = await supabase
-    .from("users")
-    .update({
-      location: `SRID=4326;POINT(${coords.longitude} ${coords.latitude})`,
-    })
-    .eq("id", userId);
-
-  if (error) {
-    console.error("Failed to save location:", error.message);
-    return false;
-  }
-
-  return true;
 }
