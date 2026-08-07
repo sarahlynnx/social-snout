@@ -10,7 +10,10 @@ import {
   ActivityIndicator,
   Keyboard,
 } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import {
+  KeyboardAvoidingView,
+  useKeyboardState,
+} from "react-native-keyboard-controller";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -33,6 +36,7 @@ export default function ChatScreen() {
   const { session } = useAuth();
   const { messages, loading, sendMessage } = useMessages(matchId);
   const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardState((s) => s.isVisible);
 
   const [matchInfo, setMatchInfo] = useState<MatchInfo | null>(null);
   const [text, setText] = useState("");
@@ -250,7 +254,7 @@ export default function ChatScreen() {
         {/* Input */}
         <View
           className="border-t border-gray-100 bg-white"
-          style={{ paddingBottom: insets.bottom || 8 }}
+          style={{ paddingBottom: keyboardVisible ? 8 : insets.bottom || 8 }}
         >
           <View className="flex-row items-center px-4 pt-3 pb-2 gap-3">
             <TextInput

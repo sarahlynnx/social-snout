@@ -155,12 +155,13 @@ function CommentItem({
 
           <Pressable
             onPress={() => onReply(comment.id, petName)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            hitSlop={{ top: 14, bottom: 14, left: 16, right: 16 }}
             style={{
               flexDirection: "row",
               alignItems: "center",
               gap: 2,
-              paddingVertical: 6,
+              paddingVertical: 8,
+              paddingRight: 8,
             }}
           >
             <Ionicons name="chatbubble-outline" size={16} color="#A8A49C" />

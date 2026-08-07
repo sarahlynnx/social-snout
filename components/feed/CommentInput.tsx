@@ -3,6 +3,7 @@ import { View, TextInput, Pressable, Text, Keyboard } from "react-native";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useKeyboardState } from "react-native-keyboard-controller";
 import type { Pet } from "@/types/database";
 
 interface CommentInputProps {
@@ -22,6 +23,7 @@ export function CommentInput({
   const [submitting, setSubmitting] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardState((s) => s.isVisible);
 
   useEffect(() => {
     if (replyingTo) {
@@ -61,7 +63,7 @@ export function CommentInput({
 
       <View
         className="flex-row items-center px-4 pt-3 gap-3"
-        style={{ paddingBottom: insets.bottom + 8 }}
+        style={{ paddingBottom: keyboardVisible ? 8 : insets.bottom + 8 }}
       >
         {petPhoto ? (
           <Image
@@ -80,12 +82,16 @@ export function CommentInput({
         <TextInput
           ref={inputRef}
           testID="comment-input"
-          className="flex-1 bg-gray-100 rounded-full px-4 text-gray-900"
+          className="flex-1 px-4 text-gray-900"
           style={{
             fontSize: 14,
-            minHeight: 32,
-            paddingTop: 8,
-            paddingBottom: 8,
+            minHeight: 40,
+            maxHeight: 120,
+            paddingTop: 10,
+            paddingBottom: 10,
+            borderWidth: 1,
+            borderColor: "#E5E5E5",
+            borderRadius: 5,
             textAlignVertical: "center",
           }}
           placeholder={

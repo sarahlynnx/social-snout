@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,9 +9,12 @@ import {
   ActivityIndicator,
   Dimensions,
   Keyboard,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
+import {
+  KeyboardAvoidingView,
+  useKeyboardState,
+} from "react-native-keyboard-controller";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/hooks/useAuth";
@@ -48,6 +51,7 @@ function getTimeAgo(date: Date): string {
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { session } = useAuth();
   const { activePet } = useActivePet();
   const { post, loading: postLoading, refresh: refreshPost } = usePost(id);
@@ -64,8 +68,7 @@ export default function PostDetailScreen() {
     petName: string;
   } | null>(null);
   const [pickerVisible, setPickerVisible] = useState(false);
-  const scrollRef = useRef<ScrollView>(null);
-  const scrollOffsetY = useRef(0);
+  const scrollRef = useRef<any>(null);
   const commentRefs = useRef<Record<string, View | null>>({});
 
   const registerCommentRef = useCallback((id: string, ref: View | null) => {
@@ -73,53 +76,31 @@ export default function PostDetailScreen() {
     else delete commentRefs.current[id];
   }, []);
 
+  const keyboardVisible = useKeyboardState((s) => s.isVisible);
+
   const handleReply = useCallback((commentId: string, petName: string) => {
-    const commentView = commentRefs.current[commentId];
-    if (!commentView || !scrollRef.current) {
-      setReplyingTo({ commentId, petName });
-      return;
-    }
-
-    (commentView as any).measureInWindow(
-      (_cx: number, commentScreenY: number, _cw: number, commentH: number) => {
-        (scrollRef.current as any).measureInWindow(
-          (_sx: number, scrollScreenY: number) => {
-            const contentY =
-              scrollOffsetY.current + (commentScreenY - scrollScreenY);
-
-            setReplyingTo({ commentId, petName });
-
-            const doScroll = () => {
-              (scrollRef.current as any)?.measureInWindow(
-                (_x: number, _y: number, _w: number, newScrollH: number) => {
-                  const target = contentY - newScrollH + commentH + 10;
-                  scrollRef.current?.scrollTo({
-                    y: Math.max(0, target),
-                    animated: true,
-                  });
-                }
-              );
-            };
-
-            let handled = false;
-            const sub = Keyboard.addListener("keyboardDidShow", () => {
-              sub.remove();
-              if (handled) return;
-              handled = true;
-              setTimeout(doScroll, 50);
-            });
-
-            setTimeout(() => {
-              sub.remove();
-              if (handled) return;
-              handled = true;
-              doScroll();
-            }, 700);
-          }
-        );
-      }
-    );
+    setReplyingTo({ commentId, petName });
   }, []);
+
+  // When a reply starts and the keyboard opens, scroll the replied-to comment
+  // so it sits just above the input (otherwise a comment high in a long thread
+  // stays hidden behind the keyboard/input).
+  useEffect(() => {
+    if (!keyboardVisible || !replyingTo) return;
+    const commentView = commentRefs.current[replyingTo.commentId];
+    const scrollNode = scrollRef.current;
+    if (!commentView || !scrollNode) return;
+
+    // measureLayout gives the comment's Y within the scroll content; scroll so
+    // the comment's top sits a little below the top of the visible area.
+    (commentView as any).measureLayout(
+      scrollNode,
+      (_x: number, y: number) => {
+        scrollNode.scrollTo({ y: Math.max(0, y - 80), animated: true });
+      },
+      () => {}
+    );
+  }, [keyboardVisible, replyingTo]);
 
   if (postLoading || !post) {
     return (
@@ -166,20 +147,21 @@ export default function PostDetailScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
-      className="flex-1 bg-white"
-    >
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        scrollEnabled={!pickerVisible}
-        onScroll={(e) => {
-          scrollOffsetY.current = e.nativeEvent.contentOffset.y;
-        }}
-        scrollEventThrottle={16}
+    <View className="flex-1 bg-white">
+      {/* Comments scroll + pinned input share one KeyboardAvoidingView so the
+          input stays pinned above the keyboard. */}
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={0}
+        className="flex-1"
       >
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          scrollEnabled={!pickerVisible}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
         {/* Post content */}
         <View className="px-6 pt-16">
           <View className="flex-row items-center">
@@ -418,18 +400,20 @@ export default function PostDetailScreen() {
             </Text>
           )}
         </View>
-      </ScrollView>
+        </ScrollView>
 
-      {/* Comment input */}
-      <CommentInput
-        activePet={activePet}
-        replyingTo={replyingTo}
-        onCancelReply={() => {
-          setReplyingTo(null);
-          Keyboard.dismiss();
-        }}
-        onSubmit={handleAddComment}
-      />
-    </KeyboardAvoidingView>
+        {/* Pinned comment input — always visible at the bottom, lifts with the
+            keyboard via the KeyboardAvoidingView. */}
+        <CommentInput
+          activePet={activePet}
+          replyingTo={replyingTo}
+          onCancelReply={() => {
+            setReplyingTo(null);
+            Keyboard.dismiss();
+          }}
+          onSubmit={handleAddComment}
+        />
+      </KeyboardAvoidingView>
+    </View>
   );
 }
