@@ -45,13 +45,12 @@ export function useAuth() {
       !!data.user && !data.session && !emailAlreadyExists;
 
     if (data.user && data.session) {
-      const { error: profileError } = await supabase.from("users").insert({
-        id: data.user.id,
-        email,
-        name,
-        avatar_url: null,
-        location: null,
-      });
+      const { error: profileError } = await supabase
+        .from("users")
+        .upsert(
+          { id: data.user.id, email, name },
+          { onConflict: "id" }
+        );
       if (profileError) throw profileError;
     }
 

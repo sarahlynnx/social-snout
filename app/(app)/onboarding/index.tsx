@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { View, Text, ScrollView, Pressable, Alert, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  Alert,
+  TextInput,
+} from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -170,10 +177,18 @@ export default function OnboardingScreen() {
     setLoading(true);
     try {
       const avatarUrl = await uploadAvatar(avatarUri, session!.user.id);
-      await supabase
-        .from("users")
-        .update({ avatar_url: avatarUrl })
-        .eq("id", session!.user.id);
+      const { error: profileError } = await supabase.from("users").upsert(
+        {
+          id: session!.user.id,
+          email: session!.user.email!,
+          name:
+            (session!.user.user_metadata?.name as string | undefined) ??
+            session!.user.email!.split("@")[0],
+          avatar_url: avatarUrl,
+        },
+        { onConflict: "id" }
+      );
+      if (profileError) throw profileError;
 
       const uploadedUrls: string[] = [];
       for (const photoUri of photos) {
@@ -220,352 +235,349 @@ export default function OnboardingScreen() {
       keyboardDismissMode="on-drag"
       bottomOffset={24}
     >
-        <View className="px-6 pt-16 pb-4">
-          <Text className="text-3xl font-bold text-gray-900">Add Your Pet</Text>
-          <Text className="text-base text-gray-500 mt-2">
-            Tell us about your furry friend to start finding playmates!
+      <View className="px-6 pt-16 pb-4">
+        <Text className="text-3xl font-bold text-gray-900">Add Your Pet</Text>
+        <Text className="text-base text-gray-500 mt-2">
+          Tell us about your furry friend to start finding playmates!
+        </Text>
+      </View>
+
+      {/* Photos */}
+      <View className="px-6 py-4">
+        <Text className="text-sm font-medium text-gray-700 mb-3">Photos</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 12, paddingTop: 8, paddingRight: 8 }}
+          style={{ overflow: "visible" }}
+        >
+          {photos.map((uri, index) => (
+            <View
+              key={index}
+              className="relative"
+              style={{ overflow: "visible" }}
+            >
+              <Image
+                source={{ uri }}
+                style={{ width: 96, height: 96, borderRadius: 12 }}
+                contentFit="cover"
+                cachePolicy="none"
+              />
+              <Pressable
+                onPress={() => removePhoto(index)}
+                className="absolute -top-2 -right-2 bg-red-500 rounded-full w-6 h-6 items-center justify-center"
+              >
+                <Ionicons name="close" size={14} color="white" />
+              </Pressable>
+            </View>
+          ))}
+          {photos.length < MAX_PET_PHOTOS && (
+            <Pressable
+              onPress={pickImage}
+              className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50"
+            >
+              <Ionicons name="camera" size={28} color="#A8A49C" />
+              <Text className="text-xs text-gray-400 mt-1">Add</Text>
+            </Pressable>
+          )}
+        </ScrollView>
+      </View>
+
+      <View className="px-6 gap-5">
+        {/* Name */}
+        <Input
+          label="Pet Name"
+          placeholder="What's their name?"
+          value={name}
+          onChangeText={setName}
+          autoCapitalize="words"
+        />
+
+        {/* Type */}
+        <View>
+          <Text className="text-sm font-medium text-gray-700 mb-2">
+            Pet Type
           </Text>
+          <View className="flex-row gap-3">
+            {PET_TYPES.map((petType) => (
+              <Pressable
+                key={petType}
+                onPress={() => handleTypeChange(petType)}
+                className={`flex-1 py-3 rounded-xl items-center border-2 ${
+                  type === petType
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-gray-200 bg-white"
+                }`}
+              >
+                <Text className="text-2xl">
+                  {petType === "DOG" ? "🐕" : "🐈"}
+                </Text>
+                <Text
+                  className={`text-sm font-medium mt-1 ${
+                    type === petType ? "text-primary-600" : "text-gray-600"
+                  }`}
+                >
+                  {petType === "DOG" ? "Dog" : "Cat"}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
 
-        {/* Photos */}
-        <View className="px-6 py-4">
-          <Text className="text-sm font-medium text-gray-700 mb-3">Photos</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 12, paddingTop: 8, paddingRight: 8 }}
-            style={{ overflow: "visible" }}
-          >
-            {photos.map((uri, index) => (
-              <View
-                key={index}
-                className="relative"
-                style={{ overflow: "visible" }}
+        {/* Breed */}
+        <View>
+          <Text className="text-sm font-medium text-gray-700 mb-2">Breed</Text>
+          <View className="flex-row flex-wrap gap-2">
+            {breeds.map((b) => (
+              <Pressable
+                key={b}
+                onPress={() => setBreed(b)}
+                className={`py-2 px-3 rounded-full border ${
+                  breed === b
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-gray-200 bg-white"
+                }`}
               >
+                <Text
+                  className={`text-sm ${
+                    breed === b
+                      ? "text-primary-600 font-medium"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {b}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          {(breed === "Other" || breed === "Mixed") && (
+            <TextInput
+              className="mt-3 border border-gray-200 rounded-xl px-4 text-gray-900"
+              style={{ fontSize: 16, minHeight: 48 }}
+              placeholder={
+                breed === "Mixed" ? "e.g. Lab/Poodle" : "Enter breed"
+              }
+              value={customBreed}
+              onChangeText={setCustomBreed}
+              autoCapitalize="words"
+              returnKeyType="done"
+              submitBehavior="blurAndSubmit"
+            />
+          )}
+        </View>
+
+        {/* Age */}
+        <View>
+          <Text className="text-sm font-medium text-gray-700 mb-2">Age</Text>
+          <View className="flex-row flex-wrap gap-2">
+            {PET_AGE_OPTIONS.map((option) => (
+              <Pressable
+                key={option.value}
+                onPress={() => setAge(option.value)}
+                className={`py-2 px-3 rounded-full border ${
+                  age === option.value
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-gray-200 bg-white"
+                }`}
+              >
+                <Text
+                  className={`text-sm ${
+                    age === option.value
+                      ? "text-primary-600 font-medium"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {option.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        {/* Gender */}
+        <View>
+          <Text className="text-sm font-medium text-gray-700 mb-2">Gender</Text>
+          <View className="flex-row flex-wrap gap-2">
+            {PET_GENDERS.map((g) => (
+              <Pressable
+                key={g}
+                onPress={() => setGender(g)}
+                className={`py-2 px-3 rounded-full border ${
+                  gender === g
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-gray-200 bg-white"
+                }`}
+              >
+                <Text
+                  className={`text-sm ${
+                    gender === g
+                      ? "text-primary-600 font-medium"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {PET_GENDER_LABELS[g]}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        {/* Size */}
+        <View>
+          <Text className="text-sm font-medium text-gray-700 mb-2">Size</Text>
+          <View className="gap-2">
+            {PET_SIZES.map((petSize) => (
+              <Pressable
+                key={petSize}
+                onPress={() => setSize(petSize)}
+                className={`py-3 px-4 rounded-xl border-2 ${
+                  size === petSize
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-gray-200 bg-white"
+                }`}
+              >
+                <Text
+                  className={`text-sm font-medium ${
+                    size === petSize ? "text-primary-600" : "text-gray-600"
+                  }`}
+                >
+                  {PET_SIZE_LABELS[petSize]}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        {/* Bio */}
+        <Input
+          label="Bio (optional)"
+          placeholder={`Tell us about ${
+            name.trim() ? `${name.trim()}'s` : "your pet's"
+          } personality...`}
+          value={bio}
+          onChangeText={setBio}
+          multiline
+          numberOfLines={3}
+          className="min-h-[80px] text-top"
+        />
+
+        {/* Temperament Tags */}
+        <View>
+          <Text className="text-sm font-medium text-gray-700 mb-2">
+            Temperament Tags
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            {TEMPERAMENT_TAGS.map((tag) => (
+              <Pressable
+                key={tag}
+                onPress={() => toggleTag(tag)}
+                className={`py-2 px-3 rounded-full border ${
+                  selectedTags.includes(tag)
+                    ? "border-primary-500 bg-primary-50"
+                    : "border-gray-200 bg-white"
+                }`}
+              >
+                <Text
+                  className={`text-sm ${
+                    selectedTags.includes(tag)
+                      ? "text-primary-600 font-medium"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {tag}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        {/* Pet Prompts */}
+        <View>
+          <Text className="text-sm font-medium text-gray-700 mb-1">
+            Pet Prompts (optional)
+          </Text>
+          <Text className="text-xs text-gray-400 mb-3">
+            Pick up to {MAX_PET_PROMPTS} to show off your pet's personality
+          </Text>
+          <View className="gap-3">
+            {PET_PROMPTS.map((question) => {
+              const selected = prompts.find((p) => p.question === question);
+              return (
+                <View key={question}>
+                  <Pressable
+                    onPress={() => togglePrompt(question)}
+                    className={`py-3 px-4 rounded-xl border-2 ${
+                      selected
+                        ? "border-primary-500 bg-primary-50"
+                        : "border-gray-200 bg-white"
+                    }`}
+                  >
+                    <Text
+                      className={`text-sm font-medium ${
+                        selected ? "text-primary-600" : "text-gray-600"
+                      }`}
+                    >
+                      {question}
+                    </Text>
+                  </Pressable>
+                  {selected && (
+                    <TextInput
+                      className="mt-2 border border-gray-200 rounded-xl px-4 text-gray-900"
+                      style={{ fontSize: 16, minHeight: 48 }}
+                      placeholder="Write your answer..."
+                      value={selected.answer}
+                      onChangeText={(text) =>
+                        updatePromptAnswer(question, text)
+                      }
+                      autoCapitalize="sentences"
+                      returnKeyType="done"
+                      submitBehavior="blurAndSubmit"
+                    />
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Owner Profile Photo */}
+        <View>
+          <Text className="text-sm font-medium text-gray-700 mb-2">
+            Your Profile Photo
+          </Text>
+          <Text className="text-xs text-gray-400 mb-3">
+            Required for safety - helps other owners verify who they're meeting.
+          </Text>
+          <Pressable onPress={pickAvatar} className="items-center">
+            {avatarUri ? (
+              <View className="relative">
                 <Image
-                  source={{ uri }}
-                  style={{ width: 96, height: 96, borderRadius: 12 }}
+                  source={{ uri: avatarUri }}
+                  style={{ width: 112, height: 112, borderRadius: 56 }}
                   contentFit="cover"
                   cachePolicy="none"
                 />
-                <Pressable
-                  onPress={() => removePhoto(index)}
-                  className="absolute -top-2 -right-2 bg-red-500 rounded-full w-6 h-6 items-center justify-center"
-                >
-                  <Ionicons name="close" size={14} color="white" />
-                </Pressable>
+                <View className="absolute bottom-0 right-0 bg-primary-500 rounded-full w-8 h-8 items-center justify-center">
+                  <Ionicons name="camera" size={16} color="white" />
+                </View>
               </View>
-            ))}
-            {photos.length < MAX_PET_PHOTOS && (
-              <Pressable
-                onPress={pickImage}
-                className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50"
-              >
-                <Ionicons name="camera" size={28} color="#A8A49C" />
-                <Text className="text-xs text-gray-400 mt-1">Add</Text>
-              </Pressable>
+            ) : (
+              <View className="w-28 h-28 rounded-full border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50">
+                <Ionicons name="person" size={32} color="#A8A49C" />
+                <Text className="text-xs text-gray-400 mt-1">Add photo</Text>
+              </View>
             )}
-          </ScrollView>
+          </Pressable>
         </View>
 
-        <View className="px-6 gap-5">
-          {/* Name */}
-          <Input
-            label="Pet Name"
-            placeholder="What's their name?"
-            value={name}
-            onChangeText={setName}
-            autoCapitalize="words"
-          />
-
-          {/* Type */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Pet Type
-            </Text>
-            <View className="flex-row gap-3">
-              {PET_TYPES.map((petType) => (
-                <Pressable
-                  key={petType}
-                  onPress={() => handleTypeChange(petType)}
-                  className={`flex-1 py-3 rounded-xl items-center border-2 ${
-                    type === petType
-                      ? "border-primary-500 bg-primary-50"
-                      : "border-gray-200 bg-white"
-                  }`}
-                >
-                  <Text className="text-2xl">
-                    {petType === "DOG" ? "🐕" : "🐈"}
-                  </Text>
-                  <Text
-                    className={`text-sm font-medium mt-1 ${
-                      type === petType ? "text-primary-600" : "text-gray-600"
-                    }`}
-                  >
-                    {petType === "DOG" ? "Dog" : "Cat"}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-
-          {/* Breed */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Breed
-            </Text>
-            <View className="flex-row flex-wrap gap-2">
-              {breeds.map((b) => (
-                <Pressable
-                  key={b}
-                  onPress={() => setBreed(b)}
-                  className={`py-2 px-3 rounded-full border ${
-                    breed === b
-                      ? "border-primary-500 bg-primary-50"
-                      : "border-gray-200 bg-white"
-                  }`}
-                >
-                  <Text
-                    className={`text-sm ${
-                      breed === b
-                        ? "text-primary-600 font-medium"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {b}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-            {(breed === "Other" || breed === "Mixed") && (
-              <TextInput
-                className="mt-3 border border-gray-200 rounded-xl px-4 text-gray-900"
-                style={{ fontSize: 16, minHeight: 48 }}
-                placeholder={
-                  breed === "Mixed" ? "e.g. Lab/Poodle" : "Enter breed"
-                }
-                value={customBreed}
-                onChangeText={setCustomBreed}
-                autoCapitalize="words"
-                returnKeyType="done"
-                submitBehavior="blurAndSubmit"
-              />
-            )}
-          </View>
-
-          {/* Age */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">Age</Text>
-            <View className="flex-row flex-wrap gap-2">
-              {PET_AGE_OPTIONS.map((option) => (
-                <Pressable
-                  key={option.value}
-                  onPress={() => setAge(option.value)}
-                  className={`py-2 px-3 rounded-full border ${
-                    age === option.value
-                      ? "border-primary-500 bg-primary-50"
-                      : "border-gray-200 bg-white"
-                  }`}
-                >
-                  <Text
-                    className={`text-sm ${
-                      age === option.value
-                        ? "text-primary-600 font-medium"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {option.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-
-          {/* Gender */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">Gender</Text>
-            <View className="flex-row flex-wrap gap-2">
-              {PET_GENDERS.map((g) => (
-                <Pressable
-                  key={g}
-                  onPress={() => setGender(g)}
-                  className={`py-2 px-3 rounded-full border ${
-                    gender === g
-                      ? "border-primary-500 bg-primary-50"
-                      : "border-gray-200 bg-white"
-                  }`}
-                >
-                  <Text
-                    className={`text-sm ${
-                      gender === g
-                        ? "text-primary-600 font-medium"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {PET_GENDER_LABELS[g]}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-
-          {/* Size */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">Size</Text>
-            <View className="gap-2">
-              {PET_SIZES.map((petSize) => (
-                <Pressable
-                  key={petSize}
-                  onPress={() => setSize(petSize)}
-                  className={`py-3 px-4 rounded-xl border-2 ${
-                    size === petSize
-                      ? "border-primary-500 bg-primary-50"
-                      : "border-gray-200 bg-white"
-                  }`}
-                >
-                  <Text
-                    className={`text-sm font-medium ${
-                      size === petSize ? "text-primary-600" : "text-gray-600"
-                    }`}
-                  >
-                    {PET_SIZE_LABELS[petSize]}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-
-          {/* Bio */}
-          <Input
-            label="Bio (optional)"
-            placeholder={`Tell us about ${
-              name.trim() ? `${name.trim()}'s` : "your pet's"
-            } personality...`}
-            value={bio}
-            onChangeText={setBio}
-            multiline
-            numberOfLines={3}
-            className="min-h-[80px] text-top"
-          />
-
-          {/* Temperament Tags */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Temperament Tags
-            </Text>
-            <View className="flex-row flex-wrap gap-2">
-              {TEMPERAMENT_TAGS.map((tag) => (
-                <Pressable
-                  key={tag}
-                  onPress={() => toggleTag(tag)}
-                  className={`py-2 px-3 rounded-full border ${
-                    selectedTags.includes(tag)
-                      ? "border-primary-500 bg-primary-50"
-                      : "border-gray-200 bg-white"
-                  }`}
-                >
-                  <Text
-                    className={`text-sm ${
-                      selectedTags.includes(tag)
-                        ? "text-primary-600 font-medium"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {tag}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-
-          {/* Pet Prompts */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-1">
-              Pet Prompts (optional)
-            </Text>
-            <Text className="text-xs text-gray-400 mb-3">
-              Pick up to {MAX_PET_PROMPTS} to show off your pet's personality
-            </Text>
-            <View className="gap-3">
-              {PET_PROMPTS.map((question) => {
-                const selected = prompts.find((p) => p.question === question);
-                return (
-                  <View key={question}>
-                    <Pressable
-                      onPress={() => togglePrompt(question)}
-                      className={`py-3 px-4 rounded-xl border-2 ${
-                        selected
-                          ? "border-primary-500 bg-primary-50"
-                          : "border-gray-200 bg-white"
-                      }`}
-                    >
-                      <Text
-                        className={`text-sm font-medium ${
-                          selected ? "text-primary-600" : "text-gray-600"
-                        }`}
-                      >
-                        {question}
-                      </Text>
-                    </Pressable>
-                    {selected && (
-                      <TextInput
-                        className="mt-2 border border-gray-200 rounded-xl px-4 text-gray-900"
-                        style={{ fontSize: 16, minHeight: 48 }}
-                        placeholder="Write your answer..."
-                        value={selected.answer}
-                        onChangeText={(text) =>
-                          updatePromptAnswer(question, text)
-                        }
-                        autoCapitalize="sentences"
-                        returnKeyType="done"
-                        submitBehavior="blurAndSubmit"
-                      />
-                    )}
-                  </View>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* Owner Profile Photo */}
-          <View>
-            <Text className="text-sm font-medium text-gray-700 mb-2">
-              Your Profile Photo
-            </Text>
-            <Text className="text-xs text-gray-400 mb-3">
-              Required for safety - helps other owners verify who they're
-              meeting.
-            </Text>
-            <Pressable onPress={pickAvatar} className="items-center">
-              {avatarUri ? (
-                <View className="relative">
-                  <Image
-                    source={{ uri: avatarUri }}
-                    style={{ width: 112, height: 112, borderRadius: 56 }}
-                    contentFit="cover"
-                    cachePolicy="none"
-                  />
-                  <View className="absolute bottom-0 right-0 bg-primary-500 rounded-full w-8 h-8 items-center justify-center">
-                    <Ionicons name="camera" size={16} color="white" />
-                  </View>
-                </View>
-              ) : (
-                <View className="w-28 h-28 rounded-full border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50">
-                  <Ionicons name="person" size={32} color="#A8A49C" />
-                  <Text className="text-xs text-gray-400 mt-1">Add photo</Text>
-                </View>
-              )}
-            </Pressable>
-          </View>
-
-          {/* Submit */}
-          <Button
-            title="Create Pet Profile"
-            onPress={handleSubmit}
-            loading={loading}
-            className="mt-4"
-          />
-        </View>
+        {/* Submit */}
+        <Button
+          title="Create Pet Profile"
+          onPress={handleSubmit}
+          loading={loading}
+          className="mt-4"
+        />
+      </View>
     </KeyboardAwareScrollView>
   );
 }
