@@ -51,11 +51,14 @@ export function CommentInput({
     <View className="border-t border-gray-100 bg-white">
       {/* Reply indicator */}
       {replyingTo && (
-        <View className="flex-row items-center justify-between px-4 pt-2">
+        <View
+          testID="reply-indicator"
+          className="flex-row items-center justify-between px-4 pt-2"
+        >
           <Text className="text-xs text-gray-400">
             Replying to {replyingTo.petName}
           </Text>
-          <Pressable onPress={onCancelReply}>
+          <Pressable testID="reply-cancel" onPress={onCancelReply}>
             <Ionicons name="close" size={16} color="#A8A49C" />
           </Pressable>
         </View>

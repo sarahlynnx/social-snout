@@ -1,0 +1,53 @@
+appId: com.socialsnout.app
+name: Comment reply - replying-to bar appears, switches, and cancels
+env:
+  EMAIL: "emma.johnson@test.com"
+  PASSWORD: "password123"
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/login.yaml
+- tapOn:
+    text: "Feed"
+# Feed has its own location gate; dismiss it if present.
+- runFlow: subflows/enable_location.yaml
+- assertVisible:
+    text: "Feed"
+# Open the first post. Which specific posts are in the feed depends on the
+# signed-in user's location/radius, so don't target a specific post — open
+# whatever is first and seed a comment so a Reply button is guaranteed.
+- extendedWaitUntil:
+    visible:
+      id: "reaction-like"
+    timeout: 15000
+- tapOn:
+    point: 50%, 45%
+- assertVisible:
+    id: "comment-input"
+# Seed a top-level comment so at least one comment (and its Reply button) exists,
+# regardless of the post's seeded comments.
+- tapOn:
+    id: "comment-input"
+- inputText: "Testing reply flow"
+- hideKeyboard
+- tapOn:
+    id: "comment-submit"
+- extendedWaitUntil:
+    visible:
+      id: "comment-reply"
+    timeout: 10000
+# Tap Reply -> the "Replying to X" bar appears above the input.
+- tapOn:
+    id: "comment-reply"
+    index: 0
+- assertVisible:
+    id: "reply-indicator"
+- assertVisible:
+    text: "Replying to .*"
+# Cancel (X) dismisses the reply state entirely.
+- tapOn:
+    id: "reply-cancel"
+- assertNotVisible:
+    id: "reply-indicator"
+- back

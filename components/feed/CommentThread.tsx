@@ -154,6 +154,7 @@ function CommentItem({
           </Pressable>
 
           <Pressable
+            testID="comment-reply"
             onPress={() => onReply(comment.id, petName)}
             hitSlop={{ top: 14, bottom: 14, left: 16, right: 16 }}
             style={{

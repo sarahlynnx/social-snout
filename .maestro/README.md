@@ -23,6 +23,7 @@ Each flow maps to a section of [../docs/install-checklist.md](../docs/install-ch
 | `07_profile.yaml`      | Profile           | Sections render, open Edit, save Matching Preferences |
 | `08_register.yaml`     | Auth              | Create account → stops at email-verification prompt   |
 | `09_logout.yaml`       | Auth              | Sign Out from Profile returns to login                |
+| `10_comment_reply.yaml`| Feed              | Reply on a comment → "Replying to" bar shows & cancels |
 | `subflows/login.yaml`  | —                 | Reusable login, called via `runFlow`                  |
 
 **Not automated** (need external state / two devices — do these manually per the checklist):
@@ -39,6 +40,8 @@ onboarding after signup (blocked by email verification).
 | `feed-create-post-fab`                                                       | Feed "+" FAB                 | `app/(app)/(tabs)/feed/index.tsx`  |
 | `reaction-like`                                                              | Post like pill               | `components/feed/ReactionBar.tsx`  |
 | `comment-input` / `comment-submit`                                           | Post-detail comment box      | `components/feed/CommentInput.tsx` |
+| `reply-indicator` / `reply-cancel`                                           | "Replying to" bar + cancel ✕ | `components/feed/CommentInput.tsx` |
+| `comment-reply`                                                              | Reply button on a comment    | `components/feed/CommentThread.tsx`|
 | `create-post-content` / `create-post-submit`                                 | Create-post form             | `app/(app)/create-post.tsx`        |
 | `chat-input` / `chat-send`                                                   | Chat message box             | `app/(app)/chat/[matchId].tsx`     |
 
