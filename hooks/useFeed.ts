@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useLocation } from "@/contexts/LocationContext";
 import { FEED_PAGE_SIZE } from "@/constants";
-import type { PostWithDetails, PostType } from "@/types/database";
+import type { FeedPost, PostType } from "@/types/database";
 
 export function useFeed() {
   const {
@@ -14,7 +14,7 @@ export function useFeed() {
     requesting: locationRequesting,
     requestLocation,
   } = useLocation();
-  const [posts, setPosts] = useState<PostWithDetails[]>([]);
+  const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -27,17 +27,14 @@ export function useFeed() {
       if (!latitude || !longitude) return;
       const t0 = Date.now();
 
-      const { data: idRows, error: rpcError } = await supabase.rpc(
-        "nearby_post_ids",
-        {
-          lat: latitude,
-          lng: longitude,
-          cursor_created_at: cursor,
-          page_size: FEED_PAGE_SIZE,
-          p_type: activeFilter,
-        }
-      );
-      console.log(`[useFeed] nearby_post_ids RPC: ${Date.now() - t0}ms`);
+      const { data, error: rpcError } = await supabase.rpc("nearby_posts", {
+        lat: latitude,
+        lng: longitude,
+        cursor_created_at: cursor,
+        page_size: FEED_PAGE_SIZE,
+        p_type: activeFilter,
+      });
+      console.log(`[useFeed] nearby_posts RPC: ${Date.now() - t0}ms`);
 
       if (rpcError) {
         setError(rpcError.message);
@@ -46,37 +43,13 @@ export function useFeed() {
 
       setError(null);
 
-      const postIds = (idRows ?? []).map(
-        (r: { post_id: string }) => r.post_id
-      );
+      const newPosts = (data ?? []) as FeedPost[];
 
-      if (postIds.length === 0) {
+      if (newPosts.length === 0) {
         setHasMore(false);
         if (reset) setPosts([]);
         return;
       }
-
-      const { data, error } = await supabase
-        .from("posts")
-        .select(
-          `
-          *,
-          pet:pets(*),
-          author:users!posts_author_id_fkey(id, name, avatar_url),
-          reactions(*),
-          comments(count)
-        `
-        )
-        .in("id", postIds)
-        .order("created_at", { ascending: false });
-      console.log(`[useFeed] hydrate posts query: ${Date.now() - t0}ms`);
-
-      if (error) {
-        console.error("Failed to fetch posts:", error.message);
-        return;
-      }
-
-      const newPosts = (data ?? []) as PostWithDetails[];
 
       if (reset) {
         setPosts(newPosts);
@@ -88,9 +61,7 @@ export function useFeed() {
         });
       }
 
-      if (newPosts.length > 0) {
-        cursorRef.current = newPosts[newPosts.length - 1].created_at;
-      }
+      cursorRef.current = newPosts[newPosts.length - 1].created_at;
       setHasMore(newPosts.length >= FEED_PAGE_SIZE);
     },
     [latitude, longitude, activeFilter]

@@ -8,7 +8,7 @@ import { PostCard } from "@/components/feed/PostCard";
 import { PostTypeFilter } from "@/components/feed/PostTypeFilter";
 import { LocationPrompt } from "@/components/ui/LocationPrompt";
 import { ErrorState } from "@/components/ui/ErrorState";
-import type { PostWithDetails, ReactionType } from "@/types/database";
+import type { FeedPost, ReactionType } from "@/types/database";
 
 export default function FeedScreen() {
   const router = useRouter();
@@ -86,12 +86,11 @@ export default function FeedScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }: { item: PostWithDetails }) => (
+        renderItem={({ item }: { item: FeedPost }) => (
           <PostCard
             post={item}
             onPress={() => router.push(`/(app)/post/${item.id}`)}
             onReact={(type) => handleReact(item.id, type)}
-            currentUserId={session?.user?.id}
           />
         )}
         contentContainerStyle={{ paddingTop: 12, paddingBottom: 100, gap: 12 }}

@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { POST_TYPE_LABELS, POST_TYPE_COLORS } from "@/constants";
 import { ReactionBar } from "@/components/feed/ReactionBar";
-import type { PostWithDetails, ReactionType } from "@/types/database";
+import type { FeedPost, ReactionType } from "@/types/database";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -22,28 +22,22 @@ function getTimeAgo(date: Date): string {
 }
 
 interface PostCardProps {
-  post: PostWithDetails;
+  post: FeedPost;
   onPress: () => void;
   onReact: (type: ReactionType) => void;
-  currentUserId: string | undefined;
 }
 
-export function PostCard({
-  post,
-  onPress,
-  onReact,
-  currentUserId,
-}: PostCardProps) {
+export function PostCard({ post, onPress, onReact }: PostCardProps) {
   const petPhoto = post.pet?.photos?.[0];
   const petName = post.pet?.name ?? post.author.name;
   const petBreed = post.pet?.breed;
   const timeAgo = getTimeAgo(new Date(post.created_at));
   const typeColor = POST_TYPE_COLORS[post.type];
   const typeLabel = POST_TYPE_LABELS[post.type];
-  const commentCount = post.comments?.[0]?.count ?? 0;
+  const commentCount = post.comment_count;
 
   const imageCount = post.images.length;
-  const imageWidth = screenWidth - 72; // mx-4 (32) + px-5 (40) = 72
+  const imageWidth = screenWidth - 72;
 
   return (
     <View className="bg-white mx-4 rounded-2xl px-5 py-4">
@@ -138,8 +132,8 @@ export function PostCard({
       {/* Reaction bar + comment count */}
       <View className="mt-3">
         <ReactionBar
-          reactions={post.reactions}
-          currentUserId={currentUserId}
+          reactionCount={post.reaction_count}
+          myReaction={post.my_reaction}
           commentCount={commentCount}
           onReact={onReact}
           onCommentPress={onPress}

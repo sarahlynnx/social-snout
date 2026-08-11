@@ -486,9 +486,11 @@ export interface Database {
         Args: {
           lat: number;
           lng: number;
-          radius_miles?: number;
+          cursor_created_at?: string | null;
+          page_size?: number;
+          p_type?: PostType | null;
         };
-        Returns: Database["public"]["Tables"]["posts"]["Row"][];
+        Returns: FeedPost[];
       };
       handle_swipe: {
         Args: {
@@ -568,6 +570,14 @@ export type PostWithDetails = Post & {
   author: Pick<User, "id" | "name" | "avatar_url">;
   reactions: Reaction[];
   comments: { count: number }[];
+};
+
+export type FeedPost = Omit<Post, "location"> & {
+  pet: Pet | null;
+  author: Pick<User, "id" | "name" | "avatar_url">;
+  reaction_count: number;
+  my_reaction: ReactionType | null;
+  comment_count: number;
 };
 
 export type CommentWithPet = Comment & {

@@ -3,11 +3,11 @@ import { View, Text, Pressable, Share, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { REACTION_EMOJIS } from "@/constants";
 import { ReactionPicker } from "@/components/feed/ReactionPicker";
-import type { Reaction, ReactionType } from "@/types/database";
+import type { ReactionType } from "@/types/database";
 
 interface ReactionBarProps {
-  reactions: Reaction[];
-  currentUserId: string | undefined;
+  reactionCount: number;
+  myReaction: ReactionType | null;
   commentCount: number;
   onReact: (type: ReactionType) => void;
   onCommentPress: () => void;
@@ -15,8 +15,8 @@ interface ReactionBarProps {
 }
 
 export function ReactionBar({
-  reactions,
-  currentUserId,
+  reactionCount,
+  myReaction,
   commentCount,
   onReact,
   onCommentPress,
@@ -24,13 +24,11 @@ export function ReactionBar({
 }: ReactionBarProps) {
   const [pickerVisible, setPickerVisible] = useState(false);
 
-  const safeReactions = reactions ?? [];
-  const myReaction = safeReactions.find((r) => r.user_id === currentUserId);
-  const totalReactions = safeReactions.length;
+  const totalReactions = reactionCount;
 
   const handleTap = () => {
     if (myReaction) {
-      onReact(myReaction.type);
+      onReact(myReaction);
     } else {
       onReact("HEART");
     }
@@ -47,11 +45,11 @@ export function ReactionBar({
   };
 
   const hasReacted = !!myReaction;
-  const likeImage = hasReacted
-    ? REACTION_EMOJIS[myReaction.type]?.image ?? REACTION_EMOJIS.HEART.image
+  const likeImage = myReaction
+    ? REACTION_EMOJIS[myReaction]?.image ?? REACTION_EMOJIS.HEART.image
     : REACTION_EMOJIS.HEART.image;
-  const likeColor = hasReacted
-    ? REACTION_EMOJIS[myReaction.type]?.color ?? "#EF4444"
+  const likeColor = myReaction
+    ? REACTION_EMOJIS[myReaction]?.color ?? "#EF4444"
     : "#5C584F";
 
   return (
@@ -88,7 +86,7 @@ export function ReactionBar({
 
         <ReactionPicker
           visible={pickerVisible}
-          currentReaction={myReaction?.type}
+          currentReaction={myReaction ?? undefined}
           onSelect={onReact}
           onClose={() => setPickerVisible(false)}
         />
