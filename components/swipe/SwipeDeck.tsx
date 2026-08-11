@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -21,7 +21,12 @@ interface SwipeDeckProps {
   onOpenProfile?: (petId: string) => void;
 }
 
-export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeDeckProps) {
+export function SwipeDeck({
+  pets,
+  currentIndex,
+  onSwipe,
+  onOpenProfile,
+}: SwipeDeckProps) {
   const position = useRef(new Animated.ValueXY()).current;
 
   const currentPet = pets[currentIndex];
@@ -31,6 +36,10 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
   currentPetRef.current = currentPet;
   const onSwipeRef = useRef(onSwipe);
   onSwipeRef.current = onSwipe;
+
+  useEffect(() => {
+    position.setValue({ x: 0, y: 0 });
+  }, [currentPet?.id, position]);
 
   const handleSwipeComplete = useCallback(
     (direction: "RIGHT" | "LEFT") => {
@@ -44,7 +53,8 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
 
   const animateOff = useCallback(
     (direction: "RIGHT" | "LEFT") => {
-      const toX = direction === "RIGHT" ? SCREEN_WIDTH * 1.5 : -SCREEN_WIDTH * 1.5;
+      const toX =
+        direction === "RIGHT" ? SCREEN_WIDTH * 1.5 : -SCREEN_WIDTH * 1.5;
       Animated.timing(position, {
         toValue: { x: toX, y: 0 },
         duration: 300,
@@ -129,8 +139,11 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
         {/* Next card (behind) */}
         {nextPet && (
           <Animated.View
+            key={nextPet.id}
             className="absolute"
-            style={[{ width: "100%", zIndex: 1, transform: [{ scale: nextScale }] }]}
+            style={[
+              { width: "100%", zIndex: 1, transform: [{ scale: nextScale }] },
+            ]}
           >
             <PetCard pet={nextPet} />
           </Animated.View>
@@ -138,6 +151,7 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
 
         {/* Current card (top, draggable) */}
         <Animated.View
+          key={currentPet.id}
           style={[{ width: "100%", zIndex: 2 }, cardStyle]}
           {...panResponder.panHandlers}
         >
@@ -146,9 +160,7 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
             className="absolute top-8 left-6 z-10 border-4 border-green-500 rounded-xl px-3 py-1"
             style={{ opacity: likeOpacity, transform: [{ rotate: "-15deg" }] }}
           >
-            <Text className="text-green-500 text-3xl font-extrabold">
-              LIKE
-            </Text>
+            <Text className="text-green-500 text-3xl font-extrabold">LIKE</Text>
           </Animated.View>
 
           {/* Nope stamp */}
@@ -156,9 +168,7 @@ export function SwipeDeck({ pets, currentIndex, onSwipe, onOpenProfile }: SwipeD
             className="absolute top-8 right-6 z-10 border-4 border-red-500 rounded-xl px-3 py-1"
             style={{ opacity: nopeOpacity, transform: [{ rotate: "15deg" }] }}
           >
-            <Text className="text-red-500 text-3xl font-extrabold">
-              NOPE
-            </Text>
+            <Text className="text-red-500 text-3xl font-extrabold">NOPE</Text>
           </Animated.View>
 
           <PetCard

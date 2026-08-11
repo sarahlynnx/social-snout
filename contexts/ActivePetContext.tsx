@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useCallback, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,8 +37,10 @@ export function ActivePetProvider({ children }: { children: React.ReactNode }) {
   // Stay in loading state until auth is resolved AND pets are fetched
   const loading = authLoading || petsLoading;
 
+  const userId = session?.user?.id ?? null;
+
   const fetchPets = useCallback(async () => {
-    if (!session?.user) {
+    if (!userId) {
       setAllPets([]);
       setActivePet(null);
       setPetsLoading(false);
@@ -42,7 +50,7 @@ export function ActivePetProvider({ children }: { children: React.ReactNode }) {
     const { data } = await supabase
       .from("pets")
       .select("*")
-      .eq("owner_id", session.user.id)
+      .eq("owner_id", userId)
       .order("created_at", { ascending: true });
 
     const pets = data ?? [];
@@ -59,7 +67,7 @@ export function ActivePetProvider({ children }: { children: React.ReactNode }) {
     const saved = savedId ? pets.find((p) => p.id === savedId) : null;
     setActivePet(saved ?? pets[0]);
     setPetsLoading(false);
-  }, [session]);
+  }, [userId]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -79,12 +87,12 @@ export function ActivePetProvider({ children }: { children: React.ReactNode }) {
   );
 
   const refreshPets = useCallback(async () => {
-    if (!session?.user) return;
+    if (!userId) return;
 
     const { data } = await supabase
       .from("pets")
       .select("*")
-      .eq("owner_id", session.user.id)
+      .eq("owner_id", userId)
       .order("created_at", { ascending: true });
 
     const pets = data ?? [];
@@ -101,7 +109,7 @@ export function ActivePetProvider({ children }: { children: React.ReactNode }) {
       }
       return null;
     });
-  }, [session]);
+  }, [userId]);
 
   return (
     <ActivePetContext.Provider

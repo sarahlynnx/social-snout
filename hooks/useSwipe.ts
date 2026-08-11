@@ -54,14 +54,16 @@ export function useSwipe() {
       return;
     }
 
-    // Reset deck when switching pets
-    if (lastPetId.current !== activePet.id) {
-      setPets([]);
-      setCurrentIndex(0);
-      setMatchedPet(null);
-      setMatchId(null);
-      lastPetId.current = activePet.id;
+    if (lastPetId.current === activePet.id) {
+      return;
     }
+
+    // Genuine pet switch: reset the deck and load the new pet's cards.
+    lastPetId.current = activePet.id;
+    setPets([]);
+    setCurrentIndex(0);
+    setMatchedPet(null);
+    setMatchId(null);
 
     async function init() {
       setLoading(true);
