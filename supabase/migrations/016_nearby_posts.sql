@@ -62,7 +62,7 @@ BEGIN
     p.images,
     p.type,
     p.created_at,
-    CASE WHEN pet.id IS NULL THEN NULL ELSE to_jsonb(pet) END AS pet,
+    CASE WHEN pt.id IS NULL THEN NULL ELSE to_jsonb(pt) END AS pet,
     jsonb_build_object(
       'id', u.id,
       'name', u.name,
@@ -73,7 +73,7 @@ BEGIN
     COALESCE(cc.cnt, 0)::INTEGER AS comment_count
   FROM posts p
   JOIN users u ON u.id = p.author_id
-  LEFT JOIN pets pet ON pet.id = p.pet_id
+  LEFT JOIN pets pt ON pt.id = p.pet_id
   LEFT JOIN LATERAL (
     SELECT COUNT(*) AS cnt FROM reactions r WHERE r.post_id = p.id
   ) rc ON TRUE

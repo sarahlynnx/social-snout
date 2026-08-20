@@ -61,6 +61,7 @@ function CommentItem({
     <View
       className={isReply ? "ml-10 mt-3" : ""}
       ref={(ref) => registerRef?.(comment.id, ref)}
+      collapsable={false}
     >
       {/* Avatar + name + time on one line */}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>

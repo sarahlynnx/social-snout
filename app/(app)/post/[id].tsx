@@ -69,7 +69,8 @@ export default function PostDetailScreen() {
   } | null>(null);
   const [pickerVisible, setPickerVisible] = useState(false);
   const scrollRef = useRef<any>(null);
-  const scrollViewHeightRef = useRef(0);
+  const scrollYRef = useRef(0);
+  const inputContainerRef = useRef<View>(null);
   const commentRefs = useRef<Record<string, View | null>>({});
 
   const registerCommentRef = useCallback((id: string, ref: View | null) => {
@@ -78,33 +79,44 @@ export default function PostDetailScreen() {
   }, []);
 
   const keyboardVisible = useKeyboardState((s) => s.isVisible);
-  const keyboardHeight = useKeyboardState((s) => s.height);
 
   const handleReply = useCallback((commentId: string, petName: string) => {
     setReplyingTo({ commentId, petName });
   }, []);
 
-  // When a reply starts and the keyboard opens, scroll the replied-to comment
-  // so its BOTTOM sits just above the input (otherwise a comment high in a long
-  // thread stays hidden above the visible area / behind the keyboard).
+  // When a reply starts and the keyboard opens, bring the replied-to comment to
+  // just above the input. We compare the ACTUAL on-screen positions of the
+  // comment and the input (measureInWindow) and scroll by the exact delta, so
+  // this is correct regardless of how the KeyboardAvoidingView resizes/moves
+  // things. Measurement is deferred until after the keyboard/layout animation
+  // settles, otherwise we'd read mid-flight positions.
   useEffect(() => {
     if (!keyboardVisible || !replyingTo) return;
     const commentView = commentRefs.current[replyingTo.commentId];
     const scrollNode = scrollRef.current;
-    const H = scrollViewHeightRef.current;
-    if (!commentView || !scrollNode || H <= 0 || keyboardHeight <= 0) return;
+    const inputView = inputContainerRef.current;
+    if (!commentView || !scrollNode || !inputView) return;
 
-    const GAP = 12;
-    (commentView as any).measureLayout(
-      scrollNode,
-      (_x: number, y: number, _w: number, h: number) => {
-        const visible = H - keyboardHeight;
-        const target = y + h - visible + GAP;
-        scrollNode.scrollTo({ y: Math.max(0, target), animated: true });
-      },
-      () => {}
-    );
-  }, [keyboardVisible, keyboardHeight, replyingTo]);
+    const GAP = 12; // breathing room between the comment's bottom and the input
+    const timer = setTimeout(() => {
+      (inputView as any).measureInWindow((_ix: number, inputTop: number) => {
+        (commentView as any).measureInWindow(
+          (_cx: number, commentTop: number, _cw: number, commentH: number) => {
+            const commentBottom = commentTop + commentH;
+            const desiredBottom = inputTop - GAP;
+            const delta = commentBottom - desiredBottom;
+            const nextOffset = Math.max(0, scrollYRef.current + delta);
+            console.log(
+              `[reply-scroll] commentBottom=${commentBottom} inputTop=${inputTop} delta=${delta} from=${scrollYRef.current} to=${nextOffset}`
+            );
+            scrollNode.scrollTo({ y: nextOffset, animated: true });
+          }
+        );
+      });
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [keyboardVisible, replyingTo]);
 
   if (postLoading || !post) {
     return (
@@ -161,9 +173,10 @@ export default function PostDetailScreen() {
       >
         <ScrollView
           ref={scrollRef}
-          onLayout={(e) => {
-            scrollViewHeightRef.current = e.nativeEvent.layout.height;
+          onScroll={(e) => {
+            scrollYRef.current = e.nativeEvent.contentOffset.y;
           }}
+          scrollEventThrottle={16}
           contentContainerStyle={{ paddingBottom: 20 }}
           scrollEnabled={!pickerVisible}
           keyboardShouldPersistTaps="handled"
@@ -410,16 +423,20 @@ export default function PostDetailScreen() {
         </ScrollView>
 
         {/* Pinned comment input — always visible at the bottom, lifts with the
-            keyboard via the KeyboardAvoidingView. */}
-        <CommentInput
-          activePet={activePet}
-          replyingTo={replyingTo}
-          onCancelReply={() => {
-            setReplyingTo(null);
-            Keyboard.dismiss();
-          }}
-          onSubmit={handleAddComment}
-        />
+            keyboard via the KeyboardAvoidingView. Wrapped in a measurable View
+            (collapsable={false}) so the reply-scroll effect can read its
+            on-screen position. */}
+        <View ref={inputContainerRef} collapsable={false}>
+          <CommentInput
+            activePet={activePet}
+            replyingTo={replyingTo}
+            onCancelReply={() => {
+              setReplyingTo(null);
+              Keyboard.dismiss();
+            }}
+            onSubmit={handleAddComment}
+          />
+        </View>
       </KeyboardAvoidingView>
     </View>
   );
