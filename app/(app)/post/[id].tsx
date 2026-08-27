@@ -180,7 +180,6 @@ export default function PostDetailScreen() {
           contentContainerStyle={{ paddingBottom: 20 }}
           scrollEnabled={!pickerVisible}
           keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
         >
           {/* Post content */}
           <View className="px-6 pt-16">

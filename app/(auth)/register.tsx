@@ -138,7 +138,6 @@ export default function RegisterScreen() {
       style={{ flex: 1 }}
       contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
       keyboardShouldPersistTaps="handled"
-      keyboardDismissMode="on-drag"
       showsVerticalScrollIndicator={false}
       bottomOffset={24}
     >
