@@ -69,6 +69,8 @@ export default function PostDetailScreen() {
   } | null>(null);
   const [pickerVisible, setPickerVisible] = useState(false);
   const scrollRef = useRef<any>(null);
+  const scrollYRef = useRef(0);
+  const inputContainerRef = useRef<View>(null);
   const commentRefs = useRef<Record<string, View | null>>({});
 
   const registerCommentRef = useCallback((id: string, ref: View | null) => {
@@ -82,24 +84,38 @@ export default function PostDetailScreen() {
     setReplyingTo({ commentId, petName });
   }, []);
 
-  // When a reply starts and the keyboard opens, scroll the replied-to comment
-  // so it sits just above the input (otherwise a comment high in a long thread
-  // stays hidden behind the keyboard/input).
+  // When a reply starts and the keyboard opens, bring the replied-to comment to
+  // just above the input. We compare the ACTUAL on-screen positions of the
+  // comment and the input (measureInWindow) and scroll by the exact delta, so
+  // this is correct regardless of how the KeyboardAvoidingView resizes/moves
+  // things. Measurement is deferred until after the keyboard/layout animation
+  // settles, otherwise we'd read mid-flight positions.
   useEffect(() => {
     if (!keyboardVisible || !replyingTo) return;
     const commentView = commentRefs.current[replyingTo.commentId];
     const scrollNode = scrollRef.current;
-    if (!commentView || !scrollNode) return;
+    const inputView = inputContainerRef.current;
+    if (!commentView || !scrollNode || !inputView) return;
 
-    // measureLayout gives the comment's Y within the scroll content; scroll so
-    // the comment's top sits a little below the top of the visible area.
-    (commentView as any).measureLayout(
-      scrollNode,
-      (_x: number, y: number) => {
-        scrollNode.scrollTo({ y: Math.max(0, y - 80), animated: true });
-      },
-      () => {}
-    );
+    const GAP = 12; // breathing room between the comment's bottom and the input
+    const timer = setTimeout(() => {
+      (inputView as any).measureInWindow((_ix: number, inputTop: number) => {
+        (commentView as any).measureInWindow(
+          (_cx: number, commentTop: number, _cw: number, commentH: number) => {
+            const commentBottom = commentTop + commentH;
+            const desiredBottom = inputTop - GAP;
+            const delta = commentBottom - desiredBottom;
+            const nextOffset = Math.max(0, scrollYRef.current + delta);
+            console.log(
+              `[reply-scroll] commentBottom=${commentBottom} inputTop=${inputTop} delta=${delta} from=${scrollYRef.current} to=${nextOffset}`
+            );
+            scrollNode.scrollTo({ y: nextOffset, animated: true });
+          }
+        );
+      });
+    }, 250);
+
+    return () => clearTimeout(timer);
   }, [keyboardVisible, replyingTo]);
 
   if (postLoading || !post) {
@@ -157,262 +173,269 @@ export default function PostDetailScreen() {
       >
         <ScrollView
           ref={scrollRef}
+          onScroll={(e) => {
+            scrollYRef.current = e.nativeEvent.contentOffset.y;
+          }}
+          scrollEventThrottle={16}
           contentContainerStyle={{ paddingBottom: 20 }}
           scrollEnabled={!pickerVisible}
           keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
         >
-        {/* Post content */}
-        <View className="px-6 pt-16">
-          <View className="flex-row items-center">
-            {petPhoto ? (
-              <Image
-                source={{ uri: petPhoto }}
-                style={{ width: 44, height: 44, borderRadius: 22 }}
-              />
-            ) : (
-              <View className="w-11 h-11 rounded-full bg-primary-100 items-center justify-center">
-                <Ionicons name="paw" size={20} color="#5A8A4F" />
-              </View>
-            )}
-            <View className="flex-1 ml-3">
-              <View className="flex-row items-center gap-2">
-                <Text className="text-base font-semibold text-gray-900">
-                  {petName}
-                </Text>
-                {typeColor && (
-                  <View
-                    style={{ backgroundColor: typeColor + "15" }}
-                    className="px-2 py-0.5 rounded-full"
-                  >
-                    <Text
-                      style={{ color: typeColor }}
-                      className="text-xs font-medium"
+          {/* Post content */}
+          <View className="px-6 pt-16">
+            <View className="flex-row items-center">
+              {petPhoto ? (
+                <Image
+                  source={{ uri: petPhoto }}
+                  style={{ width: 44, height: 44, borderRadius: 22 }}
+                />
+              ) : (
+                <View className="w-11 h-11 rounded-full bg-primary-100 items-center justify-center">
+                  <Ionicons name="paw" size={20} color="#5A8A4F" />
+                </View>
+              )}
+              <View className="flex-1 ml-3">
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-base font-semibold text-gray-900">
+                    {petName}
+                  </Text>
+                  {typeColor && (
+                    <View
+                      style={{ backgroundColor: typeColor + "15" }}
+                      className="px-2 py-0.5 rounded-full"
                     >
-                      {typeLabel}
-                    </Text>
-                  </View>
+                      <Text
+                        style={{ color: typeColor }}
+                        className="text-xs font-medium"
+                      >
+                        {typeLabel}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+                {petBreed && (
+                  <Text className="text-xs text-gray-400">{petBreed}</Text>
                 )}
               </View>
-              {petBreed && (
-                <Text className="text-xs text-gray-400">{petBreed}</Text>
-              )}
+              <Text className="text-xs text-gray-400">{timeAgo}</Text>
             </View>
-            <Text className="text-xs text-gray-400">{timeAgo}</Text>
-          </View>
 
-          <Text className="text-base text-gray-800 mt-4 leading-6">
-            {post.content}
-          </Text>
+            <Text className="text-base text-gray-800 mt-4 leading-6">
+              {post.content}
+            </Text>
 
-          {/* Images */}
-          {post.images.length > 0 && (
-            <View className="mt-4 gap-2">
-              {post.images.map((uri, i) => (
-                <Image
-                  key={i}
-                  source={{ uri }}
-                  style={{
-                    width: imageWidth,
-                    height: imageWidth,
-                    borderRadius: 12,
-                  }}
-                />
-              ))}
-            </View>
-          )}
+            {/* Images */}
+            {post.images.length > 0 && (
+              <View className="mt-4 gap-2">
+                {post.images.map((uri, i) => (
+                  <Image
+                    key={i}
+                    source={{ uri }}
+                    style={{
+                      width: imageWidth,
+                      height: imageWidth,
+                      borderRadius: 12,
+                    }}
+                  />
+                ))}
+              </View>
+            )}
 
-          {/* Action row: Like / Comment / Share */}
-          <View
-            className="mt-4 border-t border-b border-gray-100"
-            style={{
-              position: "relative",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingVertical: 10,
-            }}
-          >
-            <Pressable
-              onPress={() => {
-                if (myReaction) {
-                  handleReact(myReaction.type);
-                } else {
-                  handleReact("HEART");
-                }
-              }}
-              onLongPress={() => setPickerVisible(true)}
+            {/* Action row: Like / Comment / Share */}
+            <View
+              className="mt-4 border-t border-b border-gray-100"
               style={{
+                position: "relative",
                 flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
+                justifyContent: "space-between",
+                paddingVertical: 10,
               }}
             >
-              {myReaction ? (
-                <Image
-                  source={
-                    REACTION_EMOJIS[myReaction.type]?.image ??
-                    REACTION_EMOJIS.HEART.image
+              <Pressable
+                onPress={() => {
+                  if (myReaction) {
+                    handleReact(myReaction.type);
+                  } else {
+                    handleReact("HEART");
                   }
-                  style={{ width: 20, height: 20 }}
-                />
-              ) : (
-                <Ionicons name="heart-outline" size={20} color="#5C584F" />
-              )}
-              <Text
+                }}
+                onLongPress={() => setPickerVisible(true)}
                 style={{
-                  fontSize: 13,
-                  fontWeight: "600",
-                  color: myReaction
-                    ? REACTION_EMOJIS[myReaction.type]?.color ?? "#EF4444"
-                    : "#5C584F",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
                 }}
               >
-                Like
-              </Text>
-            </Pressable>
+                {myReaction ? (
+                  <Image
+                    source={
+                      REACTION_EMOJIS[myReaction.type]?.image ??
+                      REACTION_EMOJIS.HEART.image
+                    }
+                    style={{ width: 20, height: 20 }}
+                  />
+                ) : (
+                  <Ionicons name="heart-outline" size={20} color="#5C584F" />
+                )}
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: myReaction
+                      ? REACTION_EMOJIS[myReaction.type]?.color ?? "#EF4444"
+                      : "#5C584F",
+                  }}
+                >
+                  Like
+                </Text>
+              </Pressable>
 
-            <Pressable
-              onPress={() => {}}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <Ionicons name="chatbubble-outline" size={20} color="#5C584F" />
-              <Text
-                style={{ fontSize: 13, fontWeight: "600", color: "#5C584F" }}
+              <Pressable
+                onPress={() => {}}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                }}
               >
-                Comment
-              </Text>
-            </Pressable>
+                <Ionicons name="chatbubble-outline" size={20} color="#5C584F" />
+                <Text
+                  style={{ fontSize: 13, fontWeight: "600", color: "#5C584F" }}
+                >
+                  Comment
+                </Text>
+              </Pressable>
 
-            <Pressable
-              onPress={async () => {
-                try {
-                  await Share.share({
-                    message: "Check out this post on SocialSnout!",
-                  });
-                } catch {}
-              }}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <Ionicons name="arrow-redo-outline" size={20} color="#5C584F" />
-              <Text
-                style={{ fontSize: 13, fontWeight: "600", color: "#5C584F" }}
+              <Pressable
+                onPress={async () => {
+                  try {
+                    await Share.share({
+                      message: "Check out this post on SocialSnout!",
+                    });
+                  } catch {}
+                }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                }}
               >
-                Share
-              </Text>
-            </Pressable>
+                <Ionicons name="arrow-redo-outline" size={20} color="#5C584F" />
+                <Text
+                  style={{ fontSize: 13, fontWeight: "600", color: "#5C584F" }}
+                >
+                  Share
+                </Text>
+              </Pressable>
 
-            <ReactionPicker
-              visible={pickerVisible}
-              currentReaction={myReaction?.type}
-              onSelect={handleReact}
-              onClose={() => setPickerVisible(false)}
-            />
+              <ReactionPicker
+                visible={pickerVisible}
+                currentReaction={myReaction?.type}
+                onSelect={handleReact}
+                onClose={() => setPickerVisible(false)}
+              />
+            </View>
+
+            {/* Reaction summary */}
+            {(totalReactions > 0 || commentCount > 0) && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginTop: 12,
+                }}
+              >
+                {totalReactions > 0 ? (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    {/* Overlapping reaction icons */}
+                    <View style={{ flexDirection: "row", marginRight: 6 }}>
+                      {reactionSummary.map(([type], index) => {
+                        const reaction = REACTION_EMOJIS[type];
+                        if (!reaction) return null;
+                        return (
+                          <View
+                            key={type}
+                            style={{
+                              width: 22,
+                              height: 22,
+                              borderRadius: 11,
+                              backgroundColor: "#fff",
+                              borderWidth: 1.5,
+                              borderColor: "#fff",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginLeft: index > 0 ? -6 : 0,
+                              zIndex: reactionSummary.length - index,
+                            }}
+                          >
+                            <Image
+                              source={reaction.image}
+                              style={{ width: 14, height: 14 }}
+                            />
+                          </View>
+                        );
+                      })}
+                    </View>
+                    <Text style={{ fontSize: 13, color: "#5C584F" }}>
+                      {totalReactions}{" "}
+                      {totalReactions === 1 ? "reaction" : "reactions"}
+                    </Text>
+                  </View>
+                ) : (
+                  <View />
+                )}
+                {commentCount > 0 && (
+                  <Text style={{ fontSize: 13, color: "#5C584F" }}>
+                    {commentCount} {commentCount === 1 ? "comment" : "comments"}
+                  </Text>
+                )}
+              </View>
+            )}
           </View>
 
-          {/* Reaction summary */}
-          {(totalReactions > 0 || commentCount > 0) && (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginTop: 12,
-              }}
-            >
-              {totalReactions > 0 ? (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  {/* Overlapping reaction icons */}
-                  <View style={{ flexDirection: "row", marginRight: 6 }}>
-                    {reactionSummary.map(([type], index) => {
-                      const reaction = REACTION_EMOJIS[type];
-                      if (!reaction) return null;
-                      return (
-                        <View
-                          key={type}
-                          style={{
-                            width: 22,
-                            height: 22,
-                            borderRadius: 11,
-                            backgroundColor: "#fff",
-                            borderWidth: 1.5,
-                            borderColor: "#fff",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            marginLeft: index > 0 ? -6 : 0,
-                            zIndex: reactionSummary.length - index,
-                          }}
-                        >
-                          <Image
-                            source={reaction.image}
-                            style={{ width: 14, height: 14 }}
-                          />
-                        </View>
-                      );
-                    })}
-                  </View>
-                  <Text style={{ fontSize: 13, color: "#5C584F" }}>
-                    {totalReactions}{" "}
-                    {totalReactions === 1 ? "reaction" : "reactions"}
-                  </Text>
-                </View>
-              ) : (
-                <View />
-              )}
-              {commentCount > 0 && (
-                <Text style={{ fontSize: 13, color: "#5C584F" }}>
-                  {commentCount} {commentCount === 1 ? "comment" : "comments"}
-                </Text>
-              )}
-            </View>
-          )}
-        </View>
-
-        {/* Comments */}
-        <View className="px-6 mt-4">
-          {commentsLoading ? (
-            <ActivityIndicator
-              size="small"
-              color="#5A8A4F"
-              style={{ marginTop: 16 }}
-            />
-          ) : comments.length > 0 ? (
-            <CommentThread
-              comments={comments}
-              currentUserId={session?.user?.id}
-              onReply={handleReply}
-              onReact={(commentId, type) => {
-                if (!session?.user) return;
-                toggleCommentReaction(commentId, session.user.id, type);
-              }}
-              registerRef={registerCommentRef}
-            />
-          ) : (
-            <Text className="text-sm text-gray-400 mt-3">
-              No comments yet. Be the first!
-            </Text>
-          )}
-        </View>
+          {/* Comments */}
+          <View className="px-6 mt-4">
+            {commentsLoading ? (
+              <ActivityIndicator
+                size="small"
+                color="#5A8A4F"
+                style={{ marginTop: 16 }}
+              />
+            ) : comments.length > 0 ? (
+              <CommentThread
+                comments={comments}
+                currentUserId={session?.user?.id}
+                onReply={handleReply}
+                onReact={(commentId, type) => {
+                  if (!session?.user) return;
+                  toggleCommentReaction(commentId, session.user.id, type);
+                }}
+                registerRef={registerCommentRef}
+              />
+            ) : (
+              <Text className="text-sm text-gray-400 mt-3">
+                No comments yet. Be the first!
+              </Text>
+            )}
+          </View>
         </ScrollView>
 
         {/* Pinned comment input — always visible at the bottom, lifts with the
-            keyboard via the KeyboardAvoidingView. */}
-        <CommentInput
-          activePet={activePet}
-          replyingTo={replyingTo}
-          onCancelReply={() => {
-            setReplyingTo(null);
-            Keyboard.dismiss();
-          }}
-          onSubmit={handleAddComment}
-        />
+            keyboard via the KeyboardAvoidingView. Wrapped in a measurable View
+            (collapsable={false}) so the reply-scroll effect can read its
+            on-screen position. */}
+        <View ref={inputContainerRef} collapsable={false}>
+          <CommentInput
+            activePet={activePet}
+            replyingTo={replyingTo}
+            onCancelReply={() => {
+              setReplyingTo(null);
+              Keyboard.dismiss();
+            }}
+            onSubmit={handleAddComment}
+          />
+        </View>
       </KeyboardAvoidingView>
     </View>
   );

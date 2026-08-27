@@ -232,7 +232,6 @@ export default function OnboardingScreen() {
       style={{ flex: 1, backgroundColor: "white" }}
       contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
       keyboardShouldPersistTaps="handled"
-      keyboardDismissMode="on-drag"
       bottomOffset={24}
     >
       <View className="px-6 pt-16 pb-4">
