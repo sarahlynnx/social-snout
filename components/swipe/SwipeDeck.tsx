@@ -139,7 +139,6 @@ export function SwipeDeck({
         {/* Next card (behind) */}
         {nextPet && (
           <Animated.View
-            key={nextPet.id}
             className="absolute"
             style={[
               { width: "100%", zIndex: 1, transform: [{ scale: nextScale }] },
@@ -151,7 +150,6 @@ export function SwipeDeck({
 
         {/* Current card (top, draggable) */}
         <Animated.View
-          key={currentPet.id}
           style={[{ width: "100%", zIndex: 2 }, cardStyle]}
           {...panResponder.panHandlers}
         >
