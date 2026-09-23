@@ -298,18 +298,21 @@ ON CONFLICT (id) DO NOTHING;
 -- 4. MATCHING PREFERENCES
 -- ============================================================================
 
-INSERT INTO matching_preferences (user_id, pet_types, sizes, age_min, age_max, required_tags) VALUES
-  ('a1111111-1111-1111-1111-111111111111', '{DOG,CAT}', '{SMALL,MEDIUM,LARGE}', 0, 10, '{}'),
-  ('a2222222-2222-2222-2222-222222222222', '{DOG}',     '{MEDIUM,LARGE}',        1, 8,  '{}'),
-  ('a3333333-3333-3333-3333-333333333333', '{DOG,CAT}', '{SMALL,MEDIUM,LARGE}', 0, 10, '{}'),
-  ('a4444444-4444-4444-4444-444444444444', '{DOG}',     '{MEDIUM,LARGE}',        0, 10, '{}'),
-  ('a5555555-5555-5555-5555-555555555555', '{DOG,CAT}', '{SMALL,MEDIUM,LARGE}', 0, 10, '{}'),
-  ('a6666666-6666-6666-6666-666666666666', '{DOG}',     '{MEDIUM,LARGE}',        0, 10, '{}'),
-  ('a7777777-7777-7777-7777-777777777777', '{DOG,CAT}', '{SMALL,MEDIUM}',        0, 8,  '{}'),
-  ('a8888888-8888-8888-8888-888888888888', '{DOG,CAT}', '{SMALL,MEDIUM,LARGE}', 0, 10, '{}'),
-  ('a9999999-9999-9999-9999-999999999999', '{DOG}',     '{MEDIUM,LARGE}',        0, 5,  '{}'),
-  ('aa000000-0000-0000-0000-000000000000', '{DOG}',     '{SMALL,MEDIUM,LARGE}', 0, 10, '{}')
-ON CONFLICT (user_id) DO NOTHING;
+-- One preferences row PER PET (migration 018). Every pet starts with broad
+-- defaults; each pet's filters + distance can be narrowed independently in-app.
+INSERT INTO matching_preferences (pet_id, user_id, pet_types, sizes, genders, age_min, age_max, required_tags, radius_miles)
+SELECT
+  p.id,
+  p.owner_id,
+  '{DOG,CAT}'::pet_type[],
+  '{SMALL,MEDIUM,LARGE}'::pet_size[],
+  '{MALE,FEMALE,UNKNOWN}'::pet_gender[],
+  0,
+  10,
+  '{}'::text[],
+  10
+FROM pets p
+ON CONFLICT (pet_id) DO NOTHING;
 
 -- ============================================================================
 -- 5. SWIPES (mutual right-swipes to create matches)

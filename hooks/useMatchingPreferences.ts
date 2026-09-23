@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { useActivePet } from "@/contexts/ActivePetContext";
 import type { PetType, PetSize, PetGender } from "@/types/database";
 
 export interface MatchingPreferencesState {
@@ -25,21 +26,23 @@ const DEFAULTS: MatchingPreferencesState = {
 
 export function useMatchingPreferences() {
   const { session } = useAuth();
+  const { activePet } = useActivePet();
   const [preferences, setPreferences] =
     useState<MatchingPreferencesState>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const fetchPreferences = useCallback(async () => {
-    if (!session?.user) {
+    if (!activePet) {
       setLoading(false);
       return;
     }
 
+    setLoading(true);
     const { data, error } = await supabase
       .from("matching_preferences")
       .select("*")
-      .eq("user_id", session.user.id)
+      .eq("pet_id", activePet.id)
       .maybeSingle();
 
     if (error) {
@@ -54,19 +57,22 @@ export function useMatchingPreferences() {
         requiredTags: data.required_tags,
         radiusMiles: data.radius_miles ?? 10,
       });
+    } else {
+      setPreferences(DEFAULTS);
     }
 
     setLoading(false);
-  }, [session]);
+  }, [activePet]);
 
   const savePreferences = useCallback(
     async (prefs: MatchingPreferencesState): Promise<boolean> => {
-      if (!session?.user) return false;
+      if (!session?.user || !activePet) return false;
 
       setSaving(true);
       const { error } = await supabase.from("matching_preferences").upsert(
         {
           user_id: session.user.id,
+          pet_id: activePet.id,
           pet_types: prefs.petTypes,
           sizes: prefs.sizes,
           genders: prefs.genders,
@@ -76,7 +82,7 @@ export function useMatchingPreferences() {
           radius_miles: prefs.radiusMiles,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: "user_id" }
+        { onConflict: "pet_id" }
       );
 
       setSaving(false);
@@ -89,7 +95,7 @@ export function useMatchingPreferences() {
       setPreferences(prefs);
       return true;
     },
-    [session]
+    [session, activePet]
   );
 
   useEffect(() => {

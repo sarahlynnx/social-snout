@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useLocation } from "@/contexts/LocationContext";
+import { useActivePet } from "@/contexts/ActivePetContext";
 import { FEED_PAGE_SIZE } from "@/constants";
 import type { FeedPost, PostType } from "@/types/database";
 
@@ -14,6 +15,7 @@ export function useFeed() {
     requesting: locationRequesting,
     requestLocation,
   } = useLocation();
+  const { activePet } = useActivePet();
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +35,7 @@ export function useFeed() {
         cursor_created_at: cursor,
         page_size: FEED_PAGE_SIZE,
         p_type: activeFilter,
+        p_pet_id: activePet?.id ?? null,
       });
       console.log(`[useFeed] nearby_posts RPC: ${Date.now() - t0}ms`);
 
@@ -64,7 +67,7 @@ export function useFeed() {
       cursorRef.current = newPosts[newPosts.length - 1].created_at;
       setHasMore(newPosts.length >= FEED_PAGE_SIZE);
     },
-    [latitude, longitude, activeFilter]
+    [latitude, longitude, activeFilter, activePet?.id]
   );
 
   useEffect(() => {

@@ -373,6 +373,7 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
+          pet_id: string | null;
           pet_types: PetType[];
           sizes: PetSize[];
           genders: PetGender[];
@@ -385,6 +386,7 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
+          pet_id?: string | null;
           pet_types?: PetType[];
           sizes?: PetSize[];
           genders?: PetGender[];
@@ -397,6 +399,7 @@ export interface Database {
         Update: {
           id?: string;
           user_id?: string;
+          pet_id?: string | null;
           pet_types?: PetType[];
           sizes?: PetSize[];
           genders?: PetGender[];
@@ -492,6 +495,7 @@ export interface Database {
           cursor_created_at?: string | null;
           page_size?: number;
           p_type?: PostType | null;
+          p_pet_id?: string | null;
         };
         Returns: FeedPost[];
       };
