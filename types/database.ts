@@ -97,6 +97,7 @@ export interface Database {
         Row: {
           id: string;
           swiper_id: string;
+          swiper_pet_id: string | null;
           pet_id: string;
           direction: SwipeDirection;
           created_at: string;
@@ -104,6 +105,7 @@ export interface Database {
         Insert: {
           id?: string;
           swiper_id: string;
+          swiper_pet_id?: string | null;
           pet_id: string;
           direction: SwipeDirection;
           created_at?: string;
@@ -111,6 +113,7 @@ export interface Database {
         Update: {
           id?: string;
           swiper_id?: string;
+          swiper_pet_id?: string | null;
           pet_id?: string;
           direction?: SwipeDirection;
           created_at?: string;
